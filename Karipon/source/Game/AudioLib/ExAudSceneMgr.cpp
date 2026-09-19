@@ -6,12 +6,13 @@
 #include "JSystem/JKernel/JKRHeap.hpp"
 #include "Kamek.hpp"
 #include "Karipon/System/ByamlIter.hpp"
+#include "Karipon/System/ByamlUtil.hpp"
 #include <cstddef>
 #include <cstdio>
 
-ExAudSceneMgr::ExAudSceneMgr(JAUSectionHeap* pSectionHeap) : AudSceneMgr(pSectionHeap), mWaveTable(), mWaveSetStageIt(), mWaveSetScenarioIt() {
+ExAudSceneMgr::ExAudSceneMgr(JAUSectionHeap* pSectionHeap) : AudSceneMgr(pSectionHeap), mTableRootIt(), mWaveSetStageIt(), mWaveSetScenarioIt() {
     void* pData = MR::receiveFile("/Debug/GameAudioWaveTable.byaml");
-    mWaveTable.attach(static_cast<u8*>(pData));
+    mTableRootIt = ByamlUtil::createByamlRoot(static_cast<u8*>(pData));
 }
 
 void ExAudSceneMgr::loadStaticResource() {

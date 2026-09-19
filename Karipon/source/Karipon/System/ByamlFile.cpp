@@ -1,33 +1,38 @@
-#include "Karipon/System/ByamlFile.hpp"
+#include "Karipon/System/ByamlIter.hpp"
+#include "Karipon/System/ByamlUtil.hpp"
 #include "Karipon/System/ByamlHeader.hpp"
 #include "revolution/types.h"
 
-bool ByamlFile::attach(const u8* pData) {
-    const ByamlHeader* pHeader = reinterpret_cast<const ByamlHeader*>(pData);
+namespace ByamlUtil {
+    ByamlIter createByamlRoot(const u8* pData) {
+        const ByamlHeader* pHeader = reinterpret_cast<const ByamlHeader*>(pData);
 
-    if (pHeader->getTag() == 'BY' && (static_cast<s32>(pHeader->getVersion()) - 1) < 3) {
-        mData = pData;
-        return true;
+        if (pHeader->getTag() == 'BY' && (static_cast<s32>(pHeader->getVersion()) - 1) < 3) {
+            return ByamlIter(pData);
+        }
+
+        return ByamlIter();
     }
 
-    mData = nullptr;
-    return false;
-}
+    ByamlStringTableIter getHashKeyTable(const u8* pData) {
+        const ByamlHeader* pHeader = reinterpret_cast<const ByamlHeader*>(pData);
 
-ByamlStringTableIter ByamlFile::getHashKeyTable() const {
-    s32 offset = mHeader->getHashKeyTableOffset();
-    if (offset == 0) {
-        return ByamlStringTableIter();
+        s32 offset = pHeader->getHashKeyTableOffset();
+        if (offset == 0) {
+            return ByamlStringTableIter();
+        }
+
+        return ByamlStringTableIter(&pData[offset]);
     }
 
-    return ByamlStringTableIter(&mData[offset]);
-}
+    ByamlStringTableIter getStringTable(const u8* pData) {
+        const ByamlHeader* pHeader = reinterpret_cast<const ByamlHeader*>(pData);
 
-ByamlStringTableIter ByamlFile::getStringTable() const {
-    s32 offset = mHeader->getStringTableOffset();
-    if (offset == 0) {
-        return ByamlStringTableIter();
+        s32 offset = pHeader->getStringTableOffset();
+        if (offset == 0) {
+            return ByamlStringTableIter();
+        }
+
+        return ByamlStringTableIter(&pData[offset]);
     }
-
-    return ByamlStringTableIter(&mData[offset]);
 }

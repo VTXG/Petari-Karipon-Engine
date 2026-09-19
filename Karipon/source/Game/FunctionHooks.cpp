@@ -6,9 +6,12 @@
 #include "JSystem/JKernel/JKRHeap.hpp"
 #include "Kamek.hpp"
 #include "Karipon/Network/NetworkSystem.hpp"
+#include "Karipon/System/GameEventTableHolder.hpp"
 
 namespace {
     static void onGameSystemInitAfterStationedResourceLoaded(GameSystem* pGameSystem) {
+        GameEventTableHolder::init();
+
         pGameSystem->initAfterStationedResourceLoaded();
 
         NetworkSystem* pNetworkSystem = ExSingletonHolder<NetworkSystem>::init();

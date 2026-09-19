@@ -2,16 +2,16 @@
 #include "Karipon/System/ByamlContainerHeader.hpp"
 #include "Karipon/System/ByamlData.hpp"
 #include "Karipon/System/ByamlHeader.hpp"
-#include "Karipon/System/ByamlFile.hpp"
+#include "Karipon/System/ByamlUtil.hpp"
 #include <cstring>
 
-ByamlIter::ByamlIter(const ByamlFile* pFile) : mFile(pFile), mRootNode(nullptr) {
-    u32 dataOffset = pFile->mHeader->getDataOffset();
+ByamlIter::ByamlIter(const u8* pData) : mData(pData), mRootNode(nullptr) {
+    u32 dataOffset = mHeader->getDataOffset();
     if (dataOffset == 0) {
         return;
     }
 
-    mRootNode = &pFile->mData[dataOffset];
+    mRootNode = &mData[dataOffset];
 }
 
 bool ByamlIter::isExistKey(const char* pKey) const {
@@ -29,7 +29,7 @@ bool ByamlIter::isExistKey(const char* pKey) const {
 }
 
 s32 ByamlIter::getKeyIndex(const char* pKey) const {
-    ByamlStringTableIter hash = mFile->getHashKeyTable();
+    ByamlStringTableIter hash = ByamlUtil::getHashKeyTable(mData);
     if (!hash.isValidate()) {
         return -1;
     }
@@ -58,13 +58,13 @@ ByamlIter ByamlIter::getIterByIndex(s32 index) const {
 
     if (data.getType() != BYAML_TYPE_ARRAY && data.getType() != BYAML_TYPE_HASH) {
         if (data.getType() == BYAML_TYPE_NULL) {
-            return ByamlIter(mFile, 0);
+            return ByamlIter(mData, nullptr);
         }
 
         return ByamlIter();
     }
 
-    return ByamlIter(mFile, &mFile->mData[data.getValue()]);
+    return ByamlIter(mData, &mData[data.getValue()]);
 }
 
 bool ByamlIter::getByamlDataByIndex(ByamlData* pData, s32 index) const {
@@ -94,13 +94,13 @@ ByamlIter ByamlIter::getIterByKey(const char* pKey) const {
 
     if (data.getType() != BYAML_TYPE_ARRAY && data.getType() != BYAML_TYPE_HASH) {
         if (data.getType() == BYAML_TYPE_NULL) {
-            return ByamlIter(mFile, 0);
+            return ByamlIter(mData, nullptr);
         }
 
         return ByamlIter();
     }
 
-    return ByamlIter(mFile, &mFile->mData[data.getValue()]);
+    return ByamlIter(mData, &mData[data.getValue()]);
 }
 
 bool ByamlIter::getByamlDataByKey(ByamlData* pData, const char* pKey) const {
@@ -108,7 +108,7 @@ bool ByamlIter::getByamlDataByKey(ByamlData* pData, const char* pKey) const {
         return false;
     }
 
-    ByamlStringTableIter hashTable = mFile->getHashKeyTable();
+    ByamlStringTableIter hashTable = ByamlUtil::getHashKeyTable(mData);
     if (!hashTable.isValidate()) {
         return false;
     }
@@ -142,7 +142,7 @@ bool ByamlIter::tryConvertValue(const char** pValue, const ByamlData* pData) con
         return false;
     }
 
-    ByamlStringTableIter stringTable = mFile->getStringTable();
+    ByamlStringTableIter stringTable = ByamlUtil::getStringTable(mData);
     if (!stringTable.isValidate()) {
         return false;
     }
@@ -163,28 +163,21 @@ bool ByamlIter::tryConvertValue(bool* pValue, const ByamlData* pData) const {
 
 template<>
 bool ByamlIter::tryConvertValue(s32* pValue, const ByamlData* pData) const {
-    if (pData->getType() != BYAML_TYPE_INT) {
-        return false;
+    u32 val = pData->getValue<u32>();
+
+    if (pData->getType() == BYAML_TYPE_INT || pData->getType() == BYAML_TYPE_UINT) {
+        *pValue = val;
+        return true;
     }
 
-    *pValue = pData->getValue();
-    return true;
+    return false;
 }
 
 template<>
 bool ByamlIter::tryConvertValue(u32* pValue, const ByamlData* pData) const {
     s32 val = pData->getValue<s32>();
 
-    if (pData->getType() == BYAML_TYPE_INT) {
-        if (val >= 0) {
-            *pValue = val;
-            return true;
-        }
-
-        return false;
-    }
-
-    if (pData->getType() == BYAML_TYPE_UINT) {
+    if (pData->getType() == BYAML_TYPE_INT || pData->getType() == BYAML_TYPE_UINT) {
         *pValue = val;
         return true;
     }

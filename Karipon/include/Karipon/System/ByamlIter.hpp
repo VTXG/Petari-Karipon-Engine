@@ -5,16 +5,16 @@
 
 class ByamlContainerHeader;
 class ByamlData;
-class ByamlFile;
 class ByamlHeader;
+class ByamlFile;
 
 class ByamlIter {
 public:
-    ByamlIter() : mFile(nullptr), mRootNode(nullptr) {}
-    ByamlIter(const ByamlFile* pFile);
-    ByamlIter(const ByamlFile* pFile, const u8* pRoot) : mFile(pFile), mRootNode(pRoot) {}
+    ByamlIter() : mData(nullptr), mRootNode(nullptr) {}
+    ByamlIter(const u8* pData);
+    ByamlIter(const u8* pData, const u8* pRoot) : mData(pData), mRootNode(pRoot) {}
 
-    bool isValid() const { return mFile != nullptr; }
+    bool isValid() const { return mData != nullptr; }
     bool isTypeHash() const;
     bool isTypeArray() const;
     bool isTypeContainer() const;
@@ -53,10 +53,13 @@ public:
     template <typename T>
     bool tryConvertValue(T* pValue, const ByamlData* pData) const;
 
-    bool operator==(const ByamlIter& rOther) const { return mFile == rOther.mFile && mRootNode == rOther.mRootNode; }
+    bool operator==(const ByamlIter& rOther) const { return mData == rOther.mData && mRootNode == rOther.mRootNode; }
     bool operator!=(const ByamlIter& rOther) const { return !(*this == rOther); }
 
-    const ByamlFile* mFile;
+    union {
+        const u8* mData;
+        const ByamlHeader* mHeader;
+    };
 
     union {
         const u8* mRootNode;
