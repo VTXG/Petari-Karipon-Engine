@@ -104,8 +104,8 @@ namespace MR {
     }
 
     template < class T, typename U, typename V >
-    static FunctorV2M< T*, void (T::*)(U, V), U, V > Functor(T* a1, void (T::*a2)(U, V), U arg_0, V arg_1) {
-        return FunctorV2M< T*, void (T::*)(U, V), U, V >(a1, a2, arg_0, arg_1);
+    static FunctorV2M< T*, void (T::*)(U, V), U, V > Functor(T* pObject, void (T::*pFunction)(U, V), U arg_0, V arg_1) {
+        return FunctorV2M< T*, void (T::*)(U, V), U, V >(pObject, pFunction, arg_0, arg_1);
     }
 
     template < class T, typename U, typename V >
@@ -115,8 +115,8 @@ namespace MR {
 
     class FunctorV0F : public FunctorBase {
     public:
-        inline FunctorV0F(void (*func)(void)) {
-            mFunc = func;
+        inline FunctorV0F(void (*pFunction)(void)) {
+            mFunc = pFunction;
         };
 
         inline FunctorV0F() {
@@ -129,7 +129,7 @@ namespace MR {
             return new (pHeap, 0) FunctorV0F(*this);
         }
 
-        void (*mFunc)();  // 0x4
+        /* 0x04 */ void (*mFunc)();
     };
 
     static FunctorV0F Functor(void (*a1)()) {

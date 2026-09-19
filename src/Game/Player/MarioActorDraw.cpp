@@ -27,18 +27,22 @@
 #include "Game/Util/MtxUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
 #include "Game/Util/SchedulerUtil.hpp"
-#include "JSystem/J3DGraphAnimator/J3DJoint.hpp"
-#include "JSystem/J3DGraphAnimator/J3DModelData.hpp"
-#include "JSystem/J3DGraphBase/J3DMaterial.hpp"
-#include "JSystem/J3DGraphBase/J3DTexture.hpp"
-#include "JSystem/JKernel/JKRSolidHeap.hpp"
-#include "JSystem/JUtility/JUTNameTab.hpp"
-#include "JSystem/JUtility/JUTTexture.hpp"
+#include <JSystem/J3DGraphAnimator/J3DJoint.hpp>
+#include <JSystem/J3DGraphAnimator/J3DModelData.hpp>
+#include <JSystem/J3DGraphBase/J3DMaterial.hpp>
+#include <JSystem/J3DGraphBase/J3DTexture.hpp>
+#include <JSystem/JKernel/JKRSolidHeap.hpp>
+#include <JSystem/JUtility/JUTNameTab.hpp>
+#include <JSystem/JUtility/JUTTexture.hpp>
 #include <cstring>
 #include <revolution/gd/GDBase.h>
 
+
 namespace MR {
     void showMaterial(J3DModel*, const char*);
+    template <>
+    FunctorV0M< const MarioActor*, void (MarioActor::*)() const > Functor< MarioActor >(const MarioActor* pActor,
+                                                                                        void (MarioActor::*pFunc)() const) NO_INLINE;
 };  // namespace MR
 
 extern "C" {
