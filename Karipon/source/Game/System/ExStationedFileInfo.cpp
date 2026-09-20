@@ -7,7 +7,7 @@ namespace {
         {
             MR::StationedFileInfo::HEAP_TYPE_GDDR,
             MR::StationedFileInfo::LOAD_TYPE_MOUNT,
-            "/Debug/GameEventTable.byaml"
+            "/SystemData/GameEventTable.byaml"
         },
         {
             static_cast<MR::StationedFileInfo::HeapType>(0),

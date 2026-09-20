@@ -31,7 +31,7 @@ namespace {
 
     static void requestResourceForInitializeAudio(const char* pFilePath, JKRHeap* pHeap) {
         MR::mountAsyncArchive(pFilePath, pHeap);
-        MR::loadAsyncToMainRAM("/Debug/GameAudioWaveTable.byaml", nullptr, MR::getStationedHeapGDDR3(), JKRDvdRipper::ALLOC_DIRECTION_FORWARD);
+        MR::loadAsyncToMainRAM("/SystemData/GameAudioWaveTable.byaml", nullptr, MR::getStationedHeapGDDR3(), JKRDvdRipper::ALLOC_DIRECTION_FORWARD);
     }
 } // namespace
 

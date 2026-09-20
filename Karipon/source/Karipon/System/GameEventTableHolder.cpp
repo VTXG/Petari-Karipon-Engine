@@ -88,7 +88,7 @@ namespace {
 } // namespace
 
 void GameEventTableHolder::init() {
-    void* pData = MR::receiveFile("/Debug/GameEventTable.byaml");
+    void* pData = MR::receiveFile("/SystemData/GameEventTable.byaml");
     ByamlIter rootIt = ByamlUtil::createByamlRoot(static_cast<u8*>(pData));
 
     // Game event flag loading

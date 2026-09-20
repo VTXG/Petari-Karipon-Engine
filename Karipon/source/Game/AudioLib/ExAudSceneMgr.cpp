@@ -11,7 +11,7 @@
 #include <cstdio>
 
 ExAudSceneMgr::ExAudSceneMgr(JAUSectionHeap* pSectionHeap) : AudSceneMgr(pSectionHeap), mTableRootIt(), mWaveSetStageIt(), mWaveSetScenarioIt() {
-    void* pData = MR::receiveFile("/Debug/GameAudioWaveTable.byaml");
+    void* pData = MR::receiveFile("/SystemData/GameAudioWaveTable.byaml");
     mTableRootIt = ByamlUtil::createByamlRoot(static_cast<u8*>(pData));
 }
 
