@@ -1,6 +1,6 @@
 #include "Game/System/ExGameSystemObjHolder.hpp"
-#include "Game/System/GameSystem.hpp"
 #include "Kamek.hpp"
+#include <Game/System/GameSystem.hpp>
 
 namespace {
     static ExGameSystemObjHolder* ctorExGameSystemObjHolder(ExGameSystemObjHolder* pObjHolder) {

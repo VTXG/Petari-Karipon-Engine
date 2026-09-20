@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Game/AudioLib/AudSceneMgr.hpp"
 #include "Karipon/System/ByamlIter.hpp"
+#include <Game/AudioLib/AudSceneMgr.hpp>
 
 class JAUSectionHeap;
 
@@ -24,9 +24,7 @@ public:
 
     s32 findWaveBankNo(const char* pWaveArcName) const;
 
-    ByamlIter getRootIter(const char* pKey) const {
-        return mTableRootIt.getIterByKey(pKey);
-    }
+    ByamlIter getRootIter(const char* pKey) const { return mTableRootIt.getIterByKey(pKey); }
 
     ByamlIter mTableRootIt;
     ByamlIter mWaveSetStageIt;

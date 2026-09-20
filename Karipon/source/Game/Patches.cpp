@@ -1,9 +1,9 @@
-#include "Game/NPC/TalkMessageInfo.hpp"
 #include "Kamek.hpp"
 #include "Macros.hpp"
-#include "revolution/types.h"
+#include <Game/NPC/TalkMessageInfo.hpp>
 #include <cstdlib>
 #include <cstring>
+#include <revolution/types.h>
 
 // 360 first-person camera
 #ifdef PATCH_360_FP_CAM
@@ -50,7 +50,7 @@ namespace {
     static const char* getCurrentLanguagePrefix() {
         return cLanguagePrefix;
     }
-}
+} // namespace
 
 kmCall(0x80369F48, getCurrentLanguagePrefix);
 
@@ -97,7 +97,7 @@ namespace {
         }
 
         mbstowcs(sErrorMessageBuffer, pLabel, len);
-        sErrorMessageBuffer[ARRAY_LEN(sErrorMessageBuffer) - 1] = '\0';
+        sErrorMessageBuffer[ARRAY_SIZE(sErrorMessageBuffer) - 1] = '\0';
         pTalkMsgInfo->_0 = reinterpret_cast<u8*>(sErrorMessageBuffer);
         return false;
     }

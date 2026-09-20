@@ -1,15 +1,14 @@
 #include "Karipon/System/GameEventTableHolder.hpp"
-#include "Game/System/GameDataHolder.hpp"
-#include "Game/System/GameDataPlayerStatus.hpp"
-#include "Game/System/GameEventFlag.hpp"
-#include "Game/System/GameEventFlagTable.hpp"
-#include "Game/System/GameEventValueChecker.hpp"
-#include "Game/Util/Array.hpp"
-#include "Game/Util/FileUtil.hpp"
-#include "Game/Util/StringUtil.hpp"
 #include "Kamek.hpp"
 #include "Karipon/System/ByamlIter.hpp"
 #include "Karipon/System/ByamlUtil.hpp"
+#include <Game/System/GameDataHolder.hpp>
+#include <Game/System/GameDataPlayerStatus.hpp>
+#include <Game/System/GameEventFlag.hpp>
+#include <Game/System/GameEventFlagTable.hpp>
+#include <Game/System/GameEventValueChecker.hpp>
+#include <Game/Util/Array.hpp>
+#include <Game/Util/StringUtil.hpp>
 
 namespace {
     static MR::AssignableArray<GameEventFlag> sEventFlagTable;
@@ -88,12 +87,11 @@ namespace {
 } // namespace
 
 void GameEventTableHolder::init() {
-    void* pData = MR::receiveFile("/SystemData/GameEventTable.byaml");
-    ByamlIter rootIt = ByamlUtil::createByamlRoot(static_cast<u8*>(pData));
+    ByamlIter tableRootIt = ByamlUtil::createByamlRootFromFile("/SystemData/GameEventTable.byaml");
 
     // Game event flag loading
     {
-        ByamlIter flagsIt = rootIt.getIterByKey("EventFlags");
+        ByamlIter flagsIt = tableRootIt.getIterByKey("EventFlags");
 
         s32 size = flagsIt.getSize();
         sEventFlagTable.init(size);
@@ -105,7 +103,7 @@ void GameEventTableHolder::init() {
 
     // Game event value loading
     {
-        ByamlIter valuesIt = rootIt.getIterByKey("EventValues");
+        ByamlIter valuesIt = tableRootIt.getIterByKey("EventValues");
 
         s32 size = valuesIt.getSize();
         sEventValueTable.init(size);
@@ -117,7 +115,7 @@ void GameEventTableHolder::init() {
 
     // Game story event loading
     {
-        sStoryEventsIt = rootIt.getIterByKey("StoryEvents");
+        sStoryEventsIt = tableRootIt.getIterByKey("StoryEvents");
     }
 }
 

@@ -1,12 +1,12 @@
 #include "Karipon/Network/NetworkSystem.hpp"
-#include "Game/Util/Functor.hpp"
-#include "Game/Util/SystemUtil.hpp"
-#include "private/iostypes.h"
-#include "revolution/ipc/ipcclt.h"
-#include "revolution/os.h"
-#include "revolution/os/OSInterrupt.h"
+#include <Game/Util/Functor.hpp>
+#include <Game/Util/SystemUtil.hpp>
 #include <cstring>
 #include <mem.h>
+#include <private/iostypes.h>
+#include <revolution/ipc/ipcclt.h>
+#include <revolution/os.h>
+#include <revolution/os/OSInterrupt.h>
 
 /*
 

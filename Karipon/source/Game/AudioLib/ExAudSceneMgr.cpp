@@ -1,18 +1,17 @@
 #include "Game/AudioLib/ExAudSceneMgr.hpp"
-#include "Game/Util/FileUtil.hpp"
-#include "JSystem/JAudio2/JASWaveArcLoader.hpp"
-#include "JSystem/JAudio2/JASWaveInfo.hpp"
-#include "JSystem/JAudio2/JAUSectionHeap.hpp"
-#include "JSystem/JKernel/JKRHeap.hpp"
 #include "Kamek.hpp"
 #include "Karipon/System/ByamlIter.hpp"
 #include "Karipon/System/ByamlUtil.hpp"
+#include <Game/Util/FileUtil.hpp>
+#include <JSystem/JAudio2/JASWaveArcLoader.hpp>
+#include <JSystem/JAudio2/JASWaveInfo.hpp>
+#include <JSystem/JAudio2/JAUSectionHeap.hpp>
+#include <JSystem/JKernel/JKRHeap.hpp>
 #include <cstddef>
 #include <cstdio>
 
 ExAudSceneMgr::ExAudSceneMgr(JAUSectionHeap* pSectionHeap) : AudSceneMgr(pSectionHeap), mTableRootIt(), mWaveSetStageIt(), mWaveSetScenarioIt() {
-    void* pData = MR::receiveFile("/SystemData/GameAudioWaveTable.byaml");
-    mTableRootIt = ByamlUtil::createByamlRoot(static_cast<u8*>(pData));
+    mTableRootIt = ByamlUtil::createByamlRootFromFile("/SystemData/StageWaveTable.byaml");
 }
 
 void ExAudSceneMgr::loadStaticResource() {

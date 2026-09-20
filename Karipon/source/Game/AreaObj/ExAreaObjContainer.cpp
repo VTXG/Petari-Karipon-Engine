@@ -1,7 +1,7 @@
-#include "Game/AreaObj/AreaObjContainer.hpp"
-#include "Game/AreaObj/AreaObj.hpp"
 #include "Kamek.hpp"
 #include "Macros.hpp"
+#include <Game/AreaObj/AreaObj.hpp>
+#include <Game/AreaObj/AreaObjContainer.hpp>
 
 namespace {
     template <typename T>

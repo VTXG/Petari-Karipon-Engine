@@ -1,11 +1,7 @@
 #pragma once
 
-#ifndef ARRAY_LEN
-#define ARRAY_LEN(o) (sizeof(o) / sizeof((o)[0]))
-#endif
-
 #ifndef ARRAY_END
-#define ARRAY_END(o) ((o) + ARRAY_LEN(o))
+#define ARRAY_END(o) ((o) + (sizeof(o) / sizeof((o)[0])))
 #endif
 
 #ifndef GET_REGISTER

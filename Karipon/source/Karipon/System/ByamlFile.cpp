@@ -1,7 +1,8 @@
+#include "Karipon/System/ByamlHeader.hpp"
 #include "Karipon/System/ByamlIter.hpp"
 #include "Karipon/System/ByamlUtil.hpp"
-#include "Karipon/System/ByamlHeader.hpp"
-#include "revolution/types.h"
+#include <Game/Util/FileUtil.hpp>
+#include <revolution/types.h>
 
 namespace ByamlUtil {
     ByamlIter createByamlRoot(const u8* pData) {
@@ -12,6 +13,11 @@ namespace ByamlUtil {
         }
 
         return ByamlIter();
+    }
+
+    ByamlIter createByamlRootFromFile(const char* pFilePath) {
+        void* pData = MR::receiveFile(pFilePath);
+        return createByamlRoot(static_cast<u8*>(pData));
     }
 
     ByamlStringTableIter getHashKeyTable(const u8* pData) {
@@ -35,4 +41,4 @@ namespace ByamlUtil {
 
         return ByamlStringTableIter(&pData[offset]);
     }
-}
+} // namespace ByamlUtil

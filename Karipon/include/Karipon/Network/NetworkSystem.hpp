@@ -1,7 +1,7 @@
 #pragma once
 
-#include "private/iostypes.h"
-#include "revolution/types.h"
+#include <private/iostypes.h>
+#include <revolution/types.h>
 
 namespace NW {
     struct MACAddress {

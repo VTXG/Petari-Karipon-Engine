@@ -1,6 +1,6 @@
 #pragma once
 
-#include "revolution/types.h"
+#include <revolution/types.h>
 
 #ifdef __MWERKS__
 #pragma section RX ".kamek"

@@ -1,7 +1,7 @@
-#include "Game/NameObj/NameObjFactory.hpp"
-#include "Game/Util/StringUtil.hpp"
 #include "Kamek.hpp"
 #include "Macros.hpp"
+#include <Game/NameObj/NameObjFactory.hpp>
+#include <Game/Util/StringUtil.hpp>
 
 #define AREA_FORM_CUBE 0 // Center origin
 #define AREA_FORM_BOX 1  // Bottom origin

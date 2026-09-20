@@ -1,12 +1,12 @@
-#include "Game/System/GameSystem.hpp"
 #include "Game/Util/ExSingletonHolder.hpp"
-#include "Game/Util/FileUtil.hpp"
-#include "Game/Util/MemoryUtil.hpp"
-#include "JSystem/JKernel/JKRExpHeap.hpp"
-#include "JSystem/JKernel/JKRHeap.hpp"
 #include "Kamek.hpp"
 #include "Karipon/Network/NetworkSystem.hpp"
 #include "Karipon/System/GameEventTableHolder.hpp"
+#include <Game/System/GameSystem.hpp>
+#include <Game/Util/FileUtil.hpp>
+#include <Game/Util/MemoryUtil.hpp>
+#include <JSystem/JKernel/JKRExpHeap.hpp>
+#include <JSystem/JKernel/JKRHeap.hpp>
 
 namespace {
     static void onGameSystemInitAfterStationedResourceLoaded(GameSystem* pGameSystem) {
@@ -31,7 +31,7 @@ namespace {
 
     static void requestResourceForInitializeAudio(const char* pFilePath, JKRHeap* pHeap) {
         MR::mountAsyncArchive(pFilePath, pHeap);
-        MR::loadAsyncToMainRAM("/SystemData/GameAudioWaveTable.byaml", nullptr, MR::getStationedHeapGDDR3(), JKRDvdRipper::ALLOC_DIRECTION_FORWARD);
+        MR::loadAsyncToMainRAM("/SystemData/StageWaveTable.byaml", nullptr, MR::getStationedHeapGDDR3(), JKRDvdRipper::ALLOC_DIRECTION_FORWARD);
     }
 } // namespace
 

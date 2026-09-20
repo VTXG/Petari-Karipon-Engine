@@ -14,8 +14,7 @@ s32 ByamlStringTableIter::findStringIndex(const char* pStr) const {
 
         if (result > 0) {
             lowerBound = avg + 1;
-        }
-        else {
+        } else {
             upperBound = avg;
         }
     }

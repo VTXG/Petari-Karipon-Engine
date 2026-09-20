@@ -24,7 +24,7 @@ public:
     bool isNeedsForBound();
     bool isEndSpringWater();
 
-private:
+public:
     /* 0x8C */ MapPartsRailMover* mRailMover;
     /* 0x90 */ f32 mFloatUpSpeed;
     /* 0x94 */ f32 mAccelRate;

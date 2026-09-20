@@ -1,5 +1,5 @@
-#include "Game/System/StationedFileInfo.hpp"
 #include "Kamek.hpp"
+#include <Game/System/StationedFileInfo.hpp>
 
 namespace {
     // clang-format off

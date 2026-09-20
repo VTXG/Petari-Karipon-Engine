@@ -1,11 +1,11 @@
-#include "Game/LiveActor/AllLiveActorGroup.hpp"
-#include "Game/NameObj/NameObjExecuteHolder.hpp"
-#include "Game/Scene/SceneObjHolder.hpp"
-#include "Game/Util/JMapInfo.hpp"
-#include "Game/Util/JMapUtil.hpp"
-#include "Game/Util/SceneUtil.hpp"
 #include "Kamek.hpp"
 #include "Macros.hpp"
+#include <Game/LiveActor/AllLiveActorGroup.hpp>
+#include <Game/NameObj/NameObjExecuteHolder.hpp>
+#include <Game/Scene/SceneObjHolder.hpp>
+#include <Game/Util/JMapInfo.hpp>
+#include <Game/Util/JMapUtil.hpp>
+#include <Game/Util/SceneUtil.hpp>
 
 namespace {
     static void listObj(const JMapInfoIter& rIter) {
@@ -27,9 +27,9 @@ namespace {
         if (pInfo != nullptr) {
             isLiveActor = pInfo->mDrawBufferType != -1;
         }
-    
+
         OSReport("[%d] IterName=%s Name=%s Flag=%04X LiveActor=%d\n", pObj->mExecutorIdx, pObj->mName, pIterName, pObj->mFlag, isLiveActor);
     }
-}
+} // namespace
 
 // kmCall(0x80342A44, listObj);

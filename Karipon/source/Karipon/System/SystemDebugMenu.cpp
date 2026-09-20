@@ -1,21 +1,23 @@
 #include "Karipon/System/SystemDebugMenu.hpp"
-#include "Game/NameObj/NameObjHolder.hpp"
-#include "Game/System/FileLoader.hpp"
-#include "Game/System/GameSystem.hpp"
-#include "Game/System/GameSystemSceneController.hpp"
-#include "Game/System/HeapMemoryWatcher.hpp"
-#include "Game/System/WPad.hpp"
-#include "Game/System/WPadButton.hpp"
-#include "Game/System/WPadHolder.hpp"
-#include "Game/Util/DirectDraw.hpp"
-#include "Game/Util/ScreenUtil.hpp"
-#include "Game/Util/SingletonHolder.hpp"
-#include "Game/Util/SystemUtil.hpp"
-#include "JSystem/JKernel/JKRExpHeap.hpp"
-#include "JSystem/JKernel/JKRHeap.hpp"
-#include "JSystem/JKernel/JKRSolidHeap.hpp"
 #include "Macros.hpp"
-#include "revolution/mtx.h"
+#include <Game/NameObj/NameObjHolder.hpp>
+#include <Game/System/FileLoader.hpp>
+#include <Game/System/GameSystem.hpp>
+#include <Game/System/GameSystemSceneController.hpp>
+#include <Game/System/HeapMemoryWatcher.hpp>
+#include <Game/System/WPad.hpp>
+#include <Game/System/WPadButton.hpp>
+#include <Game/System/WPadHolder.hpp>
+#include <Game/Util/DirectDraw.hpp>
+#include <Game/Util/ScreenUtil.hpp>
+#include <Game/Util/SingletonHolder.hpp>
+#include <Game/Util/SystemUtil.hpp>
+#include <JSystem/JKernel/JKRExpHeap.hpp>
+#include <JSystem/JKernel/JKRHeap.hpp>
+#include <JSystem/JKernel/JKRSolidHeap.hpp>
+#include <revolution/mtx.h>
+#include <revolution/os/OSTime.h>
+#include <revolution/types.h>
 #include <wstring.h>
 
 extern "C" {
@@ -33,8 +35,8 @@ namespace {
     namespace DiagnosticsPage {
         static OSTick sLastTick;
 
-        static void printHeapInfo(SystemDebugMenu* pMenu, const wchar_t* pHeapName, JKRHeap* pHeap) {
-            if (!pHeap) {
+        static void printHeapInfo(SystemDebugMenu* pMenu, const char* pHeapName, JKRHeap* pHeap) {
+            if (pHeap == nullptr) {
                 return;
             }
 
@@ -42,7 +44,7 @@ namespace {
             u32 used = max - pHeap->getFreeSize();
             f32 usedPercent = static_cast<f32>(used) / static_cast<f32>(max) * 100.0f;
 
-            pMenu->printTextF(false, L"%ls : %.02f%% usage, 0x%08X/0x%08X bytes used\n", pHeapName, usedPercent, used, max);
+            pMenu->printTextF(false, L"%s : %.02f%% usage, 0x%08X/0x%08X bytes used\n", pHeapName, usedPercent, used, max);
         }
 
         static void update(SystemDebugMenu* pMenu) {
@@ -65,17 +67,17 @@ namespace {
                               pNameObjHolder->mObjArray2.mCount);
 
             HeapMemoryWatcher* pWatcher = SingletonHolder<HeapMemoryWatcher>::get();
-            printHeapInfo(pMenu, L"SystemHeap", JKRHeap::sSystemHeap);
-            printHeapInfo(pMenu, L"StationedHeapNapa", pWatcher->mStationedHeapNapa);
-            printHeapInfo(pMenu, L"StationedHeapGDDR", pWatcher->mStationedHeapGDDR);
-            printHeapInfo(pMenu, L"GameHeapNapa", pWatcher->mGameHeapNapa);
-            printHeapInfo(pMenu, L"GameHeapGDDR", pWatcher->mGameHeapGDDR);
-            printHeapInfo(pMenu, L"FileCacheHeap", pWatcher->mFileCacheHeap);
-            printHeapInfo(pMenu, L"SceneHeapNapa", pWatcher->mSceneHeapNapa);
-            printHeapInfo(pMenu, L"SceneHeapGDDR", pWatcher->mSceneHeapGDDR);
-            printHeapInfo(pMenu, L"WPadHeap", pWatcher->mWPadHeap);
-            printHeapInfo(pMenu, L"HomeButtonLayoutHeap", pWatcher->mHomeButtonLayoutHeap);
-            printHeapInfo(pMenu, L"AudSystemHeap", pWatcher->mAudSystemHeap);
+            printHeapInfo(pMenu, "SystemHeap", JKRHeap::sSystemHeap);
+            printHeapInfo(pMenu, "StationedHeapNapa", pWatcher->mStationedHeapNapa);
+            printHeapInfo(pMenu, "StationedHeapGDDR", pWatcher->mStationedHeapGDDR);
+            printHeapInfo(pMenu, "GameHeapNapa", pWatcher->mGameHeapNapa);
+            printHeapInfo(pMenu, "GameHeapGDDR", pWatcher->mGameHeapGDDR);
+            printHeapInfo(pMenu, "FileCacheHeap", pWatcher->mFileCacheHeap);
+            printHeapInfo(pMenu, "SceneHeapNapa", pWatcher->mSceneHeapNapa);
+            printHeapInfo(pMenu, "SceneHeapGDDR", pWatcher->mSceneHeapGDDR);
+            printHeapInfo(pMenu, "WPadHeap", pWatcher->mWPadHeap);
+            printHeapInfo(pMenu, "HomeButtonLayoutHeap", pWatcher->mHomeButtonLayoutHeap);
+            printHeapInfo(pMenu, "AudSystemHeap", pWatcher->mAudSystemHeap);
         }
     } // namespace DiagnosticsPage
 
@@ -116,7 +118,7 @@ void SystemDebugMenu::update() {
     mSelectCurrentIndex = 0;
 
     initWriter();
-    printTextF(false, L"----- %s [%d/%d] -----\n", ::cPageUpdateFunc[mPageIndex].mName, mPageIndex + 1, ARRAY_LEN(::cPageUpdateFunc));
+    printTextF(false, L"----- %s [%d/%d] -----\n", ::cPageUpdateFunc[mPageIndex].mName, mPageIndex + 1, ARRAY_SIZE(::cPageUpdateFunc));
     ::cPageUpdateFunc[mPageIndex].mFunc(this);
 
     if (pPadButton->testButton1()) {
@@ -129,12 +131,12 @@ void SystemDebugMenu::update() {
         }
 
         if (pPadButton->testTriggerLeft()) {
-            mPageIndex = wrap(mPageIndex - 1, 0, ARRAY_LEN(::cPageUpdateFunc));
+            mPageIndex = wrap(mPageIndex - 1, 0, ARRAY_SIZE(::cPageUpdateFunc));
             mSelectIndex = 0;
         }
 
         if (pPadButton->testTriggerRight()) {
-            mPageIndex = wrap(mPageIndex + 1, 0, ARRAY_LEN(::cPageUpdateFunc));
+            mPageIndex = wrap(mPageIndex + 1, 0, ARRAY_SIZE(::cPageUpdateFunc));
             mSelectIndex = 0;
         }
     }
