@@ -15,12 +15,12 @@ ExAudSceneMgr::ExAudSceneMgr(JAUSectionHeap* pSectionHeap) : AudSceneMgr(pSectio
 }
 
 void ExAudSceneMgr::loadStaticResource() {
-    ByamlIter staticResourceIt = getRootIter("StaticResource");
+    ByamlIter staticResourceIt = mTableRootIt.getIterByKey("StaticResource");
     loadWaveSet(staticResourceIt);
 }
 
 bool ExAudSceneMgr::isLoadDoneStaticResource() const {
-    ByamlIter staticResourceIt = getRootIter("StaticResource");
+    ByamlIter staticResourceIt = mTableRootIt.getIterByKey("StaticResource");
     return isLoadDoneWaveSet(staticResourceIt);
 }
 
@@ -34,7 +34,7 @@ void ExAudSceneMgr::loadStageResource(const char* pStageName) {
         mPrevPlayerMode = mPlayerMode;
     }
 
-    ByamlIter waveSetStageIt = getRootIter("StageResource").getIterByKey(pStageName).getIterByKey("Common");
+    ByamlIter waveSetStageIt = mTableRootIt.getIterByKey("StageResource").getIterByKey(pStageName).getIterByKey("Common");
 
     if (waveSetStageIt != mWaveSetStageIt) {
         eraseWaveSet(mWaveSetStageIt);
@@ -51,7 +51,7 @@ void ExAudSceneMgr::loadScenarioResource(const char* pStageName, s32 scenarioNo)
     char key[16];
     snprintf(key, sizeof(key), "Scenario%d", scenarioNo);
 
-    ByamlIter waveSetScenarioIt = getRootIter("StageResource").getIterByKey(pStageName).getIterByKey(key);
+    ByamlIter waveSetScenarioIt = mTableRootIt.getIterByKey("StageResource").getIterByKey(pStageName).getIterByKey(key);
 
     if (waveSetScenarioIt != mWaveSetScenarioIt) {
         eraseWaveSet(mWaveSetScenarioIt);

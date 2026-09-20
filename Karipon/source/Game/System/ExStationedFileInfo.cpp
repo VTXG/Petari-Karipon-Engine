@@ -6,12 +6,17 @@ namespace {
     static const MR::StationedFileInfo cStationedFileInfo[] = {
         {
             MR::StationedFileInfo::HEAP_TYPE_GDDR,
-            MR::StationedFileInfo::LOAD_TYPE_MOUNT,
+            MR::StationedFileInfo::LOAD_TYPE_FILE,
+            "/SystemData/GalaxyID.bcsv"
+        },
+        {
+            MR::StationedFileInfo::HEAP_TYPE_GDDR,
+            MR::StationedFileInfo::LOAD_TYPE_FILE,
             "/SystemData/GameCometTable.byaml"
         },
         {
             MR::StationedFileInfo::HEAP_TYPE_GDDR,
-            MR::StationedFileInfo::LOAD_TYPE_MOUNT,
+            MR::StationedFileInfo::LOAD_TYPE_FILE,
             "/SystemData/GameEventTable.byaml"
         },
         {

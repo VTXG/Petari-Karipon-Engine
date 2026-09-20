@@ -274,3 +274,16 @@ kmWrite32(&loadToMainRAM__10FileRipperFPCcPUcbP7JKRHeapQ210FileRipper14AllocDire
 // Shrink home button heap
 extern kmSymbol createHeaps__17HeapMemoryWatcherFv;
 kmWrite16(&createHeaps__17HeapMemoryWatcherFv + 0x82, 5);
+
+// Expand audio heap
+extern kmSymbol init__10GameSystemFv;
+kmWrite16(&init__10GameSystemFv + 0x26, 0xE8);
+
+extern kmSymbol startDMA__12JKRAramPieceFP12JKRAMCommand;
+kmWrite16(&startDMA__12JKRAramPieceFP12JKRAMCommand + 0x4A, 0xE8);
+
+extern kmSymbol aramSize__9AudParams;
+kmWrite32(&aramSize__9AudParams, 0xE80000);
+
+extern kmSymbol createRootHeap__17HeapMemoryWatcherFv;
+kmWrite16(&createRootHeap__17HeapMemoryWatcherFv + 0x2E, 0xE8);

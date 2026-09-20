@@ -24,8 +24,6 @@ public:
 
     s32 findWaveBankNo(const char* pWaveArcName) const;
 
-    ByamlIter getRootIter(const char* pKey) const { return mTableRootIt.getIterByKey(pKey); }
-
     ByamlIter mTableRootIt;
     ByamlIter mWaveSetStageIt;
     ByamlIter mWaveSetScenarioIt;
