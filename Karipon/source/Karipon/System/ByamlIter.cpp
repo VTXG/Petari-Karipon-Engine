@@ -39,7 +39,7 @@ s32 ByamlIter::getKeyIndex(const char* pKey) const {
 
 s32 ByamlIter::getSize() const {
     if (mRootNode == nullptr) {
-        return false;
+        return 0;
     }
 
     if (mContainingHeader->getType() == BYAML_TYPE_ARRAY || mContainingHeader->getType() == BYAML_TYPE_HASH) {

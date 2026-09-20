@@ -89,7 +89,7 @@ namespace {
 void GameEventTableHolder::init() {
     ByamlIter tableRootIt = ByamlUtil::createByamlRootFromFile("/SystemData/GameEventTable.byaml");
 
-    // Game event flag loading
+    // Game event flags
     {
         ByamlIter flagsIt = tableRootIt.getIterByKey("EventFlags");
 
@@ -101,7 +101,7 @@ void GameEventTableHolder::init() {
         }
     }
 
-    // Game event value loading
+    // Game event values
     {
         ByamlIter valuesIt = tableRootIt.getIterByKey("EventValues");
 
@@ -113,7 +113,7 @@ void GameEventTableHolder::init() {
         }
     }
 
-    // Game story event loading
+    // Game story events
     {
         sStoryEventsIt = tableRootIt.getIterByKey("StoryEvents");
     }

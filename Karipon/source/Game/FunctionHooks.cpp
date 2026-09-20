@@ -1,6 +1,7 @@
 #include "Game/Util/ExSingletonHolder.hpp"
 #include "Kamek.hpp"
 #include "Karipon/Network/NetworkSystem.hpp"
+#include "Karipon/System/GameCometTableHolder.hpp"
 #include "Karipon/System/GameEventTableHolder.hpp"
 #include <Game/System/GameSystem.hpp>
 #include <Game/Util/FileUtil.hpp>
@@ -10,6 +11,7 @@
 
 namespace {
     static void onGameSystemInitAfterStationedResourceLoaded(GameSystem* pGameSystem) {
+        GameCometTableHolder::init();
         GameEventTableHolder::init();
 
         pGameSystem->initAfterStationedResourceLoaded();
