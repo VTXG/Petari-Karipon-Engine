@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src=".github/Watermark_Low.png" width="700" alt="TicoKit"/><br>
+  <img src=".github/Watermark_Low.png" width="600" alt="TicoKit"/><br>
   <a href="https://discord.gg/ZxEqyYeZbf">
     <img src="https://img.shields.io/discord/727908905392275526?color=%237289DA&logo=discord&logoColor=%23FFFFFF">
   </a>
