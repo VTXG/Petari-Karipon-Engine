@@ -101,10 +101,18 @@ namespace {
         }
     }
 
-    static GalaxyCometTimeTable* ctorCometTimeTable(GalaxyCometTimeTable* pCometTimeTable) {
-        s32 tableIndex = reinterpret_cast<s32>(pCometTimeTable->mTimePaper);
-        pCometTimeTable->mTimePaper = createCometTimePaper(tableIndex);
-        return pCometTimeTable;
+    static GalaxyCometScheduler* ctorGalaxyCometScheduler(GalaxyCometScheduler* pCometScheduler) {
+        pCometScheduler->mEnabled = true;
+
+        s32 size = sCometCyclesIt.getSize();
+        pCometScheduler->mTimeTables.init(size);
+
+        for (s32 i = 0; i < size; i++) {
+            pCometScheduler->mTimeTables[i] = new GalaxyCometTimeTable(nullptr);
+            pCometScheduler->mTimeTables[i]->mTimePaper = createCometTimePaper(i);
+        }
+
+        return pCometScheduler;
     }
 } // namespace
 
@@ -122,5 +130,5 @@ kmWrite32(&init__16CometEventKeeperFv + 0xAC, PPC_B(0x34));
 extern kmSymbol __ct__20GalaxyCometSchedulerFv;
 kmWrite32(&__ct__20GalaxyCometSchedulerFv + 0x60, PPC_ADDI(4, 29, 1));
 
-extern kmSymbol __ct__20GalaxyCometTimeTableFPC20GalaxyCometTimePaper;
-kmBranch(&__ct__20GalaxyCometTimeTableFPC20GalaxyCometTimePaper + 0x70, ctorCometTimeTable);
+extern kmSymbol __ct__20GalaxyCometSchedulerFv;
+kmBranch(&__ct__20GalaxyCometSchedulerFv, ctorGalaxyCometScheduler);
