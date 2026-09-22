@@ -7,6 +7,11 @@ namespace {
         {
             MR::StationedFileInfo::HEAP_TYPE_GDDR,
             MR::StationedFileInfo::LOAD_TYPE_FILE,
+            "/SystemData/DomeParamTable.byaml"
+        },
+        {
+            MR::StationedFileInfo::HEAP_TYPE_GDDR,
+            MR::StationedFileInfo::LOAD_TYPE_FILE,
             "/SystemData/GalaxyID.bcsv"
         },
         {

@@ -1,5 +1,4 @@
 #include "Karipon/System/SystemDebugMenu.hpp"
-#include "Macros.hpp"
 #include <Game/NameObj/NameObjHolder.hpp>
 #include <Game/System/FileLoader.hpp>
 #include <Game/System/GameSystem.hpp>
