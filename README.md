@@ -2,6 +2,8 @@
   <img src=".github/Watermark_Low.png" width="600" alt="TicoKit"/><br>
   <a href="https://discord.gg/ZxEqyYeZbf">
     <img src="https://img.shields.io/discord/727908905392275526?color=%237289DA&logo=discord&logoColor=%23FFFFFF">
+    PRO
+    COMING SOON TO THEATERS NEAR YOU
   </a>
 </h1>
 
