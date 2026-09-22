@@ -386,13 +386,14 @@ namespace JGeometry {
         }
 
         void getEulerXYZ(TVec3f& rDest) const {
-            if (this->mMtx[2][0] - 1.0f >= -(f32)JGeometry::TUtil< f32 >::epsilon()) {
+            const f32 zx = this->mMtx[2][0];
+            if (zx - 1.0f >= -(f32)JGeometry::TUtil< f32 >::epsilon()) {
                 rDest.set(JMAATan2(-this->mMtx[0][1], this->mMtx[1][1]), -HALF_PI, 0.0f);
                 return;
             }
 
             f32 f1 = 1.0f;  // TODO: this is a hack to fix the float regswap
-            if (this->mMtx[2][0] + f1 <= (f32)JGeometry::TUtil< f32 >::epsilon()) {
+            if (zx + f1 <= (f32)JGeometry::TUtil< f32 >::epsilon()) {
                 rDest.set(JMAATan2(this->mMtx[0][1], this->mMtx[1][1]), HALF_PI, 0.0f);
                 return;
             }
@@ -770,6 +771,18 @@ namespace JGeometry {
         void makeRotate(const TVec3f& rVec, f32 angle) {
             zeroTrans();
             TRotation3< T >::setRotate(rVec, angle);
+        }
+
+        void makeRotate(const TVec3f& rFrom, const TVec3f& rTo, f32 angle) {
+            TQuat4f q;
+            q.setRotate(rFrom, rTo, rFrom.turnRate(rTo, angle));
+            makeQuat(q);
+        }
+
+        void makeRotateRate(const TVec3f& rFrom, const TVec3f& rTo, f32 ratio) {
+            TQuat4f q;
+            q.setRotate(rFrom, rTo, ratio);
+            makeQuat(q);
         }
 
         void makeQuat(const TQuat4f& rSrcQuat) {
