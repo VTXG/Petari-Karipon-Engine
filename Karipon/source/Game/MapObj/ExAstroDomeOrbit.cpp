@@ -12,53 +12,24 @@
 #include <revolution/types.h>
 
 namespace {
-    static void getColorValueByKey(const ByamlIter& rIter, GXColor& rColor, const char* pKey) {
-        ByamlIter colorIt = rIter.getIterByKey(pKey);
-        u32 r = 0;
-        u32 g = 0;
-        u32 b = 0;
-        colorIt.tryGetValueByKey(&r, "R");
-        colorIt.tryGetValueByKey(&g, "G");
-        colorIt.tryGetValueByKey(&b, "B");
-        rColor.r = r;
-        rColor.g = g;
-        rColor.b = b;
-        rColor.a = 0xFF;
-    }
-
-    static void getVectorValueByKey(const ByamlIter& rIter, TVec3f& rVec, const char* pKey) {
-        ByamlIter vectorIt = rIter.getIterByKey(pKey);
-        f32 x = 0.0f;
-        f32 y = 0.0f;
-        f32 z = 0.0f;
-        vectorIt.tryGetValueByKey(&x, "X");
-        vectorIt.tryGetValueByKey(&y, "Y");
-        vectorIt.tryGetValueByKey(&z, "Z");
-        rVec.x = x;
-        rVec.y = y;
-        rVec.z = z;
-    }
-} // namespace
-
-namespace {
     static ByamlIter createDomeParamIter(s32 scenarioNo) {
         ByamlIter rootIt = ByamlUtil::createByamlRootFromFile("/SystemData/DomeParamTable.byaml");
         return rootIt.getIterByIndex(scenarioNo - 1);
     }
 
     static void setupAstroDomeOrbit(ExAstroDomeOrbit* pOrbit, s32 id) {
+        pOrbit->mAngle = 230.0f * id; // ::cGalaxyRotateCoordOffset
+
         ByamlIter orbitIt = createDomeParamIter(MR::getCurrentScenarioNo()).getIterByKey("Orbits").getIterByIndex(id);
 
-        getColorValueByKey(orbitIt, pOrbit->mColor, "Color");
-        getColorValueByKey(orbitIt, pOrbit->mBloom, "Bloom");
+        ByamlUtil::getColorValue(orbitIt.getIterByKey("Color"), &pOrbit->mColor);
+        ByamlUtil::getColorValue(orbitIt.getIterByKey("Bloom"), &pOrbit->mBloom);
 
         f32 radius = 0.0f;
         orbitIt.tryGetValueByKey(&radius, "Radius");
         pOrbit->mOrbitRadius = radius;
 
-        getVectorValueByKey(orbitIt, pOrbit->mRotation, "Rotate");
-
-        pOrbit->mAngle = 230.0f * id; // ::cGalaxyRotateCoordOffset
+        ByamlUtil::getVector3Value(orbitIt.getIterByKey("Rotate"), &pOrbit->mRotation);
     }
 
     static const char* getDomeSkyName(s32 scenarioNo) {
@@ -106,7 +77,7 @@ kmWrite32(&getModelName__19AstroMapObjFunctionFPCcl + 0x58, PPC_B(0x54));
 
 extern kmSymbol getKoopaFortressAppearBgm__15AudStageBgmWrapFPCc;
 kmCall(&getKoopaFortressAppearBgm__15AudStageBgmWrapFPCc + 0x38, getKoopaFortressBgmId);
-kmWrite32(&getKoopaFortressAppearBgm__15AudStageBgmWrapFPCc + 0x3C, PPC_MR(0, 3)); // mr r0, r3
+kmWrite32(&getKoopaFortressAppearBgm__15AudStageBgmWrapFPCc + 0x3C, PPC_MR(0, 3));
 
 extern kmSymbol exeOpen__15MiniatureGalaxyFv;
 kmCall(&exeOpen__15MiniatureGalaxyFv + 0x1B0, getKoopaFortressBgmId);

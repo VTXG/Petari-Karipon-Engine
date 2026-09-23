@@ -41,4 +41,26 @@ namespace ByamlUtil {
 
         return ByamlStringTableIter(&pData[offset]);
     }
+
+    void getColorValue(const ByamlIter& rIter, GXColor* pValue) {
+        u32 r = 0, g = 0, b = 0, a = 0xFF;
+        rIter.tryGetValueByKey(&r, "R");
+        rIter.tryGetValueByKey(&g, "G");
+        rIter.tryGetValueByKey(&b, "B");
+        rIter.tryGetValueByKey(&a, "A");
+        pValue->r = r;
+        pValue->g = g;
+        pValue->b = b;
+        pValue->a = a;
+    }
+
+    void getVector3Value(const ByamlIter& rIter, TVec3f* pValue) {
+        f32 x = 0.0f, y = 0.0f, z = 0.0f;
+        rIter.tryGetValueByKey(&x, "X");
+        rIter.tryGetValueByKey(&y, "Y");
+        rIter.tryGetValueByKey(&z, "Z");
+        pValue->x = x;
+        pValue->y = y;
+        pValue->z = z;
+    }
 } // namespace ByamlUtil
