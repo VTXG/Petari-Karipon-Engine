@@ -1,7 +1,9 @@
 #include "Game/MapObj/ExAstroDomeOrbit.hpp"
+#include "Game/Util/ExSingletonHolder.hpp"
 #include "Kamek.hpp"
 #include "Karipon/System/ByamlIter.hpp"
 #include "Karipon/System/ByamlUtil.hpp"
+#include "Karipon/System/KariponResourceHolder.hpp"
 #include "Macros.hpp"
 #include <Game/AudioLib/AudSoundNameConverter.hpp>
 #include <Game/AudioLib/AudWrap.hpp>
@@ -12,15 +14,11 @@
 #include <revolution/types.h>
 
 namespace {
-    static ByamlIter createDomeParamIter(s32 scenarioNo) {
-        ByamlIter rootIt = ByamlUtil::createByamlRootFromFile("/SystemData/DomeParamTable.byaml");
-        return rootIt.getIterByIndex(scenarioNo - 1);
-    }
-
     static void setupAstroDomeOrbit(ExAstroDomeOrbit* pOrbit, s32 id) {
         pOrbit->mAngle = 230.0f * id; // ::cGalaxyRotateCoordOffset
 
-        ByamlIter orbitIt = createDomeParamIter(MR::getCurrentScenarioNo()).getIterByKey("Orbits").getIterByIndex(id);
+        ByamlIter orbitIt =
+            ExSingletonHolder< KariponResourceHolder >::get()->getDomeParamIter(MR::getCurrentScenarioNo()).getIterByKey("Orbits").getIterByIndex(id);
 
         ByamlUtil::getColorValue(orbitIt.getIterByKey("Color"), &pOrbit->mColor);
         ByamlUtil::getColorValue(orbitIt.getIterByKey("Bloom"), &pOrbit->mBloom);
@@ -34,7 +32,7 @@ namespace {
 
     static const char* getDomeSkyName(s32 scenarioNo) {
         const char* pSkyName = nullptr;
-        createDomeParamIter(scenarioNo).tryGetValueByKey(&pSkyName, "Sky");
+        ExSingletonHolder< KariponResourceHolder >::get()->getDomeParamIter(scenarioNo).tryGetValueByKey(&pSkyName, "Sky");
         return pSkyName;
     }
 
@@ -46,8 +44,10 @@ namespace {
 
     static u32 getKoopaFortressBgmId() {
         const char* pBgmName = nullptr;
-        createDomeParamIter(MR::getCurrentScenarioNo()).tryGetValueByKey(&pBgmName, "KoopaFortressBgm");
-        return static_cast<u32>(AudSingletonHolder<AudSoundNameConverter>::get()->getSoundID(pBgmName));
+        ExSingletonHolder< KariponResourceHolder >::get()
+            ->getDomeParamIter(MR::getCurrentScenarioNo())
+            .tryGetValueByKey(&pBgmName, "KoopaFortressBgm");
+        return static_cast< u32 >(AudSingletonHolder< AudSoundNameConverter >::get()->getSoundID(pBgmName));
     }
 } // namespace
 

@@ -54,7 +54,7 @@ CFLAGS = [
     "-I-",
 
     "-DPATCH_360_FP_CAM",
-    "-DPATCH_KOR_DIFFS",
+    # "-DPATCH_KOR_DIFFS",
     "-DPATCH_MISSING_MSG",
     "-DPATCH_NO_COMET_RETRY",
     "-DPATCH_QUICK_PAUSE",

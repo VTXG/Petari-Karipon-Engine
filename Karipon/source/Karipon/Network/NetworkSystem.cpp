@@ -207,11 +207,11 @@ IOSError NetworkSystem::recv(IOSFd fd, void* pBuffer, u32 size, u32 flags, NW::S
     params.mFlags = flags;
 
     IOSIoVector iov[3] ATTRIBUTE_ALIGN(32);
-    iov[0].base = reinterpret_cast<u8*>(&params);
+    iov[0].base = reinterpret_cast< u8* >(&params);
     iov[0].length = sizeof(params);
-    iov[1].base = static_cast<u8*>(pBuffer);
+    iov[1].base = static_cast< u8* >(pBuffer);
     iov[1].length = size;
-    iov[2].base = reinterpret_cast<u8*>(pFrom);
+    iov[2].base = reinterpret_cast< u8* >(pFrom);
     iov[2].length = pFrom != nullptr ? sizeof(*pFrom) : 0;
 
     return IOS_Ioctlv(mFd, IOCTLV_SO_RECV_FROM, 1, pFrom != nullptr ? 2 : 1, iov);
@@ -241,9 +241,9 @@ IOSError NetworkSystem::send(IOSFd fd, void* pBuffer, u32 size, u32 flags, NW::S
     }
 
     IOSIoVector iov[2] ATTRIBUTE_ALIGN(32);
-    iov[0].base = static_cast<u8*>(pBuffer);
+    iov[0].base = static_cast< u8* >(pBuffer);
     iov[0].length = size;
-    iov[1].base = reinterpret_cast<u8*>(&params);
+    iov[1].base = reinterpret_cast< u8* >(&params);
     iov[1].length = sizeof(params);
 
     return IOS_Ioctlv(mFd, IOCTLV_SO_SEND_TO, 2, 0, iov);

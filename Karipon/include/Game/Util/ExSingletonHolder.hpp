@@ -2,7 +2,7 @@
 
 #include <revolution/types.h>
 
-template <typename T>
+template < typename T >
 class ExSingletonHolder {
 public:
     static T* init() {
@@ -19,5 +19,5 @@ public:
     static T* sInstance;
 };
 
-template <typename T>
-T* ExSingletonHolder<T>::sInstance;
+template < typename T >
+T* ExSingletonHolder< T >::sInstance;

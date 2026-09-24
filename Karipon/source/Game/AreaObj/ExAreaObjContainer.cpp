@@ -4,7 +4,7 @@
 #include <Game/AreaObj/AreaObjContainer.hpp>
 
 namespace {
-    template <typename T>
+    template < typename T >
     static AreaObjMgr* createManager(s32 count, const char* pName) {
         return new T(count, pName);
     }

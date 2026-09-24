@@ -24,7 +24,6 @@ public:
 
     s32 findWaveBankNo(const char* pWaveArcName) const;
 
-    ByamlIter mTableRootIt;
     ByamlIter mWaveSetStageIt;
     ByamlIter mWaveSetScenarioIt;
 };

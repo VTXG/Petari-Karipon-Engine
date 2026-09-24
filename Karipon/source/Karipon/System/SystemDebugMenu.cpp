@@ -41,7 +41,7 @@ namespace {
 
             u32 max = pHeap->mSize;
             u32 used = max - pHeap->getFreeSize();
-            f32 usedPercent = static_cast<f32>(used) / static_cast<f32>(max) * 100.0f;
+            f32 usedPercent = static_cast< f32 >(used) / static_cast< f32 >(max) * 100.0f;
 
             pMenu->printTextF(false, L"%s : %.02f%% usage, 0x%08X/0x%08X bytes used\n", pHeapName, usedPercent, used, max);
         }
@@ -51,21 +51,21 @@ namespace {
             OSTick span = tick - sLastTick;
             sLastTick = tick;
 
-            f32 fps = span == 0 ? 0.0f : static_cast<f32>(OS_TIMER_CLOCK) / static_cast<f32>(span);
+            f32 fps = span == 0 ? 0.0f : static_cast< f32 >(OS_TIMER_CLOCK) / static_cast< f32 >(span);
             pMenu->printTextF(false, L"FPS : %.0f\n", fps);
 
-            FileLoader* pFileLoader = SingletonHolder<FileLoader>::get();
+            FileLoader* pFileLoader = SingletonHolder< FileLoader >::get();
             ArchiveHolder* pArchiveHolder = pFileLoader->mArchiveHolder;
             FileHolder* pFileHolder = pFileLoader->mFileHolder;
             pMenu->printTextF(false, L"File Info : %d requests, %d/%d archives, %d/%d files\n", pFileLoader->mRequestedFileCount,
                               pArchiveHolder->mEntries.mCount, pArchiveHolder->mEntries.capacity(), pFileHolder->mEntries.mCount,
                               pFileHolder->mEntries.capacity());
 
-            NameObjHolder* pNameObjHolder = SingletonHolder<GameSystem>::get()->mSceneController->mObjHolder;
+            NameObjHolder* pNameObjHolder = SingletonHolder< GameSystem >::get()->mSceneController->mObjHolder;
             pMenu->printTextF(false, L"Scene Object Info : %d objects | %d objects\n", pNameObjHolder->mObjArray1.mCount,
                               pNameObjHolder->mObjArray2.mCount);
 
-            HeapMemoryWatcher* pWatcher = SingletonHolder<HeapMemoryWatcher>::get();
+            HeapMemoryWatcher* pWatcher = SingletonHolder< HeapMemoryWatcher >::get();
             printHeapInfo(pMenu, "SystemHeap", JKRHeap::sSystemHeap);
             printHeapInfo(pMenu, "StationedHeapNapa", pWatcher->mStationedHeapNapa);
             printHeapInfo(pMenu, "StationedHeapGDDR", pWatcher->mStationedHeapGDDR);

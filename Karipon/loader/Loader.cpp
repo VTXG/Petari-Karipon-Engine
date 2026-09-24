@@ -1,7 +1,7 @@
 #include "Game/System/HeapMemoryWatcher.hpp"
 #include "Game/Util/SingletonHolder.hpp"
-#include "JSystem/JKernel/JKRHeap.hpp"
 #include "JSystem/JKernel/JKRExpHeap.hpp"
+#include "JSystem/JKernel/JKRHeap.hpp"
 #include "Kamek.hpp"
 #include "revolution/dvd.h"
 #include "revolution/gx/GXStruct.h"
@@ -25,9 +25,9 @@
 #define KREL_BranchLink 65
 
 extern "C" {
-    void* memset(void *, int, int);
-    void TRK_flush_cache(u32, int);
-    void __OSStopAudioSystem();
+void* memset(void*, int, int);
+void TRK_flush_cache(u32, int);
+void __OSStopAudioSystem();
 }
 
 typedef void (*CtorFuncPtr)();
@@ -54,104 +54,104 @@ namespace {
         return address & 0x80000000 ? address : (text + address);
     }
 
-    inline u8* cmdAddr32(u8 *pInput, u32 text, u32 address) {
-        u32 target = resolveAddress(text, *(const u32 *)pInput);
-        *(u32 *)address = target;
+    inline u8* cmdAddr32(u8* pInput, u32 text, u32 address) {
+        u32 target = resolveAddress(text, *(const u32*)pInput);
+        *(u32*)address = target;
         return pInput + 4;
     }
 
-    inline u8* cmdAddr16Lo(u8 *pInput, u32 text, u32 address) {
-        u32 target = resolveAddress(text, *(const u32 *)pInput);
-        *(u16 *)address = target & 0xFFFF;
+    inline u8* cmdAddr16Lo(u8* pInput, u32 text, u32 address) {
+        u32 target = resolveAddress(text, *(const u32*)pInput);
+        *(u16*)address = target & 0xFFFF;
         return pInput + 4;
     }
 
-    inline u8* cmdAddr16Hi(u8 *pInput, u32 text, u32 address) {
-        u32 target = resolveAddress(text, *(const u32 *)pInput);
-        *(u16 *)address = target & 0xFFFF;
+    inline u8* cmdAddr16Hi(u8* pInput, u32 text, u32 address) {
+        u32 target = resolveAddress(text, *(const u32*)pInput);
+        *(u16*)address = target & 0xFFFF;
         return pInput + 4;
     }
 
-    inline u8* cmdAddr16Ha(u8 *pInput, u32 text, u32 address) {
-        u32 target = resolveAddress(text, *(const u32 *)pInput);
-        *(u16 *)address = target >> 16;
+    inline u8* cmdAddr16Ha(u8* pInput, u32 text, u32 address) {
+        u32 target = resolveAddress(text, *(const u32*)pInput);
+        *(u16*)address = target >> 16;
         if (target & 0x8000)
-            *(u16 *)address += 1;
+            *(u16*)address += 1;
         return pInput + 4;
     }
 
-    inline u8* cmdRel24(u8 *pInput, u32 text, u32 address) {
-        u32 target = resolveAddress(text, *(const u32 *)pInput);
+    inline u8* cmdRel24(u8* pInput, u32 text, u32 address) {
+        u32 target = resolveAddress(text, *(const u32*)pInput);
         u32 delta = target - address;
-        *(u32 *)address &= 0xFC000003;
-        *(u32 *)address |= (delta & 0x3FFFFFC);
+        *(u32*)address &= 0xFC000003;
+        *(u32*)address |= (delta & 0x3FFFFFC);
         return pInput + 4;
     }
 
-    inline u8* cmdWrite32(u8 *pInput, u32 text, u32 address) {
-        u32 value = *(const u32 *)pInput;
-        *(u32 *)address = value;
+    inline u8* cmdWrite32(u8* pInput, u32 text, u32 address) {
+        u32 value = *(const u32*)pInput;
+        *(u32*)address = value;
         return pInput + 4;
     }
 
-    inline u8* cmdWrite16(u8 *pInput, u32 text, u32 address) {
-        u32 value = *(const u32 *)pInput;
-        *(u16 *)address = value & 0xFFFF;
+    inline u8* cmdWrite16(u8* pInput, u32 text, u32 address) {
+        u32 value = *(const u32*)pInput;
+        *(u16*)address = value & 0xFFFF;
         return pInput + 4;
     }
 
-    inline u8* cmdWrite8(u8 *pInput, u32 text, u32 address) {
-        u32 value = *(const u32 *)pInput;
-        *(u8 *)address = value & 0xFF;
+    inline u8* cmdWrite8(u8* pInput, u32 text, u32 address) {
+        u32 value = *(const u32*)pInput;
+        *(u8*)address = value & 0xFF;
         return pInput + 4;
     }
 
-    inline u8* cmdCondWritePointer(u8 *pInput, u32 text, u32 address) {
-        u32 target = resolveAddress(text, *(const u32 *)pInput);
-        u32 original = ((const u32 *)pInput)[1];
-        if (*(u32 *)address == original)
-            *(u32 *)address = target;
+    inline u8* cmdCondWritePointer(u8* pInput, u32 text, u32 address) {
+        u32 target = resolveAddress(text, *(const u32*)pInput);
+        u32 original = ((const u32*)pInput)[1];
+        if (*(u32*)address == original)
+            *(u32*)address = target;
         return pInput + 8;
     }
 
-    inline u8* cmdCondWrite32(u8 *pInput, u32 text, u32 address) {
-        u32 value = *(const u32 *)pInput;
-        u32 original = ((const u32 *)pInput)[1];
-        if (*(u32 *)address == original)
-            *(u32 *)address = value;
+    inline u8* cmdCondWrite32(u8* pInput, u32 text, u32 address) {
+        u32 value = *(const u32*)pInput;
+        u32 original = ((const u32*)pInput)[1];
+        if (*(u32*)address == original)
+            *(u32*)address = value;
         return pInput + 8;
     }
 
-    inline u8* cmdCondWrite16(u8 *pInput, u32 text, u32 address) {
-        u32 value = *(const u32 *)pInput;
-        u32 original = ((const u32 *)pInput)[1];
-        if (*(u16 *)address == (original & 0xFFFF))
-            *(u16 *)address = value & 0xFFFF;
+    inline u8* cmdCondWrite16(u8* pInput, u32 text, u32 address) {
+        u32 value = *(const u32*)pInput;
+        u32 original = ((const u32*)pInput)[1];
+        if (*(u16*)address == (original & 0xFFFF))
+            *(u16*)address = value & 0xFFFF;
         return pInput + 8;
     }
 
-    inline u8* cmdCondWrite8(u8 *pInput, u32 text, u32 address) {
-        u32 value = *(const u32 *)pInput;
-        u32 original = ((const u32 *)pInput)[1];
-        if (*(u8 *)address == (original & 0xFF))
-            *(u8 *)address = value & 0xFF;
+    inline u8* cmdCondWrite8(u8* pInput, u32 text, u32 address) {
+        u32 value = *(const u32*)pInput;
+        u32 original = ((const u32*)pInput)[1];
+        if (*(u8*)address == (original & 0xFF))
+            *(u8*)address = value & 0xFF;
         return pInput + 8;
     }
 
-    inline u8* cmdBranch(u8 *pInput, u32 text, u32 address) {
-        *(u32 *)address = 0x48000000;
+    inline u8* cmdBranch(u8* pInput, u32 text, u32 address) {
+        *(u32*)address = 0x48000000;
         return cmdRel24(pInput, text, address);
     }
 
-    inline u8* cmdBranchLink(u8 *pInput, u32 text, u32 address) {
-        *(u32 *)address = 0x48000001;
+    inline u8* cmdBranchLink(u8* pInput, u32 text, u32 address) {
+        *(u32*)address = 0x48000001;
         return cmdRel24(pInput, text, address);
     }
-}
+} // namespace
 
 static void error(const char* pMessage) {
-    GXColor fg = { 0xFF, 0xFF, 0xFF, 0xFF };
-    GXColor bg = { 0x00 };
+    GXColor fg = {0xFF, 0xFF, 0xFF, 0xFF};
+    GXColor bg = {0x00};
     OSFatal(fg, bg, pMessage);
 }
 
@@ -211,11 +211,11 @@ static void initCustomCode() {
         if (pCmdHeader->mAddress == 0xFFFFFE) {
             address = *reinterpret_cast<u32*>(pHookStart);
             pHookStart += sizeof(u32);
-        }
-        else {
+        } else {
             address = pCmdHeader->mAddress + reinterpret_cast<u32>(pTextStart);
         }
 
+        // clang-format off
         #define KREL_HandleCmd(name) \
             case KREL_##name: pHookStart = cmd##name(pHookStart, reinterpret_cast<u32>(pTextStart), address); break;
 
@@ -238,12 +238,13 @@ static void initCustomCode() {
             OSReport("[KariponLoader] Unknown relocation command 0x%02X\n", pCmdHeader->mCmdType);
             break;
         }
+        // clang-format on
 
         TRK_flush_cache(address & (~31), 0x20);
     }
 
     memset(pHookBuffer, 0, hookSize);
-    
+
     OSReport("[KariponLoader] Running .ctors...\n");
     CtorFuncPtr* ctorStart = reinterpret_cast<CtorFuncPtr*>(pTextStart + header.mCtorStart);
     CtorFuncPtr* ctorEnd = reinterpret_cast<CtorFuncPtr*>(pTextStart + header.mCtorEnd);

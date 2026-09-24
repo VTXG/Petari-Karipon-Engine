@@ -24,7 +24,7 @@ enum ByamlDataType {
 class ByamlHashPair {
 public:
     s32 getKey() const { return mData >> 8; }
-    ByamlDataType getType() const { return static_cast<ByamlDataType>(mData & 0xFF); }
+    ByamlDataType getType() const { return static_cast< ByamlDataType >(mData & 0xFF); }
     s32 getValue() const { return mValue; }
 
     const s32 mData;
@@ -46,10 +46,10 @@ public:
     ByamlDataType getType() const { return mType; }
     u32 getValue() const { return mValue; }
 
-    template <typename T>
+    template < typename T >
     T getValue() const {
         u32 val = getValue();
-        return *reinterpret_cast<const T*>(&val);
+        return *reinterpret_cast< const T* >(&val);
     }
 
     u32 mValue;
@@ -80,7 +80,7 @@ public:
     bool getDataByIndex(ByamlData* pData, s32 index) const;
     const u32* getDataTable() const;
     const u8* getOffsetData(u32 off) const { return &mData[off]; }
-    u32 getSize() const { return *reinterpret_cast<const u32*>(mData) & 0xFFFFFF; }
+    u32 getSize() const { return *reinterpret_cast< const u32* >(mData) & 0xFFFFFF; }
     const u8* getTypeTable() const { return mData + 4; }
 
     const u8* mData;

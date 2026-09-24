@@ -19,7 +19,7 @@ typedef const unsigned char kmSymbol;
 
 #define kmHookStruct(size) static const u32 kmIdentifier(Hook, __COUNTER__)[size] __attribute__((section(".kamek"))) __attribute__((used))
 
-#define kmHandleSymbol(symbol, offset) (reinterpret_cast<kmSymbol*>(symbol) + (offset))
+#define kmHandleSymbol(symbol, offset) (reinterpret_cast< kmSymbol* >(symbol) + (offset))
 
 #define kmHookStruct0(type) kmHookStruct(2) = {0, (type)}
 #define kmHookStruct1(type, arg0) kmHookStruct(6) = {1, (type), (u32)(arg0)}
@@ -47,8 +47,8 @@ typedef const unsigned char kmSymbol;
 #define kmSymCondWrite16(symbol, offset, value, original) kmCondWrite16(kmHandleSymbol(symbol, offset), value, original);
 #define kmSymCondWrite8(symbol, offset, value, original) kmCondWrite8(kmHandleSymbol(symbol, offset), value, original);
 
-#define kmBranch(addr, ptr) kmHookStruct2(kmIdInjectBranch, (addr), reinterpret_cast<u32*>(&ptr))
-#define kmCall(addr, ptr) kmHookStruct2(kmIdInjectCall, (addr), reinterpret_cast<u32*>(&ptr))
+#define kmBranch(addr, ptr) kmHookStruct2(kmIdInjectBranch, (addr), reinterpret_cast< u32* >(&ptr))
+#define kmCall(addr, ptr) kmHookStruct2(kmIdInjectCall, (addr), reinterpret_cast< u32* >(&ptr))
 
 #define kmSymBranch(symbol, offset, value) kmBranch(kmHandleSymbol(symbol, offset), value);
 #define kmSymCall(symbol, offset, value) kmCall(kmHandleSymbol(symbol, offset), value);

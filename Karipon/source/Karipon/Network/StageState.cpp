@@ -14,7 +14,7 @@ namespace {
         register NameObj* pObj;
         GET_REGISTER(pObj, r28);
 
-        NameObjExecuteHolder* pExecuteHolder = MR::getSceneObj<NameObjExecuteHolder>(SceneObj_NameObjExecuteHolder);
+        NameObjExecuteHolder* pExecuteHolder = MR::getSceneObj< NameObjExecuteHolder >(SceneObj_NameObjExecuteHolder);
 
         const char* pIterName;
         if (!MR::getObjectName(&pIterName, rIter)) {

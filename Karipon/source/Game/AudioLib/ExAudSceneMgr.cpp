@@ -1,7 +1,9 @@
 #include "Game/AudioLib/ExAudSceneMgr.hpp"
+#include "Game/Util/ExSingletonHolder.hpp"
 #include "Kamek.hpp"
 #include "Karipon/System/ByamlIter.hpp"
 #include "Karipon/System/ByamlUtil.hpp"
+#include "Karipon/System/KariponResourceHolder.hpp"
 #include <Game/Util/FileUtil.hpp>
 #include <JSystem/JAudio2/JASWaveArcLoader.hpp>
 #include <JSystem/JAudio2/JASWaveInfo.hpp>
@@ -10,17 +12,15 @@
 #include <cstddef>
 #include <cstdio>
 
-ExAudSceneMgr::ExAudSceneMgr(JAUSectionHeap* pSectionHeap) : AudSceneMgr(pSectionHeap), mTableRootIt(), mWaveSetStageIt(), mWaveSetScenarioIt() {
-    mTableRootIt = ByamlUtil::createByamlRootFromFile("/SystemData/StageWaveTable.byaml");
-}
+ExAudSceneMgr::ExAudSceneMgr(JAUSectionHeap* pSectionHeap) : AudSceneMgr(pSectionHeap), mWaveSetStageIt(), mWaveSetScenarioIt() {}
 
 void ExAudSceneMgr::loadStaticResource() {
-    ByamlIter staticResourceIt = mTableRootIt.getIterByKey("StaticResource");
+    ByamlIter staticResourceIt = ExSingletonHolder< KariponResourceHolder >::get()->getStageWaveStaticResourceIter();
     loadWaveSet(staticResourceIt);
 }
 
 bool ExAudSceneMgr::isLoadDoneStaticResource() const {
-    ByamlIter staticResourceIt = mTableRootIt.getIterByKey("StaticResource");
+    ByamlIter staticResourceIt = ExSingletonHolder< KariponResourceHolder >::get()->getStageWaveStaticResourceIter();
     return isLoadDoneWaveSet(staticResourceIt);
 }
 
@@ -34,7 +34,8 @@ void ExAudSceneMgr::loadStageResource(const char* pStageName) {
         mPrevPlayerMode = mPlayerMode;
     }
 
-    ByamlIter waveSetStageIt = mTableRootIt.getIterByKey("StageResource").getIterByKey(pStageName).getIterByKey("Common");
+    ByamlIter waveSetStageIt =
+        ExSingletonHolder< KariponResourceHolder >::get()->getStageWaveStageResourceIter().getIterByKey(pStageName).getIterByKey("Common");
 
     if (waveSetStageIt != mWaveSetStageIt) {
         eraseWaveSet(mWaveSetStageIt);
@@ -51,7 +52,8 @@ void ExAudSceneMgr::loadScenarioResource(const char* pStageName, s32 scenarioNo)
     char key[16];
     snprintf(key, sizeof(key), "Scenario%d", scenarioNo);
 
-    ByamlIter waveSetScenarioIt = mTableRootIt.getIterByKey("StageResource").getIterByKey(pStageName).getIterByKey(key);
+    ByamlIter waveSetScenarioIt =
+        ExSingletonHolder< KariponResourceHolder >::get()->getStageWaveStageResourceIter().getIterByKey(pStageName).getIterByKey(key);
 
     if (waveSetScenarioIt != mWaveSetScenarioIt) {
         eraseWaveSet(mWaveSetScenarioIt);

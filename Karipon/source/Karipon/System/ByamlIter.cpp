@@ -163,7 +163,7 @@ bool ByamlIter::tryConvertValue(bool* pValue, const ByamlData* pData) const {
 
 template <>
 bool ByamlIter::tryConvertValue(s32* pValue, const ByamlData* pData) const {
-    u32 val = pData->getValue<u32>();
+    u32 val = pData->getValue< u32 >();
 
     if (pData->getType() == BYAML_TYPE_INT || pData->getType() == BYAML_TYPE_UINT) {
         *pValue = val;
@@ -175,7 +175,7 @@ bool ByamlIter::tryConvertValue(s32* pValue, const ByamlData* pData) const {
 
 template <>
 bool ByamlIter::tryConvertValue(u32* pValue, const ByamlData* pData) const {
-    s32 val = pData->getValue<s32>();
+    s32 val = pData->getValue< s32 >();
 
     if (pData->getType() == BYAML_TYPE_INT || pData->getType() == BYAML_TYPE_UINT) {
         *pValue = val;
@@ -191,6 +191,6 @@ bool ByamlIter::tryConvertValue(f32* pValue, const ByamlData* pData) const {
         return false;
     }
 
-    *pValue = pData->getValue<f32>();
+    *pValue = pData->getValue< f32 >();
     return true;
 }

@@ -11,7 +11,7 @@ namespace {
     static void drawGameSystem(GameSystem* pGameSystem) {
         pGameSystem->draw();
 
-        ExGameSystemObjHolder* pSystemObjHolder = reinterpret_cast<ExGameSystemObjHolder*>(pGameSystem->mObjHolder);
+        ExGameSystemObjHolder* pSystemObjHolder = reinterpret_cast< ExGameSystemObjHolder* >(pGameSystem->mObjHolder);
         pSystemObjHolder->mSystemDebugMenu->update();
     }
 } // namespace

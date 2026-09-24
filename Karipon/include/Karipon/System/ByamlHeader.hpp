@@ -22,10 +22,10 @@ public:
     ByamlStringTableIter() : mData(nullptr) {}
     ByamlStringTableIter(const u8* pData) : mData(pData) {}
 
-    s32 getSize() const { return *reinterpret_cast<const u32*>(mData) & 0xFFFFFF; }
-    const u32* getAddressTable() const { return reinterpret_cast<const u32*>(mData + 4); }
+    s32 getSize() const { return *reinterpret_cast< const u32* >(mData) & 0xFFFFFF; }
+    const u32* getAddressTable() const { return reinterpret_cast< const u32* >(mData + 4); }
     u32 getStringAddress(s32 index) const { return getAddressTable()[index]; }
-    const char* getString(s32 index) const { return reinterpret_cast<const char*>(&mData[getStringAddress(index)]); }
+    const char* getString(s32 index) const { return reinterpret_cast< const char* >(&mData[getStringAddress(index)]); }
     s32 findStringIndex(const char* pStr) const;
     bool isValidate() const { return mData != nullptr; }
 

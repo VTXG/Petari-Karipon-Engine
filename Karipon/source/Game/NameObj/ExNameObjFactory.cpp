@@ -10,12 +10,12 @@
 #define AREA_FORM_BOWN 4
 
 namespace {
-    template <typename T>
+    template < typename T >
     static NameObj* createExtNameObj(const char* pName) {
         return new T(pName);
     }
 
-    template <typename T, u32 Form>
+    template < typename T, u32 Form >
     static NameObj* createExtAreaObj(const char* pName) {
         return new T(Form, pName);
     }

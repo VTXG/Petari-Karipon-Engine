@@ -98,7 +98,7 @@ namespace {
 
         mbstowcs(sErrorMessageBuffer, pLabel, len);
         sErrorMessageBuffer[ARRAY_SIZE(sErrorMessageBuffer) - 1] = '\0';
-        pTalkMsgInfo->_0 = reinterpret_cast<u8*>(sErrorMessageBuffer);
+        pTalkMsgInfo->_0 = reinterpret_cast< u8* >(sErrorMessageBuffer);
         return false;
     }
 } // namespace

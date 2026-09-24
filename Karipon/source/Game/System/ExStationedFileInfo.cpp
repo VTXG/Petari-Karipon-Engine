@@ -2,35 +2,8 @@
 #include <Game/System/StationedFileInfo.hpp>
 
 namespace {
-    // clang-format off
     static const MR::StationedFileInfo cStationedFileInfo[] = {
-        {
-            MR::StationedFileInfo::HEAP_TYPE_GDDR,
-            MR::StationedFileInfo::LOAD_TYPE_FILE,
-            "/SystemData/DomeParamTable.byaml"
-        },
-        {
-            MR::StationedFileInfo::HEAP_TYPE_GDDR,
-            MR::StationedFileInfo::LOAD_TYPE_FILE,
-            "/SystemData/GalaxyID.bcsv"
-        },
-        {
-            MR::StationedFileInfo::HEAP_TYPE_GDDR,
-            MR::StationedFileInfo::LOAD_TYPE_FILE,
-            "/SystemData/GameCometTable.byaml"
-        },
-        {
-            MR::StationedFileInfo::HEAP_TYPE_GDDR,
-            MR::StationedFileInfo::LOAD_TYPE_FILE,
-            "/SystemData/GameEventTable.byaml"
-        },
-        {
-            static_cast<MR::StationedFileInfo::HeapType>(0),
-            static_cast<MR::StationedFileInfo::LoadType>(255), 
-            nullptr
-        }
-    };
-    // clang-format on
+        {static_cast< MR::StationedFileInfo::HeapType >(0), static_cast< MR::StationedFileInfo::LoadType >(255), nullptr}};
 
     // clang-format off
 #ifdef __MWERKS__

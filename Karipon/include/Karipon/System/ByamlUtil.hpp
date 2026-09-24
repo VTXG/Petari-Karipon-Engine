@@ -1,7 +1,7 @@
 #pragma once
 
-#include "JSystem/JGeometry/TVec.hpp"
-#include "revolution/gx/GXStruct.h"
+#include <JSystem/JGeometry/TVec.hpp>
+#include <revolution/gx/GXStruct.h>
 #include <revolution/types.h>
 
 class ByamlIter;

@@ -33,7 +33,7 @@ bool ByamlHashIter::getDataByIndex(ByamlData* pData, s32 index) const {
         return false;
     }
 
-    if (static_cast<s32>(getSize()) < 1) {
+    if (static_cast< s32 >(getSize()) < 1) {
         return false;
     }
 
@@ -46,7 +46,7 @@ bool ByamlHashIter::getDataByKey(ByamlData* pData, s32 key) const {
         return false;
     }
 
-    if (static_cast<s32>(getSize()) < 1) {
+    if (static_cast< s32 >(getSize()) < 1) {
         return false;
     }
 
@@ -91,7 +91,7 @@ const ByamlHashPair* ByamlHashIter::getPairByIndex(s32 index) const {
         return nullptr;
     }
 
-    if (static_cast<s32>(getSize()) <= index) {
+    if (static_cast< s32 >(getSize()) <= index) {
         return nullptr;
     }
 
@@ -103,7 +103,7 @@ const ByamlHashPair* ByamlHashIter::getPairTable() const {
         return nullptr;
     }
 
-    return reinterpret_cast<const ByamlHashPair*>(mData + 4);
+    return reinterpret_cast< const ByamlHashPair* >(mData + 4);
 }
 
 u32 ByamlHashIter::getSize() const {
@@ -111,7 +111,7 @@ u32 ByamlHashIter::getSize() const {
         return 0;
     }
 
-    u32 val = *reinterpret_cast<const u32*>(mData);
+    u32 val = *reinterpret_cast< const u32* >(mData);
     return val & 0xFFFFFF;
 }
 
@@ -120,14 +120,14 @@ bool ByamlArrayIter::getDataByIndex(ByamlData* pData, s32 index) const {
         return false;
     }
 
-    if (static_cast<s32>(getSize()) <= index) {
+    if (static_cast< s32 >(getSize()) <= index) {
         return false;
     }
 
-    pData->set(static_cast<ByamlDataType>(getTypeTable()[index]), getDataTable()[index]);
+    pData->set(static_cast< ByamlDataType >(getTypeTable()[index]), getDataTable()[index]);
     return true;
 }
 
 const u32* ByamlArrayIter::getDataTable() const {
-    return reinterpret_cast<const u32*>(getOffsetData((getSize() + 7) & 0xFFFFFFFC));
+    return reinterpret_cast< const u32* >(getOffsetData((getSize() + 7) & 0xFFFFFFFC));
 }

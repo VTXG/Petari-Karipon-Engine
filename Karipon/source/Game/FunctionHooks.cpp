@@ -1,24 +1,25 @@
 #include "Game/Util/ExSingletonHolder.hpp"
 #include "Kamek.hpp"
 #include "Karipon/Network/NetworkSystem.hpp"
-#include "Karipon/System/GalaxyIDHolder.hpp"
-#include "Karipon/System/GameCometTableHolder.hpp"
-#include "Karipon/System/GameEventTableHolder.hpp"
+#include "Karipon/System/KariponResourceHolder.hpp"
 #include <Game/System/GameSystem.hpp>
+#include <Game/System/GameSystemObjHolder.hpp>
 #include <Game/Util/FileUtil.hpp>
 #include <Game/Util/MemoryUtil.hpp>
 #include <JSystem/JKernel/JKRExpHeap.hpp>
 #include <JSystem/JKernel/JKRHeap.hpp>
 
 namespace {
-    static void onGameSystemInitAfterStationedResourceLoaded(GameSystem* pGameSystem) {
-        GalaxyIDHolder::init();
-        GameCometTableHolder::init();
-        GameEventTableHolder::init();
+    static void initGameSystem(GameSystemObjHolder* pGameSystemObjHolder) {
+        ExSingletonHolder< KariponResourceHolder >::init();
+        ExSingletonHolder< KariponResourceHolder >::get()->init();
+        pGameSystemObjHolder->init();
+    }
 
+    static void initAfterStationedResourceLoadedGameSystem(GameSystem* pGameSystem) {
         pGameSystem->initAfterStationedResourceLoaded();
 
-        NetworkSystem* pNetworkSystem = ExSingletonHolder<NetworkSystem>::init();
+        NetworkSystem* pNetworkSystem = ExSingletonHolder< NetworkSystem >::init();
         pNetworkSystem->initSystem(true);
 
         /*
@@ -32,15 +33,10 @@ namespace {
             pNetworkSystem->mIP.mOctets[3]);
         */
     }
-
-    static void requestResourceForInitializeAudio(const char* pFilePath, JKRHeap* pHeap) {
-        MR::mountAsyncArchive(pFilePath, pHeap);
-        MR::loadAsyncToMainRAM("/SystemData/StageWaveTable.byaml", nullptr, MR::getStationedHeapGDDR3(), JKRDvdRipper::ALLOC_DIRECTION_FORWARD);
-    }
 } // namespace
 
-extern kmSymbol initAfterStationedResourceLoaded__18GameSystemFunctionFv;
-kmBranch(&initAfterStationedResourceLoaded__18GameSystemFunctionFv + 0x4, onGameSystemInitAfterStationedResourceLoaded);
+extern kmSymbol init__10GameSystemFv;
+kmCall(&init__10GameSystemFv + 0xB4, initGameSystem);
 
-extern kmSymbol requestResourceForInitialize__16AudSystemWrapperFv;
-kmCall(&requestResourceForInitialize__16AudSystemWrapperFv + 0x74, requestResourceForInitializeAudio);
+extern kmSymbol initAfterStationedResourceLoaded__18GameSystemFunctionFv;
+kmBranch(&initAfterStationedResourceLoaded__18GameSystemFunctionFv + 0x4, initAfterStationedResourceLoadedGameSystem);

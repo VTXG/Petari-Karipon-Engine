@@ -28,7 +28,7 @@ public:
     ByamlIter getIterByKey(const char* pKey) const;
     bool getByamlDataByKey(ByamlData* pData, const char* pKey) const;
 
-    template <typename T>
+    template < typename T >
     bool tryGetValueByIndex(T* pValue, s32 index) const {
         ByamlData data;
 
@@ -36,10 +36,10 @@ public:
             return false;
         }
 
-        return tryConvertValue<T>(pValue, &data);
+        return tryConvertValue< T >(pValue, &data);
     }
 
-    template <typename T>
+    template < typename T >
     bool tryGetValueByKey(T* pValue, const char* pKey) const {
         ByamlData data;
 
@@ -47,10 +47,10 @@ public:
             return false;
         }
 
-        return tryConvertValue<T>(pValue, &data);
+        return tryConvertValue< T >(pValue, &data);
     }
 
-    template <typename T>
+    template < typename T >
     bool tryConvertValue(T* pValue, const ByamlData* pData) const;
 
     bool operator==(const ByamlIter& rOther) const { return mData == rOther.mData && mRootNode == rOther.mRootNode; }
