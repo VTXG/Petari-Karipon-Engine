@@ -12,10 +12,13 @@
 namespace {
     static void initGameSystem(GameSystemObjHolder* pGameSystemObjHolder) {
         ExSingletonHolder< KariponResourceHolder >::init();
+        ExSingletonHolder< KariponResourceHolder >::get()->init();
         pGameSystemObjHolder->init();
     }
 
     static void initAfterStationedResourceLoadedGameSystem(GameSystem* pGameSystem) {
+        ExSingletonHolder< KariponResourceHolder >::get()->initAfterStationedResourceLoaded();
+
         pGameSystem->initAfterStationedResourceLoaded();
 
         NetworkSystem* pNetworkSystem = ExSingletonHolder< NetworkSystem >::init();

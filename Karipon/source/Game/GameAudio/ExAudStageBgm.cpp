@@ -26,8 +26,8 @@ namespace {
 
         const StageBgmEntry* pEntry = ExSingletonHolder< KariponResourceHolder >::get()->findStageBgmEntry(pStageName, scenarioNo);
 
-        if (pEntry != nullptr && pEntry->mBgmIDName != nullptr && (cometBgm == -1 || pEntry->mScenarioNo != 0)) {
-            return static_cast< u32 >(AudSingletonHolder< AudSoundNameConverter >::get()->getSoundID(pEntry->mBgmIDName));
+        if (pEntry != nullptr && (cometBgm == -1 || pEntry->mScenarioNo != 0)) {
+            return pEntry->mBgmId;
         }
 
         return cometBgm;
@@ -49,10 +49,8 @@ namespace {
 
         const StageBgmSetEntry* pEntry = ExSingletonHolder< KariponResourceHolder >::get()->findStageBgmSetEntry(pStageName);
 
-        if (pEntry != nullptr && bgmNo < pEntry->mChangeBgmIDName.size()) {
-            return pEntry->mChangeBgmIDName[bgmNo] != nullptr ?
-                       static_cast< u32 >(AudSingletonHolder< AudSoundNameConverter >::get()->getSoundID(pEntry->mChangeBgmIDName[bgmNo])) :
-                       -1;
+        if (pEntry != nullptr && bgmNo < pEntry->mChangeBgmId.size()) {
+            return pEntry->mChangeBgmId[bgmNo];
         }
 
         return 0;
@@ -72,6 +70,34 @@ namespace {
         const StageBgmEntry* pEntry =
             ExSingletonHolder< KariponResourceHolder >::get()->findStageBgmEntry(MR::getCurrentStageName(), MR::getCurrentScenarioNo());
         return pEntry != nullptr && pEntry->mStartType == 1;
+    }
+
+    static u32 getSeqIdForMultiBgm(u32 id) {
+        return ExSingletonHolder< KariponResourceHolder >::get()->findMultiBgmSetEntry(id)->mSettings.mSeqId;
+    }
+
+    static u32 getStreamIdForMultiBgm(u32 id) {
+        return ExSingletonHolder< KariponResourceHolder >::get()->findMultiBgmSetEntry(id)->mSettings.mStreamId;
+    }
+
+    static f32 getBeatMulForMultiBgm(u32 id) {
+        return ExSingletonHolder< KariponResourceHolder >::get()->findMultiBgmSetEntry(id)->mSettings.mBeatMul;
+    }
+
+    static u32 getIntroBeatsForMultiBgm(u32 id) {
+        return ExSingletonHolder< KariponResourceHolder >::get()->findMultiBgmSetEntry(id)->mSettings.mIntroBeats;
+    }
+
+    static u32 getLoopBeatsForMultiBgm(u32 id) {
+        return ExSingletonHolder< KariponResourceHolder >::get()->findMultiBgmSetEntry(id)->mSettings.mLoopBeats;
+    }
+
+    static u32 getLoopStartSamplesForMultiBgm(u32 id) {
+        return ExSingletonHolder< KariponResourceHolder >::get()->findMultiBgmSetEntry(id)->mSettings.mLoopStartSamples;
+    }
+
+    static u32 getLoopEndSamplesForMultiBgm(u32 id) {
+        return ExSingletonHolder< KariponResourceHolder >::get()->findMultiBgmSetEntry(id)->mSettings.mLoopEndSamples;
     }
 } // namespace
 
@@ -96,3 +122,24 @@ kmBranch(&getBgmState__16AudStageBgmTableFPCcl, getBgmStateAudStageBgmTable);
 extern kmSymbol isStartBgmOnWelcome__15ScenarioStarterFv;
 kmCall(&isStartBgmOnWelcome__15ScenarioStarterFv + 0x38, isStartBgmOnWelcome);
 kmWrite32(&isStartBgmOnWelcome__15ScenarioStarterFv + 0x3C, PPC_B(0x6C));
+
+extern kmSymbol getSeqIdForMultiBgm__13AudBgmSettingFUl;
+kmBranch(&getSeqIdForMultiBgm__13AudBgmSettingFUl, getSeqIdForMultiBgm);
+
+extern kmSymbol getStreamIdForMultiBgm__13AudBgmSettingFUl;
+kmBranch(&getStreamIdForMultiBgm__13AudBgmSettingFUl, getStreamIdForMultiBgm);
+
+extern kmSymbol getBeatMulForMultiBgm__13AudBgmSettingFUl;
+kmBranch(&getBeatMulForMultiBgm__13AudBgmSettingFUl, getBeatMulForMultiBgm);
+
+extern kmSymbol getIntroBeatsForMultiBgm__13AudBgmSettingFUl;
+kmBranch(&getIntroBeatsForMultiBgm__13AudBgmSettingFUl, getIntroBeatsForMultiBgm);
+
+extern kmSymbol getLoopBeatsForMultiBgm__13AudBgmSettingFUl;
+kmBranch(&getLoopBeatsForMultiBgm__13AudBgmSettingFUl, getLoopBeatsForMultiBgm);
+
+extern kmSymbol getLoopStartSamplesForMultiBgm__13AudBgmSettingFUl;
+kmBranch(&getLoopStartSamplesForMultiBgm__13AudBgmSettingFUl, getLoopStartSamplesForMultiBgm);
+
+extern kmSymbol getLoopEndSamplesForMultiBgm__13AudBgmSettingFUl;
+kmBranch(&getLoopEndSamplesForMultiBgm__13AudBgmSettingFUl, getLoopEndSamplesForMultiBgm);

@@ -15,9 +15,8 @@ class KariponResourceHolder {
 public:
     KariponResourceHolder();
 
-    void initGalaxyResource();
-    void initEventResource();
-    void initAudioResource();
+    void init();
+    void initAfterStationedResourceLoaded();
 
     // Galaxy
     template < typename T >
@@ -42,6 +41,7 @@ public:
     // Audio
     const StageBgmEntry* findStageBgmEntry(const char* pStageName, s32 scenarioNo);
     const StageBgmSetEntry* findStageBgmSetEntry(const char* pStageName);
+    const MultiBgmSetEntry* findMultiBgmSetEntry(u32 id);
     ByamlIter getStageWaveStaticResourceIter() const { return mStageWaveTable.getIterByKey("StaticResource"); }
     ByamlIter getStageWaveStageResourceIter() const { return mStageWaveTable.getIterByKey("StageResource"); }
 
@@ -59,6 +59,6 @@ public:
     // Audio
     MR::AssignableArray< StageBgmEntry > mStageBgmTable;
     MR::AssignableArray< StageBgmSetEntry > mStageBgmSetTable;
-    JMapInfo mMultiBgmTable;
+    MR::AssignableArray< MultiBgmSetEntry > mMultiBgmTable;
     ByamlIter mStageWaveTable;
 };

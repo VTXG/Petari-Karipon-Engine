@@ -1,6 +1,7 @@
 #include "Karipon/System/KariponResourceHolder.hpp"
 #include "Game/GameAudio/ExAudStageBgm.hpp"
 #include "Karipon/System/ByamlUtil.hpp"
+#include <Game/AudioLib/AudSoundId.hpp>
 #include <Game/AudioLib/AudSoundNameConverter.hpp>
 #include <Game/System/GalaxyCometScheduler.hpp>
 #include <Game/System/GameEventFlag.hpp>
@@ -44,6 +45,18 @@ namespace {
         /* 0xA */ "CompleteMarioAndLuigi",
         /* 0xB */ "StoryEventSync",
     };
+
+    static bool isValidString(const char* pStr) {
+        return pStr != nullptr && pStr[0] != '\0';
+    }
+
+    static u32 getSoundID(const char* pName) {
+        if (isValidString(pName)) {
+            return static_cast< u32 >(AudSingletonHolder< AudSoundNameConverter >::get()->getSoundID(pName));
+        }
+
+        return -1;
+    }
 
     static u32 countAndMountResource(const char* pFormat, u32 start) {
         u32 count = 0;
@@ -132,10 +145,10 @@ namespace {
         rFlag.mSaveFlag = save == 0 ? 1 : 0;
         rFlag.mCondition1 = condition1;
         rFlag.mCondition2 = condition2;
-        rFlag.mCondition3 = pCondition3 != nullptr && pCondition3[0] != '\0' ? pCondition3 : nullptr;
-        rFlag.mCondition4 = pCondition4 != nullptr && pCondition4[0] != '\0' ? pCondition4 : nullptr;
+        rFlag.mCondition3 = isValidString(pCondition3) ? pCondition3 : nullptr;
+        rFlag.mCondition4 = isValidString(pCondition4) ? pCondition4 : nullptr;
 
-        if (pType != nullptr) {
+        if (isValidString(pType)) {
             for (u32 i = GameEventFlag::Type_None; i <= GameEventFlag::Type_StoryEventSync; i++) {
                 if (MR::isEqualString(pType, cEventFlagTypeTable[i])) {
                     rFlag.mType = i;
@@ -167,7 +180,7 @@ namespace {
         rInfo.getValue(idx, "StartType", &startType);
         rEntry.mName = pName;
         rEntry.mScenarioNo = scenarioNo;
-        rEntry.mBgmIDName = pBgmIdName;
+        rEntry.mBgmId = getSoundID(pBgmIdName);
         rEntry.mStartType = startType;
     }
 
@@ -176,7 +189,7 @@ namespace {
         rInfo.getValue(idx, "StageName", &pName);
         rEntry.mName = pName;
 
-        rEntry.mChangeBgmIDName.init(changeBgmIDFieldNum);
+        rEntry.mChangeBgmId.init(changeBgmIDFieldNum);
 
         for (u32 i = 0; i < changeBgmIDFieldNum; i++) {
             char key[0x32];
@@ -184,7 +197,7 @@ namespace {
 
             const char* pChangeBgmIdName = nullptr;
             rInfo.getValue(i, key, &pChangeBgmIdName);
-            rEntry.mChangeBgmIDName[i] = pChangeBgmIdName != nullptr && pChangeBgmIdName[0] != '\0' ? pChangeBgmIdName : nullptr;
+            rEntry.mChangeBgmId[i] = getSoundID(pChangeBgmIdName);
         }
 
         rEntry.mChangeBgmState.init(changeBgmStateFieldNum);
@@ -195,8 +208,35 @@ namespace {
 
             s32 changeBgmState = -1;
             rInfo.getValue(i, key, &changeBgmState);
-            rEntry.mChangeBgmState[i] = changeBgmState >= 0 ? changeBgmState : -1;
+            rEntry.mChangeBgmState[i] = changeBgmState;
         }
+    }
+
+    static void initMultiBgmSet(MultiBgmSetEntry& rEntry, JMapInfo& rInfo, s32 idx) {
+        const char* pMultiIdName = nullptr;
+        const char* pSeqIdName = nullptr;
+        const char* pStreamIdName = nullptr;
+        f32 beatMul = 1.0f;
+        u32 introBeats = 0;
+        u32 loopBeats = 0;
+        u32 loopStartSamples = 0;
+        u32 loopEndSamples = 0;
+        rInfo.getValue(idx, "MultiIdName", &pMultiIdName);
+        rInfo.getValue(idx, "SeqIdName", &pSeqIdName);
+        rInfo.getValue(idx, "StreamIdName", &pStreamIdName);
+        rInfo.getValue(idx, "BeatMul", &beatMul);
+        rInfo.getValue(idx, "IntroBeats", &introBeats);
+        rInfo.getValue(idx, "LoopBeats", &loopBeats);
+        rInfo.getValue(idx, "LoopStartSamples", &loopStartSamples);
+        rInfo.getValue(idx, "LoopEndSamples", &loopEndSamples);
+        rEntry.mMultiId = getSoundID(pMultiIdName);
+        rEntry.mSettings.mSeqId = getSoundID(pSeqIdName);
+        rEntry.mSettings.mStreamId = getSoundID(pStreamIdName);
+        rEntry.mSettings.mBeatMul = beatMul;
+        rEntry.mSettings.mIntroBeats = introBeats;
+        rEntry.mSettings.mLoopBeats = loopBeats;
+        rEntry.mSettings.mLoopStartSamples = loopStartSamples;
+        rEntry.mSettings.mLoopEndSamples = loopEndSamples;
     }
 } // namespace
 
@@ -207,26 +247,26 @@ KariponResourceHolder::KariponResourceHolder() {
 
     u32 cometTableCount = countAndMountResource("/SystemData/CometCycleTable%d.bcsv", 1);
     mCometCycleTables.init(cometTableCount);
-
-    initGalaxyResource();
-    initEventResource();
-    initAudioResource();
 }
 
-void KariponResourceHolder::initGalaxyResource() {
+void KariponResourceHolder::init() {
+    // GalaxyIDTable loading
     mGalaxyIDTable = MR::receiveFile("/SystemData/GalaxyIDTable.bcsv");
+
+    // StageParamTable loading
     mStageParamTable = ByamlUtil::createByamlRootFromFile("/SystemData/StageParamTable.byaml");
+
+    // DomeParamTable loading
     mDomeParamTable = ByamlUtil::createByamlRootFromFile("/SystemData/DomeParamTable.byaml");
 
+    // CometCycleTable loading
     for (s32 i = 0; i < mCometCycleTables.size(); i++) {
         char filePath[0x100];
         snprintf(filePath, sizeof(filePath), "/SystemData/CometCycleTable%d.bcsv", i + 1);
-        mCometCycleTables[i] = createCometCycleTable(MR::receiveFile(filePath));
+        mCometCycleTables[i] = ::createCometCycleTable(MR::receiveFile(filePath));
     }
-}
 
-void KariponResourceHolder::initEventResource() {
-    // GameEventFlag table initialization
+    // GameEventFlagTable loading
     {
         JMapInfo info;
         info.attach(MR::receiveFile("/SystemData/GameEventFlagTable.bcsv"));
@@ -235,11 +275,11 @@ void KariponResourceHolder::initEventResource() {
         mGameEventFlags.init(numEntries);
 
         for (s32 i = 0; i < numEntries; i++) {
-            initGameEventFlag(mGameEventFlags[i], info, i);
+            ::initGameEventFlag(mGameEventFlags[i], info, i);
         }
     }
 
-    // GameEventValueTable initialization
+    // GameEventValueTable loading
     {
         JMapInfo info;
         info.attach(MR::receiveFile("/SystemData/GameEventValueTable.bcsv"));
@@ -248,15 +288,19 @@ void KariponResourceHolder::initEventResource() {
         mGameEventValues.init(numEntries);
 
         for (s32 i = 0; i < numEntries; i++) {
-            initGameEventValue(mGameEventValues[i], info, i);
+            ::initGameEventValue(mGameEventValues[i], info, i);
         }
     }
 
+    // GameStoryEventTable loading
     mGameStoryEventTable.attach(MR::receiveFile("/SystemData/GameStoryEventTable.bcsv"));
+
+    // StageWaveTable loading
+    mStageWaveTable = ByamlUtil::createByamlRootFromFile("/SystemData/StageWaveTable.byaml");
 }
 
-void KariponResourceHolder::initAudioResource() {
-    // StageBgmTable initialization
+void KariponResourceHolder::initAfterStationedResourceLoaded() {
+    // StageBgmTable loading
     {
         JMapInfo info;
         info.attach(MR::receiveFile("/SystemData/StageBgmTable.bcsv"));
@@ -265,11 +309,11 @@ void KariponResourceHolder::initAudioResource() {
         mStageBgmTable.init(numEntries);
 
         for (s32 i = 0; i < numEntries; i++) {
-            initStageBgmEntry(mStageBgmTable[i], info, i);
+            ::initStageBgmEntry(mStageBgmTable[i], info, i);
         }
     }
 
-    // StageBgmSetTable initialization
+    // StageBgmSetTable loading
     {
         JMapInfo info;
         info.attach(MR::receiveFile("/SystemData/StageBgmSetTable.bcsv"));
@@ -281,12 +325,22 @@ void KariponResourceHolder::initAudioResource() {
         u32 changeBgmStateFieldNum = countJMapField(info, "ChangeBgmState%d");
 
         for (s32 i = 0; i < numEntries; i++) {
-            initStageBgmSetEntry(mStageBgmSetTable[i], info, i, changeBgmIDFieldNum, changeBgmStateFieldNum);
+            ::initStageBgmSetEntry(mStageBgmSetTable[i], info, i, changeBgmIDFieldNum, changeBgmStateFieldNum);
         }
     }
 
-    mMultiBgmTable.attach(MR::receiveFile("/SystemData/MultiBgmTable.bcsv"));
-    mStageWaveTable = ByamlUtil::createByamlRootFromFile("/SystemData/StageWaveTable.byaml");
+    // MultiBgmTable loading
+    {
+        JMapInfo info;
+        info.attach(MR::receiveFile("/SystemData/MultiBgmTable.bcsv"));
+
+        s32 numEntries = info.getNumEntries();
+        mMultiBgmTable.init(numEntries);
+
+        for (s32 i = 0; i < numEntries; i++) {
+            ::initMultiBgmSet(mMultiBgmTable[i], info, i);
+        }
+    }
 }
 
 u8 KariponResourceHolder::getStoryEventProgress(const char* pEventName) {
@@ -300,17 +354,17 @@ u8 KariponResourceHolder::getStoryEventProgress(const char* pEventName) {
 const StageBgmEntry* KariponResourceHolder::findStageBgmEntry(const char* pStageName, s32 scenarioNo) {
     const StageBgmEntry* pDefaultEntry = nullptr;
 
-    for (s32 i = 0; i < mStageBgmTable.size(); i++) {
-        const StageBgmEntry* pEntry = &mStageBgmTable[i];
+    for (const StageBgmEntry* pEntry = mStageBgmTable.begin(); pEntry < mStageBgmTable.end(); pEntry++) {
+        if (!MR::isEqualString(pEntry->mName, pStageName)) {
+            continue;
+        }
 
-        if (MR::isEqualString(pEntry->mName, pStageName)) {
-            if (pEntry->mScenarioNo == scenarioNo) {
-                return pEntry;
-            }
+        if (pEntry->mScenarioNo == scenarioNo) {
+            return pEntry;
+        }
 
-            if (pEntry->mScenarioNo == 0) {
-                pDefaultEntry = pEntry;
-            }
+        if (pEntry->mScenarioNo == 0) {
+            pDefaultEntry = pEntry;
         }
     }
 
@@ -318,10 +372,24 @@ const StageBgmEntry* KariponResourceHolder::findStageBgmEntry(const char* pStage
 }
 
 const StageBgmSetEntry* KariponResourceHolder::findStageBgmSetEntry(const char* pStageName) {
-    for (s32 i = 0; i < mStageBgmSetTable.size(); i++) {
-        const StageBgmSetEntry* pEntry = &mStageBgmSetTable[i];
-
+    for (const StageBgmSetEntry* pEntry = mStageBgmSetTable.begin(); pEntry < mStageBgmSetTable.end(); pEntry++) {
         if (MR::isEqualString(pEntry->mName, pStageName)) {
+            return pEntry;
+        }
+    }
+
+    return nullptr;
+}
+
+const MultiBgmSetEntry* KariponResourceHolder::findMultiBgmSetEntry(u32 id) {
+    if (id < mMultiBgmTable.size()) {
+        if ((mMultiBgmTable[id].mMultiId & 0xFEFEFFFF) == id) {
+            return &mMultiBgmTable[id];
+        }
+    }
+
+    for (const MultiBgmSetEntry* pEntry = mMultiBgmTable.begin(); pEntry < mMultiBgmTable.end(); pEntry++) {
+        if ((mMultiBgmTable[id].mMultiId & 0xFEFEFFFF) == id) {
             return pEntry;
         }
     }
