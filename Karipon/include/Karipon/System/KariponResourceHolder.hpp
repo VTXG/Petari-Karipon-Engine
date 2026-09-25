@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Game/GameAudio/ExAudStageBgm.hpp"
 #include "Karipon/System/ByamlIter.hpp"
 #include <Game/Util/Array.hpp>
 #include <Game/Util/JMapInfo.hpp>
@@ -14,9 +15,9 @@ class KariponResourceHolder {
 public:
     KariponResourceHolder();
 
-    void init();
-    void initGameEventFlags(void* pResource);
-    void initGameEventValues(void* pResource);
+    void initGalaxyResource();
+    void initEventResource();
+    void initAudioResource();
 
     // Galaxy
     template < typename T >
@@ -39,6 +40,8 @@ public:
     u8 getStoryEventProgress(const char* pEventName);
 
     // Audio
+    const StageBgmEntry* findStageBgmEntry(const char* pStageName, s32 scenarioNo);
+    const StageBgmSetEntry* findStageBgmSetEntry(const char* pStageName);
     ByamlIter getStageWaveStaticResourceIter() const { return mStageWaveTable.getIterByKey("StaticResource"); }
     ByamlIter getStageWaveStageResourceIter() const { return mStageWaveTable.getIterByKey("StageResource"); }
 
@@ -54,8 +57,8 @@ public:
     JMapInfo mGameStoryEventTable;
 
     // Audio
-    JMapInfo mStageBgmTable;
-    JMapInfo mScenarioBgmTable;
+    MR::AssignableArray< StageBgmEntry > mStageBgmTable;
+    MR::AssignableArray< StageBgmSetEntry > mStageBgmSetTable;
     JMapInfo mMultiBgmTable;
     ByamlIter mStageWaveTable;
 };

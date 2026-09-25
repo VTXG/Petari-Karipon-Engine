@@ -12,7 +12,6 @@
 namespace {
     static void initGameSystem(GameSystemObjHolder* pGameSystemObjHolder) {
         ExSingletonHolder< KariponResourceHolder >::init();
-        ExSingletonHolder< KariponResourceHolder >::get()->init();
         pGameSystemObjHolder->init();
     }
 

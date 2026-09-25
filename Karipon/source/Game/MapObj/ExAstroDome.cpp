@@ -41,14 +41,6 @@ namespace {
         GET_REGISTER(scenarioNo, r29);
         return getDomeSkyName(scenarioNo);
     }
-
-    static u32 getKoopaFortressBgmId() {
-        const char* pBgmName = nullptr;
-        ExSingletonHolder< KariponResourceHolder >::get()
-            ->getDomeParamIter(MR::getCurrentScenarioNo())
-            .tryGetValueByKey(&pBgmName, "KoopaFortressBgm");
-        return static_cast< u32 >(AudSingletonHolder< AudSoundNameConverter >::get()->getSoundID(pBgmName));
-    }
 } // namespace
 
 extern kmSymbol init__15MiniatureGalaxyFRC12JMapInfoIter;
@@ -74,12 +66,3 @@ kmWrite32(&init__12AstroDomeSkyFRC12JMapInfoIter + 0x54, PPC_B(0x8));
 extern kmSymbol getModelName__19AstroMapObjFunctionFPCcl;
 kmCall(&getModelName__19AstroMapObjFunctionFPCcl + 0x54, getSkyNameForAstroList);
 kmWrite32(&getModelName__19AstroMapObjFunctionFPCcl + 0x58, PPC_B(0x54));
-
-extern kmSymbol getKoopaFortressAppearBgm__15AudStageBgmWrapFPCc;
-kmCall(&getKoopaFortressAppearBgm__15AudStageBgmWrapFPCc + 0x38, getKoopaFortressBgmId);
-kmWrite32(&getKoopaFortressAppearBgm__15AudStageBgmWrapFPCc + 0x3C, PPC_MR(0, 3));
-
-extern kmSymbol exeOpen__15MiniatureGalaxyFv;
-kmCall(&exeOpen__15MiniatureGalaxyFv + 0x1B0, getKoopaFortressBgmId);
-kmWrite32(&exeOpen__15MiniatureGalaxyFv + 0x1B4, PPC_LI(4, 0));
-kmCall(&exeOpen__15MiniatureGalaxyFv + 0x1B8, AudWrap::startStageBgm);
