@@ -55,6 +55,12 @@ void MarioFoo_FORCE_MATCH_SDATA2() {
     (void)6.0f;
 }
 
+void MarioFoo_FORCE_MATCH(TVec3f& rVec, f32 a, f32 b, f32 c) {
+    rVec.setLength(a);
+    rVec.setLength(b);
+    rVec.setLength(c);
+}
+
 namespace {
     f32 cTurnMotionSpeed = 5.0f;
     f32 cWidth = 70.0f;
@@ -203,7 +209,7 @@ bool MarioFoo::update() {
         _2C += speedRatio * (_20 * mActor->getConst().getTable()->mSwimRotSpeedX);
     }
 
-    if (!checkLvlA() && !checkLvlZ() && !_18 && _28 < cTurnMotionSpeed) {
+    if (!checkLvlA() && !checkLvlZ() && !_18 && _28 < ::cTurnMotionSpeed) {
         f32 turnAngle = _2C;
         if (_2C > 1.5707964f) {
             turnAngle = 1.5707964f;
@@ -233,7 +239,7 @@ bool MarioFoo::update() {
             ratio = 1.0f;
         }
 
-        targetAngle = _2C + ratio * (cNeutralAngleWait - _2C);
+        targetAngle = _2C + ratio * (::cNeutralAngleWait - _2C);
     } else {
         if (getStickY() > 0.0f) {
             f32 slowRatio = 0.0f;
@@ -251,14 +257,14 @@ bool MarioFoo::update() {
             }
 
             ratio = MR::clamp(ratio, 0.0f, 1.0f);
-            f32 limit = ratio * cLimitAngleWait + (1.0f - ratio) * cLimitAngleSink;
+            f32 limit = ratio * ::cLimitAngleWait + (1.0f - ratio) * ::cLimitAngleSink;
             if (getPlayer()->mVerticalSpeed < 100.0f) {
-                limit = cNeutralAngleWait;
+                limit = ::cNeutralAngleWait;
             }
 
-            targetAngle = cNeutralAngleWait + (limit - cNeutralAngleWait) * getStickY();
+            targetAngle = ::cNeutralAngleWait + (limit - ::cNeutralAngleWait) * getStickY();
         } else if (getStickY() < 0.0f) {
-            targetAngle = cNeutralAngleWait + (cUpperAngleWait - cNeutralAngleWait) * -getStickY();
+            targetAngle = ::cNeutralAngleWait + (::cUpperAngleWait - ::cNeutralAngleWait) * -getStickY();
         }
     }
 
@@ -272,7 +278,7 @@ bool MarioFoo::update() {
 
     blend *= mActor->getConst().getTable()->mSwimXJetRotRatio;
     if (getStickP() == 0.0f) {
-        targetAngle = cLimitAngleSink;
+        targetAngle = ::cLimitAngleSink;
         blend *= 0.5f;
     }
 
@@ -280,10 +286,10 @@ bool MarioFoo::update() {
         targetAngle = 1.0471976f;
         if (getStickY() > 0.1f) {
             f32 ratio = 1.1f * (getStickY() - 0.1f);
-            targetAngle = cLimitAngleSink * ratio + targetAngle * (1.0f - ratio);
+            targetAngle = ::cLimitAngleSink * ratio + targetAngle * (1.0f - ratio);
         } else if (getStickY() < -0.1f) {
             f32 ratio = 1.1f * (-getStickY() - 0.1f);
-            targetAngle = cUpperAngleWait * ratio + targetAngle * (1.0f - ratio);
+            targetAngle = ::cUpperAngleWait * ratio + targetAngle * (1.0f - ratio);
         }
 
         blend = 0.01f;
@@ -309,14 +315,13 @@ bool MarioFoo::update() {
         stopAnimation("水泳ターン下");
     }
 
-    _2C = MR::clamp(_2C, cUpperAngleWait, cLimitAngleSink);
+    _2C = MR::clamp(_2C, ::cUpperAngleWait, ::cLimitAngleSink);
 
     f32 turnRatio = speedRatio + mActor->getConst().getTable()->mSwimRotSpeedZStop;
     MR::rotAxisVecRad(_30, -_3C, &_30, turnRatio * (_24 * mActor->mConst->getTable()->mSwimRotSpeedZ));
     MR::vecKillElement(_30, _3C, &_30);
     MR::normalize(&_30);
-    TVec3f side;
-    PSVECCrossProduct(&_3C, &_30, &side);
+    TVec3f side = _3C.cross(_30);
     MR::normalize(&side);
     getPlayer()->setSideVec(side);
     TVec3f front;
@@ -362,7 +367,7 @@ bool MarioFoo::update() {
 
     updateTilt();
 
-    if (_48) {
+    if (_48 != nullptr) {
         TVec3f center;
         MR::calcSpherePos(&center, _48);
         f32 radius = MR::getSphereRadius(_48);
@@ -743,8 +748,9 @@ void MarioFoo::draw3D() const {
         GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
         _6B8->load(GX_TEXMAP0);
 
+        u32 midpoint;
         u32 count = _6B0;
-        u32 midpoint = count / 2;
+        midpoint = count / 2;
         TVec3f previous;
         TVec2f nextTexCoords[2];
         TVec2f texCoords[2];
@@ -769,12 +775,10 @@ void MarioFoo::draw3D() const {
                         TVec3f width;
                         width.cross(horizontal, MR::getCamZdir());
                         width.scale(10.0f);
-                        const TVec3f& rPosition = _B0[index];
-                        const TVec3f& rSide = _3B0[index];
-                        leftEdge[0] = rPosition + width - rSide * cWidth;
-                        leftEdge[1] = rPosition - width - rSide * cWidth;
-                        rightEdge[0] = rPosition + width + rSide * cWidth;
-                        rightEdge[1] = rPosition - width + rSide * cWidth;
+                        leftEdge[0] = _B0[index] + width - _3B0[index] * ::cWidth;
+                        leftEdge[1] = _B0[index] - width - _3B0[index] * ::cWidth;
+                        rightEdge[0] = _B0[index] + width + _3B0[index] * ::cWidth;
+                        rightEdge[1] = _B0[index] - width + _3B0[index] * ::cWidth;
                         break;
                     }
                 }
@@ -791,12 +795,11 @@ void MarioFoo::draw3D() const {
                 nextTexCoords[0].set(0.0f, textureY);
                 nextTexCoords[1].set(1.0f, textureY);
                 const TVec3f& rPosition = _B0[index];
-                const TVec3f& rSide = _3B0[index];
                 TVec3f direction = rPosition - previous;
-                TVec3f width(rSide);
+                TVec3f width(_3B0[index]);
                 width.setLength(10.0f);
-                nextLeftEdge[0] = rPosition + width - rSide * cWidth;
-                nextLeftEdge[1] = rPosition - width - rSide * cWidth;
+                nextLeftEdge[0] = rPosition + width - _3B0[index] * ::cWidth;
+                nextLeftEdge[1] = rPosition - width - _3B0[index] * ::cWidth;
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                 MR::ddSendVtxData(leftEdge[0], texCoords[0]);
                 MR::ddSendVtxData(nextLeftEdge[0], nextTexCoords[0]);
@@ -804,8 +807,8 @@ void MarioFoo::draw3D() const {
                 MR::ddSendVtxData(leftEdge[1], texCoords[1]);
                 GXEnd();
 
-                nextRightEdge[0] = rPosition + width + rSide * cWidth;
-                nextRightEdge[1] = rPosition - width + rSide * cWidth;
+                nextRightEdge[0] = rPosition + width + _3B0[index] * ::cWidth;
+                nextRightEdge[1] = rPosition - width + _3B0[index] * ::cWidth;
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                 MR::ddSendVtxData(rightEdge[0], texCoords[0]);
                 MR::ddSendVtxData(nextRightEdge[0], nextTexCoords[0]);

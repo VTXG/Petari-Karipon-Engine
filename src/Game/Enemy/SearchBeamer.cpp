@@ -375,7 +375,7 @@ bool SearchBeamer::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pRece
 
 void SearchBeamer::updateHitSensor(HitSensor* pSensor) {
     if (!pSensor->mValidByHost) {
-        pSensor->mPosition.set< f32 >(mBeamStart);
+        pSensor->mPosition.set(mBeamStart);
         return;
     }
 
@@ -416,22 +416,8 @@ void SearchBeamer::updatePropeller() {
         _B0 += 0.30f;
     }
 
-    f32 v4 = 10.0f;
-
-    if (_B0 < 10.0f) {
-        v4 = v4;
-    } else {
-        v4 = 40.0f;
-
-        if (_B0 > 40.0f) {
-            v4 = v4;
-        } else {
-            v4 = _B0;
-        }
-    }
-
-    _B0 = v4;
-    _AC += v4;
+    _B0 = MR::clamp(_B0, 10.0f, 40.0f);
+    _AC += _B0;
 }
 
 void SearchBeamer::updateBeamEffect(bool a1) {
@@ -466,7 +452,7 @@ void SearchBeamer::updateBeamShadow() {
 
 void SearchBeamer::initBeamPos() {
     MR::copyJointPos(this, "Core", &mBeamStart);
-    mBeamEnd.set< f32 >(mBeamStart);
+    mBeamEnd.set(mBeamStart);
     MR::hideMaterial(this, "lambert5_v");
 }
 
@@ -497,12 +483,12 @@ void SearchBeamer::bowToPlayer() {
     MR::clampVecAngleDeg(&_94, v9, 35.0f);
 }
 
-bool SearchBeamer::checkBeamDistiny(TVec3f* a1, TVec3f a2) const {
+bool SearchBeamer::checkBeamDistiny(TVec3f* pPosition, TVec3f a2) const {
     TVec3f v12;
     v12.scale(_140, a2);
 
-    if (!MR::getFirstPolyOnLineToMap(a1, nullptr, mPosition, v12)) {
-        a1->add(v12, mPosition);
+    if (!MR::getFirstPolyOnLineToMap(pPosition, nullptr, mPosition, v12)) {
+        pPosition->add(v12, mPosition);
         return false;
     }
 

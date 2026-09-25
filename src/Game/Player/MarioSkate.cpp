@@ -111,6 +111,7 @@ bool MarioSkate::start() {
 }
 
 bool MarioSkate::update() {
+    f32 speed;
     if (!getPlayer()->mMovementStates._1 || getPlayer()->mMovementStates.jumping) {
         return false;
     }
@@ -174,7 +175,7 @@ bool MarioSkate::update() {
         }
     }
 
-    f32 speed = getPlayer()->mWalkSpeed;
+    speed = getPlayer()->mWalkSpeed;
     if (speed < 1.2f * getStickP()) {
         getPlayer()->mWalkSpeed = 1.2f * getStickP();
     }
@@ -306,7 +307,7 @@ bool MarioSkate::close() {
             f32 vertical = MR::vecKillElement(pPlayer->mJumpVec, getGravityVec(), &velocity);
             velocity *= 1.5f;
             velocity += getGravityVec() * vertical;
-            getPlayer()->mJumpVec = velocity;
+            getPlayer()->setJumpVec(velocity);
         }
     } else if (getPlayer()->mMovementStates._1) {
         stopAnimation(nullptr, "基本");

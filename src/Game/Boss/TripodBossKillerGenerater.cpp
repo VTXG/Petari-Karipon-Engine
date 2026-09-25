@@ -79,10 +79,10 @@ void TripodBossKillerGenerater::init(const JMapInfoIter& rIter) {
     MR::useStageSwitchReadAppear(this, rIter);
 
     if (mActiveLabel > 0) {
-        MR::startBck(this, "Shoot");
+        MR::startBck(this, "2ndDemo");
         MR::setBckFrameAndStop(this, 0.0f);
     } else {
-        MR::startBck(this, "2ndDemo");
+        MR::startBck(this, "Shoot");
         MR::setBckFrameAndStop(this, 0.0f);
     }
 
@@ -131,8 +131,8 @@ void TripodBossKillerGenerater::activateTripodBoss() {
     _E1 = true;
 }
 
-void TripodBossKillerGenerater::setLocalMatrix(const TPos3f& pMtx) {
-    _E4.set(pMtx);
+void TripodBossKillerGenerater::setLocalMatrix(const TPos3f& rPMtx) {
+    _E4.set(rPMtx);
 }
 
 void TripodBossKillerGenerater::setActiveLebel(s32 label) {
@@ -304,8 +304,8 @@ void TripodBossKillerGenerater::exeShootSetting() {
     _8C.getTrans(trans);
 
     HomingKiller* killer = mKiller;
-    killer->mBasePos.set< f32 >(trans);
-    killer->mBaseFront.set< f32 >(front);
+    killer->mBasePos.set(trans);
+    killer->mBaseFront.set(front);
 
     if (!tryBreak() && !tryAbort() && !tryShoot()) {
         return;

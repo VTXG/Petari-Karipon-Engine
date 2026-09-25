@@ -139,14 +139,13 @@ void Mario::fixWallingDir(bool immediate) {
 }
 
 bool Mario::fixWallingTop() {
-    TVec3f side;
-    PSVECCrossProduct(&getWallNorm(), &getAirGravityVec(), &side);
+    TVec3f side = getWallNorm().cross(getAirGravityVec());
     MR::normalizeOrZero(&side);
     if (MR::isNearZero(side)) {
         return false;
     }
 
-    PSVECCrossProduct(&getWallNorm(), &side, &_75C);
+    _75C.cross(getWallNorm(), side);
     MR::normalizeOrZero(&_75C);
     if (MR::isNearZero(_75C)) {
         return false;
@@ -336,8 +335,7 @@ bool Mario::isEnableStickWall() {
         return false;
     }
 
-    TVec3f side;
-    PSVECCrossProduct(&getWallNorm(), &getAirGravityVec(), &side);
+    TVec3f side = getWallNorm().cross(getAirGravityVec());
     if (MR::normalizeOrZero(&side)) {
         return false;
     }
@@ -456,7 +454,7 @@ bool MarioWall::update() {
         }
     }
 
-    if (_14 >= mActor->getConst().getTable()->mWallReleaseTime + mActor->getConst().getTable()->mWallStickTime) {
+    if (_14 >= getActor()->getConst().getTable()->mWallReleaseTime + getActor()->getConst().getTable()->mWallStickTime) {
         release = true;
     }
 
@@ -503,7 +501,7 @@ bool MarioWall::update() {
     }
 
     f32 blend = 0.9f;
-    f32 speed = mActor->getConst().getTable()->mWallDropSpeedNormal;
+    f32 speed = getActor()->getConst().getTable()->mWallDropSpeedNormal;
     u8 side = getPlayer()->checkStickWallSide();
     if (side == 1) {
         side = 0;
@@ -512,19 +510,19 @@ bool MarioWall::update() {
     switch (side) {
     case 1:
         blend = 0.7f;
-        if (_14 > mActor->getConst().getTable()->mWallStickTime) {
-            _14 = mActor->getConst().getTable()->mWallStickTime;
+        if (_14 > getActor()->getConst().getTable()->mWallStickTime) {
+            _14 = getActor()->getConst().getTable()->mWallStickTime;
         }
 
         _18 = 0;
-        speed = mActor->getConst().getTable()->mWallDropSpeedStop;
+        speed = getActor()->getConst().getTable()->mWallDropSpeedStop;
         changeAnimation("壁くっつき");
         stopEffect("共通壁手擦り");
         break;
     case 2:
         if (_1E) {
-            if (_14 < mActor->getConst().getTable()->mWallStickTimeIce - 15) {
-                _14 = mActor->getConst().getTable()->mWallStickTimeIce - 15;
+            if (_14 < getActor()->getConst().getTable()->mWallStickTimeIce - 15) {
+                _14 = getActor()->getConst().getTable()->mWallStickTimeIce - 15;
             }
         } else if (_14 < 165) {
             _14 = 165;
@@ -537,7 +535,7 @@ bool MarioWall::update() {
         stopEffect("共通壁手擦り");
         break;
     case 0:
-        if (_14 < mActor->getConst().getTable()->mWallStickTime) {
+        if (_14 < getActor()->getConst().getTable()->mWallStickTime) {
             stopEffect("共通壁手擦り");
         } else {
             if (!isAnimationRun("壁くっつき")) {
@@ -555,12 +553,12 @@ bool MarioWall::update() {
         _18++;
     }
 
-    if (_14 < mActor->getConst().getTable()->mWallStickTime) {
+    if (_14 < getActor()->getConst().getTable()->mWallStickTime) {
         blend = 1.0f;
     }
 
     if (_1E) {
-        if (_14 > mActor->getConst().getTable()->mWallStickTimeIce) {
+        if (_14 > getActor()->getConst().getTable()->mWallStickTimeIce) {
             _1C = 1;
             _24 = getPlayer()->getWallNorm();
             return false;
@@ -573,10 +571,10 @@ bool MarioWall::update() {
     addVelocity(getPlayer()->_75C, -_20);
     if (side <= 1) {
         f32 ratio;
-        if (_14 < mActor->getConst().getTable()->mWallStickTime) {
+        if (_14 < getActor()->getConst().getTable()->mWallStickTime) {
             ratio = 0.0f;
         } else {
-            ratio = 1.0f - (_14 - mActor->getConst().getTable()->mWallStickTime) * mActor->getConst().getTable()->mWallSideMoveRatio;
+            ratio = 1.0f - (_14 - getActor()->getConst().getTable()->mWallStickTime) * getActor()->getConst().getTable()->mWallSideMoveRatio;
         }
 
         getPlayer()->moveWallSlide(MR::clamp(ratio, 0.0f, 1.0f));
@@ -690,15 +688,15 @@ bool Mario::fixWallingDist() {
             MR::vecKillElement(position - mPosition, *getGravityVec(), &correction);
             if (!MR::isNearZero(correction)) {
                 TVec3f relative(correction + mActor->_288);
-                if (__fabsf(relative.x) < __fabsf(correction.x)) {
+                if (MR::abs(relative.x) < MR::abs(correction.x)) {
                     correction.x = relative.x;
                 }
 
-                if (__fabsf(relative.y) < __fabsf(correction.y)) {
+                if (MR::abs(relative.y) < MR::abs(correction.y)) {
                     correction.y = relative.y;
                 }
 
-                if (__fabsf(relative.z) < __fabsf(correction.z)) {
+                if (MR::abs(relative.z) < MR::abs(correction.z)) {
                     correction.z = relative.z;
                 }
 

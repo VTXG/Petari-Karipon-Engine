@@ -114,9 +114,9 @@ namespace NrvWaterRoad {
     NEW_NERVE(WaterRoadNrvDisappear, WaterRoad, Disappear);
 };  // namespace NrvWaterRoad
 
-WaterRoadModelInfo::WaterRoadModelInfo(WaterRoad* road, bool isLow)
+WaterRoadModelInfo::WaterRoadModelInfo(WaterRoad* pRoad, bool isLow)
     : mIsLow(isLow), mNumPoints(), mNumLinePoints(), mNumLoopPoints(12), mPoints(), mNormals(), mRailCoords(), mDispListLength(), mDispList() {
-    initPoints(road);
+    initPoints(pRoad);
     initDisplayList();
 }
 
@@ -439,8 +439,8 @@ void WaterRoadModelInfo::loadMaterialHigh(const WaterRoad* pRoad) const {
     GXSetIndTexMtx(GX_ITM_0, indMtx, 0);
     GXSetNumTevStages(5);
 
-    GXSetTevColor(GX_TEVREG0, sTevColor1);
-    GXSetTevColor(GX_TEVREG1, sTevColor2);
+    GXSetTevColor(GX_TEVREG0, ::sTevColor1);
+    GXSetTevColor(GX_TEVREG1, ::sTevColor2);
 
     if (pRoad != nullptr) {
         GXSetTevColor(GX_TEVREG2, Color8(0xFF, 0xFF, 0xFF, pRoad->mAlpha));
@@ -526,8 +526,8 @@ void WaterRoadModelInfo::loadMaterialLow() const {
 
     GXSetNumIndStages(0);
     GXSetNumTevStages(4);
-    GXSetTevColor(GX_TEVREG0, sTevColor1);
-    GXSetTevColor(GX_TEVREG1, sTevColor2);
+    GXSetTevColor(GX_TEVREG0, ::sTevColor1);
+    GXSetTevColor(GX_TEVREG1, ::sTevColor2);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_TEXC, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO);
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
@@ -577,6 +577,7 @@ void WaterRoad::init(const JMapInfoIter& rIter) {
     if (MR::getRailDirection(this).dot(mBaseUp) >= ::sDotUpdateAxis) {
         MR::calcActorAxisX(&mBaseUp, this);
     }
+
     updateDemo(0.0f);
 
     initNerve(GET_NERVE(WaterRoad, WaterRoadNrvWait));
@@ -743,7 +744,6 @@ void WaterRoad::exeDisappear() {
 }
 
 void WaterRoad::movement() {
-    // FIXME: float regswaps in repeat
     // https://decomp.me/scratch/6VOUU
 
     if (!MR::isValidMovement(this)) {
@@ -752,12 +752,12 @@ void WaterRoad::movement() {
 
     LiveActor::movement();
 
-    mTexUV0.x = MR::repeat(mTexUV0.x + ::sTexSpeedU0, 0.0f, 1.0f);
-    mTexUV0.y = MR::repeat(mTexUV0.y + ::sTexSpeedV0, 0.0f, 1.0f);
-    mTexUV1.x = MR::repeat(mTexUV1.x + ::sTexSpeedU1, 0.0f, 1.0f);
-    mTexUV1.y = MR::repeat(mTexUV1.y + ::sTexSpeedV1, 0.0f, 1.0f);
-    mTexUV2.x = MR::repeat(mTexUV2.x + ::sTexSpeedU2, 0.0f, 1.0f);
-    mTexUV2.y = MR::repeat(mTexUV2.y + ::sTexSpeedV2, 0.0f, 1.0f);
+    mTexUV0.x = MR::repeat2(mTexUV0.x + ::sTexSpeedU0, 0.0f, 1.0f);
+    mTexUV0.y = MR::repeat2(mTexUV0.y + ::sTexSpeedV0, 0.0f, 1.0f);
+    mTexUV1.x = MR::repeat2(mTexUV1.x + ::sTexSpeedU1, 0.0f, 1.0f);
+    mTexUV1.y = MR::repeat2(mTexUV1.y + ::sTexSpeedV1, 0.0f, 1.0f);
+    mTexUV2.x = MR::repeat2(mTexUV2.x + ::sTexSpeedU2, 0.0f, 1.0f);
+    mTexUV2.y = MR::repeat2(mTexUV2.y + ::sTexSpeedV2, 0.0f, 1.0f);
 
     MR::calcNearestRailPos(&mCamRailNearestPos, this, MR::getCamPos());
     MR::startSoundObjectLevel(mSoundObj, "SE_AT_LV_WATER_ROAD");

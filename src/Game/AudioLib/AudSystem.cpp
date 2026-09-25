@@ -83,8 +83,8 @@ namespace {
         AudDopplerAudible< 4 >::newMemPool(initJAI.mMaxNumSe);
         AudSeStrategy::newMemPool(initJAI.mMaxNumSe);
         SpkSystem::newSoundMemPool(64);
-        AudMe::newMemPool(32);       // FIXME: size
-        AudMeTrack::newMemPool(96);  // FIXME: size
+        AudMe::newMemPool(32);
+        AudMeTrack::newMemPool(96);
 
         return initJAI.mMaxNumSeq;
     }
@@ -176,8 +176,7 @@ AudSystem::AudSystem(JAUSectionHeap* pSectionHeap, JKRArchive* pChordArchive, JK
     setAudience(&mAudience);
 
     JAUStreamStaticAramMgr* streamAramMgr = new JAUStreamStaticAramMgr();
-    JASHeap* aramHeap = JASKernel::getAramHeap();
-    streamAramMgr->alloc(aramHeap, JASAramStream::getBlockSize() * AudParams::streamAramBlocks_perChunk);
+    streamAramMgr->alloc(AudParams::streamAramBlocks_perChunk, JASKernel::getAramHeap());
     mStreamAramMgr = streamAramMgr;
     mStreamMgr.setStreamAramMgr(mStreamAramMgr);
 

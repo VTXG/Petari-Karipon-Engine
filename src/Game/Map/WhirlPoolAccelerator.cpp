@@ -74,9 +74,9 @@ bool WhirlPoolAccelerator::calcInfo(const TVec3f& rPosition, TVec3f* pAccelerati
 }
 
 void WhirlPoolAccelerator::movement() {
-    mRotation = MR::repeatDegree(-10.0f + mRotation);
-    mTexOffsetU0 = MR::repeat(0.01f + mTexOffsetU0, 0.0f, 1.0f);
-    mTexOffsetV0 = MR::repeat(-0.025f + mTexOffsetV0, 0.0f, 1.0f);
+    mRotation = MR::repeat2(-10.0f + mRotation, 0.0f, 360.0f);
+    mTexOffsetU0 = MR::repeat2(0.01f + mTexOffsetU0, 0.0f, 1.0f);
+    mTexOffsetV0 = MR::repeat2(-0.025f + mTexOffsetV0, 0.0f, 1.0f);
     MR::startLevelSound(this, "SE_AT_LV_WHIRL_POOL");
 }
 
@@ -98,12 +98,12 @@ void WhirlPoolAccelerator::initPoints() {
         f32 rate = MR::getEaseInValue(static_cast< f32 >(mPointCount - i) / mPointCount, 0.0f, 1.0f, 1.0f);
         f32 radius = mRadius * (rate + 0.6f * (1.0f - rate));
         u8 alpha = 0xFF;
-        if (i < sAlphaPointNum) {
-            alpha = 50.0f + 205.0f * (i / sAlphaPointNum);
+        if (i < ::sAlphaPointNum) {
+            alpha = 50.0f + 205.0f * (i / ::sAlphaPointNum);
         }
 
-        if (i >= mPointCount - sAlphaPointNum) {
-            alpha = 50.0f + 205.0f * ((mPointCount - 1 - i) / sAlphaPointNum);
+        if (i >= mPointCount - ::sAlphaPointNum) {
+            alpha = 50.0f + 205.0f * ((mPointCount - 1 - i) / ::sAlphaPointNum);
         }
 
         mPoints[i] = new WhirlPoolPoint(position, mAxis, normal, radius, angle / 360.0f, alpha);

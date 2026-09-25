@@ -9,6 +9,7 @@
 #include "Game/Util/ObjUtil.hpp"
 #include "Game/Util/PlayerUtil.hpp"
 #include "Game/Util/SoundUtil.hpp"
+#include "JSystem/JGeometry/TVec.hpp"
 
 void DashRing_FORCE_MATCH_SDATA2() {
     (void)1.0f;
@@ -115,6 +116,7 @@ void DashRing::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
     TVec3f dir(MR::getSensorPos(pReceiver) - mPosition);
     TVec3f vec40;
     f32 val = MR::vecKillElement(dir, mAxis, &vec40);
+
     if (MR::abs(val) < 20.0f && vec40.length() < 200.0f) {
         MR::sendArbitraryMsg(ACTMES_PASS_RING, pReceiver, getSensor("body"));
 
@@ -158,6 +160,7 @@ void DashRing::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
     }
 
     f32 f1 = MR::diffAngleAbs(mAxis, dir);
+
     if (f1 > MR::diffAngleAbs(mAxis, -dir)) {
         MR::vecBlendSphere(mAxis, -dir, &mAxis, 0.03f);
     } else {
@@ -262,10 +265,12 @@ void DashRing::calcSubAxis() {
 }
 
 void DashRing::draw() const {
-    TVec3f axis = mAxis;
-    TVec3f subAxis = mSubAxis;
+    TVec3f axis, subAxis;
+    axis = mAxis;
+    subAxis = mSubAxis;
 
     f32 f1 = 1.0f;
+
     if (mActiveTime > 105) {
         f1 = static_cast< f32 >(mActiveTime - 105) / 15.0f;
 
@@ -281,10 +286,10 @@ void DashRing::draw() const {
     }
 
     f32 f2 = mScale.x * 200.0f * f1;
-    f32 f3 = f2 * TWO_PI / 64;
+    f32 segmentLength = (f2 * JMath::TAngleConstant_< f32 >::RADIAN_DEG360()) / 64.0f;
 
     TPos3f rotMtx;
-    PSMTXRotAxisRad(rotMtx, axis, TWO_PI / 64);
+    PSMTXRotAxisRad(rotMtx, axis, TWO_PI / 64.0f);
 
     TDDraw::setup(0, 1, 0);
 
@@ -296,7 +301,7 @@ void DashRing::draw() const {
         TVec3f crossVec;
         crossVec.cross(subAxis, axis);
 
-        TDDraw::drawCylinder(vecB0 - crossVec * f3 * 0.5f, crossVec * f3, mScale.y * f1 * 30.0f, 0x00808060, 0x00808080, 0x10);
+        TDDraw::drawCylinder(vecB0 - crossVec * segmentLength * 0.5f, crossVec * segmentLength, mScale.y * f1 * 30.0f, 0x00808060, 0x00808080, 0x10);
 
         PSMTXMultVec(rotMtx, subAxis, subAxis);
     }

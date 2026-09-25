@@ -46,8 +46,8 @@ namespace {
     static const f32 sSlopeDegree = 20.0f;
     static const f32 sItemPosRadius = 5000.0f;
     static const f32 sSelectEffectOffset = 1000.0f;
-    const char* cMarioNameMessageID = "System_FileSelect_Icon000";
     const char* cLuigiNameMessageID = "System_FileSelect_Icon001";
+    const char* cMarioNameMessageID = "System_FileSelect_Icon000";
     static s32 sBgmNearState = 6;
     static u32 sBgmNearStateChangeFrames = 60;
     static s32 sBgmFarState = 5;
@@ -204,6 +204,7 @@ void FileSelector::notifyItem(FileSelectItem* pItem, s32 msg) {
         if (isNerve(GET_NERVE(FileSelector, FileSelectorNrvCopySelect))) {
             onPoint(pItem);
         }
+
         break;
     default:
         break;
@@ -222,7 +223,7 @@ void FileSelector::control() {
     for (int i = 0; i < mItems->getObjNum(); i++) {
         LiveActor* pActor = mItems->getActor(i);
         TVec3f& rEffectPosition = mSelectEffect[i].mPosition;
-        rEffectPosition.set(pActor->mPosition + TVec3f(0.0f, sSelectEffectOffset, 0.0f));
+        rEffectPosition.set(pActor->mPosition + TVec3f(0.0f, ::sSelectEffectOffset, 0.0f));
     }
 
     updateBgm();
@@ -591,7 +592,7 @@ void FileSelector::calcBasePos(f32 offset) {
     translation.makeTrans(0.0f, offset, 0.0f);
 
     TPos3f rotation;
-    rotation.makeRotate(TVec3f(1.0f, 0.0f, 0.0f), sSlopeDegree * PI / 180.0f);
+    rotation.makeRotate(TVec3f(1.0f, 0.0f, 0.0f), ::sSlopeDegree * PI / 180.0f);
 
     TPos3f transform;
     transform.concat(translation, rotation);
@@ -601,10 +602,10 @@ void FileSelector::calcBasePos(f32 offset) {
             continue;
         }
 
-        f32 theta = static_cast< f32 >(-(i + 4)) * thetaStep - sItemThetaOffset[i] * PI / 180.0f;
+        f32 theta = static_cast< f32 >(-(i + 4)) * thetaStep - ::sItemThetaOffset[i] * PI / 180.0f;
         f32 cosTheta = MR::cos(theta);
         f32 sinTheta = MR::sin(theta);
-        _98[i].set(sItemPosRadius * cosTheta, 0.0f, sItemPosRadius * sinTheta);
+        _98[i].set(::sItemPosRadius * cosTheta, 0.0f, ::sItemPosRadius * sinTheta);
         transform.mult(_98[i], _98[i]);
     }
 }
@@ -787,6 +788,14 @@ void FileSelector::playSelectedME() {
     default:
         break;
     }
+}
+
+void FileSelector_FORCE_MATCH() {
+    MR::startSystemME("ME_ASTRO_DOME_CALCEL1");
+    MR::startSystemME("ME_ASTRO_DOME_CALCEL2");
+    MR::startSystemME("ME_ASTRO_DOME_CALCEL3");
+    MR::startSystemME("ME_ASTRO_DOME_CALCEL4");
+    MR::startSystemME("ME_ASTRO_DOME_CALCEL5");
 }
 
 void FileSelector::updateBgm() {

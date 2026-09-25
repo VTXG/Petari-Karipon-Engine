@@ -20,6 +20,7 @@ namespace JGeometry {
 
         rDest[2] = -rSrc[2];
     }
+
 #else
     inline void negateInternal(const f32* rSrc, f32* rDest);
 #endif
@@ -38,6 +39,7 @@ namespace JGeometry {
             psq_st z1, 8(dst), 1, 0
         }
     }
+
 #else
     static void subInternal(const f32* vec1, const f32* vec2, f32* dst);
 #endif
@@ -54,6 +56,7 @@ namespace JGeometry {
 
         dst[2] = vec1[2] * vec2[2];
     }
+
 #else
     void mulInternal(const f32* vec1, const f32* vec2, f32* dst);
 #endif
@@ -253,6 +256,10 @@ namespace JGeometry {
         T x, y;
     };
 
+    template <>
+    TVec2< f32 >::TVec2() {
+    }
+
     template < typename T >
     struct TVec3 {
         T x;
@@ -335,6 +342,7 @@ namespace JGeometry {
             }
             ;
         }
+
 #else
         TVec3(const Vec& vec);
 #endif
@@ -355,6 +363,7 @@ namespace JGeometry {
             }
             ;
         }
+
 #else
         TVec3(const TVec3< f32 >& vec);
 #endif
@@ -448,14 +457,12 @@ namespace JGeometry {
             z = val;
         }
 
-        inline void set2(f32 val) {
-            z = val;
-            y = val;
-            x = val;
-        }
-
         template < typename T >
-        void setAll(f32);
+        void setAll(f32 value) NO_INLINE {
+            x = value;
+            y = value;
+            z = value;
+        }
 
         void setTrans(MtxPtr mtx) {
             set< f32 >((*mtx)[3], (*mtx)[7], (*mtx)[11]);
@@ -520,7 +527,8 @@ namespace JGeometry {
 
         // appears to be needed in RingBeam to match stack in some places
         TVec3 scaleInline(f32 scalar) const {
-            TVec3 ret(*this);
+            const TVec3& rSelf = *this;
+            TVec3 ret(rSelf);
             ret.scale(scalar);
             return ret;
         }
@@ -630,6 +638,7 @@ namespace JGeometry {
             }
             ;
         }
+
 #else
         void setPSZeroVec();
 #endif
@@ -690,6 +699,7 @@ namespace JGeometry {
                 psq_st destXY, 0(dest), 0, 0
                 psq_st destZ, 8(dest), 1, 0
             }
+
 #else
             x += src.x * scale;
             y += src.y * scale;
@@ -869,6 +879,7 @@ namespace JGeometry {
             if (a > maxAngle) {
                 rate = maxAngle / a;
             }
+
             return rate;
         }
 
@@ -916,7 +927,12 @@ namespace JGeometry {
             w = _w;
         }
 
-        void scale(T val);
+        void scale(T val) NO_INLINE {
+            x *= val;
+            y *= val;
+            z *= val;
+            w *= val;
+        }
 
         inline TVec3< T >* toTVec3() {
             return (TVec3< T >*)this;
@@ -1018,21 +1034,26 @@ namespace JGeometry {
             f32 m20 = 2.0f * (this->x * this->z - this->w * this->y);
 
             if (m20 - 1.0f >= -TUtil< f32 >::epsilon()) {
-                rDest.x = JMAATan2(-(2.0f * (this->x * this->y - this->w * this->z)), 1.0f - 2.0f * (this->x * this->x + this->z * this->z));
+                f32 numerator = 2.0f * (this->x * this->y - this->w * this->z);
+                rDest.x = JMAATan2(-numerator, 1.0f - 2.0f * (this->x * this->x + this->z * this->z));
                 rDest.y = -JMath::TAngleConstant_< f32 >::RADIAN_DEG090();
                 rDest.z = 0.0f;
             } else if (1.0f + m20 <= TUtil< f32 >::epsilon()) {
-                rDest.x = JMAATan2(2.0f * (this->x * this->y - this->w * this->z), 1.0f - 2.0f * (this->x * this->x + this->z * this->z));
+                f32 numerator = 2.0f * (this->x * this->y - this->w * this->z);
+                rDest.x = JMAATan2(numerator, 1.0f - 2.0f * (this->x * this->x + this->z * this->z));
                 rDest.y = JMath::TAngleConstant_< f32 >::RADIAN_DEG090();
                 rDest.z = 0.0f;
             } else {
                 f32 m10 = 2.0f * (this->x * this->y + this->w * this->z);
+                f32 numerator = 2.0f * (this->y * this->z + this->w * this->x);
+                f32 denominator = 1.0f - 2.0f * (this->x * this->x + this->y * this->y);
                 f32 m00 = 1.0f - 2.0f * (this->y * this->y + this->z * this->z);
-                rDest.x = JMAATan2(2.0f * (this->y * this->z + this->w * this->x), 1.0f - 2.0f * (this->x * this->x + this->y * this->y));
+                rDest.x = JMAATan2(numerator, denominator);
                 rDest.y = JMath::sAsinAcosTable.asin_(-m20);
                 rDest.z = JMAATan2(m10, m00);
             }
         }
+
         void setEuler(T _x, T _y, T _z) NO_INLINE {
             f32 cx = cos(0.5f * _x);
             f32 cy = cos(0.5f * _y);
@@ -1049,6 +1070,7 @@ namespace JGeometry {
             this->z = cysz * cx - sycz * sx;
             this->w = cycz * cx + sysz * sx;
         }
+
         void setEuler(const TVec3< T >& rpy) {
             setEuler(rpy.x, rpy.y, rpy.z);
         }
@@ -1069,8 +1091,8 @@ namespace JGeometry {
         void setEulerY(T _y) {
             f32 s = sin(_y * 0.5f);
             f32 c = cos(_y * 0.5f);
-            this->y = s;
             this->x = 0.0f;
+            this->y = s;
             this->z = 0.0f;
             this->w = c;
         }
@@ -1086,15 +1108,18 @@ namespace JGeometry {
 
         f32 getRotate(TVec3< T >& rAxis) {
             f32 length = toTvec()->squared();
+            f32 angle;
 
             if (length <= JGeometry::TUtil< f32 >::epsilon()) {
+                angle = 0.0f;
                 rAxis.zero();
-                return 0.0f;
+            } else {
+                f32 lengthinv = JGeometry::TUtil< f32 >::inv_sqrt(length);
+                rAxis.scale(lengthinv, *toTvec());
+                angle = JGeometry::TUtil< f32 >::acos(this->w) * 2.0f;
             }
 
-            f32 lengthinv = JGeometry::TUtil< f32 >::inv_sqrt(length);
-            rAxis.scale(lengthinv, *toTvec());
-            return JGeometry::TUtil< f32 >::acos(this->w) * 2.0f;
+            return angle;
         }
 
         void setRotate(const TVec3< f32 >& rA, const TVec3< f32 >& rB, f32 ratio) {
@@ -1118,9 +1143,12 @@ namespace JGeometry {
             if (crossPart <= TUtil< f32 >::epsilon()) {
                 this->template set< f32 >(0.0f, 0.0f, 0.0f, 1.0f);
             } else {
-                f32 dotPart = rA.dot(rB);
+                f32 dotPart = JMathInlineVEC::PSVECDotProduct(&rA, &rB);
                 f32 halfAngle = 0.5f * JMAATan2(crossPart, dotPart);
-                toTvec()->scale((f32)sin(halfAngle) / crossPart, dir);
+                f32 scale = static_cast< f32 >(sin(halfAngle)) / crossPart;
+                this->x = dir.x * scale;
+                this->y = dir.y * scale;
+                this->z = dir.z * scale;
                 this->w = cos(halfAngle);
             }
         }
@@ -1173,7 +1201,7 @@ namespace JGeometry {
             if (1.0f - product <= TUtil< f32 >::epsilon()) {
                 weight = 1.0f - ratio;
             } else {
-                f32 angle = JMAAcosRadian(product);
+                f32 angle = JMath::sAsinAcosTable.acos_(product);
                 f32 sinAngle = sin(angle);
                 weight = (f32)sin((1.0f - ratio) * angle) / sinAngle;
                 ratio = (f32)sin(ratio * angle) / sinAngle;

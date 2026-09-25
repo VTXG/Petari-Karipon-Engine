@@ -12,6 +12,11 @@
 #include "Game/Util/PlayerUtil.hpp"
 #include "Game/Util/SoundUtil.hpp"
 
+void KoopaShockWave_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+}
+
 namespace {
     // static const s32 sStepWaveAttack = _;
     // static const f32 sModelRadius = _;
@@ -86,6 +91,8 @@ namespace {
     }
 };  // namespace
 
+#pragma push
+#pragma opt_propagation off
 void KoopaShockWave::exeWaveAttack() {
     if (MR::isFirstStep(this)) {
         mPartsModel->makeActorAppeared();
@@ -122,16 +129,22 @@ void KoopaShockWave::exeWaveAttack() {
     mAngle = MR::calcNerveValue(this, 360, 0.0f, 180.0f);
 
     f32 scale = MR::cosDegree(mAngle);
-    makeShockWaveMtx(&mBaseMtx, mUp, mFront, KoopaFunction::getPlanetCenterPos(mKoopa), scale, 1300.0f);
-    makeShockWaveMtx(&mMtx, mUp, mFront, KoopaFunction::getPlanetCenterPos(mKoopa), scale, 1260.0f);
+    ::makeShockWaveMtx(&mBaseMtx, mUp, mFront, KoopaFunction::getPlanetCenterPos(mKoopa), scale, 1300.0f);
+    ::makeShockWaveMtx(&mMtx, mUp, mFront, KoopaFunction::getPlanetCenterPos(mKoopa), scale, 1260.0f);
 
     f32 frame = MR::sinDegree(mAngle) * 10.0f;
     MR::setBckFrameAndStop(this, frame);
     MR::setBckFrameAndStop(mPartsModel, frame);
     MR::setBckFrameAndStop(mShadow, frame);
 
-    f32 f1 = mAngle <= 90.0f ? mAngle / 90.0f : 1.0f - (mAngle - 90.0f) / 90.0f;
-    MR::startLevelSound(mKoopa, "SE_BM_LV_KOOPA_SWAVE_MOVE", 100.0f * f1);
+    f32 volume;
+    if (mAngle <= 90.0f) {
+        volume = mAngle / 90.0f;
+    } else {
+        volume = 1.0f - (mAngle - 90.0f) / 90.0f;
+    }
+    volume *= 100.0f;
+    MR::startLevelSound(mKoopa, "SE_BM_LV_KOOPA_SWAVE_MOVE", volume);
 
     if (MR::isStep(this, 350)) {
         MR::startBrk(this, "Erase");
@@ -143,6 +156,7 @@ void KoopaShockWave::exeWaveAttack() {
         kill();
     }
 }
+#pragma pop
 
 void KoopaShockWave::updateHitSensor(HitSensor* pSensor) {
     TVec3f playerPos = *MR::getPlayerPos();

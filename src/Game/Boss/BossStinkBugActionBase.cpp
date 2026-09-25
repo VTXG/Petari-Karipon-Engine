@@ -12,13 +12,69 @@
 #include "Game/Util/RailUtil.hpp"
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/SpringValue.hpp"
+#include "Game/Util/StringUtil.hpp"
 #include <JSystem/JGeometry/TVec.hpp>
 #include <revolution/mtx.h>
 #include <revolution/types.h>
 
+void BossStinkBugActionBase_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)3.0f;
+    (void)15.0f;
+    (void)0.02f;
+    (void)0.95f;
+    (void)0.75f;
+    (void)-15.0f;
+    (void)35.0f;
+    (void)4e+01f;
+    (void)0.3f;
+    (void)1.1e+03f;
+    (void)1.2f;
+    (void)0.99f;
+    (void)1.8e+02f;
+    (void)0.9f;
+    (void)0.6666667f;
+    (void)1.5e+03f;
+    (void)12.0f;
+    (void)2.5e+03f;
+    (void)1e+03f;
+    (void)5.5e+02f;
+    (void)2e+03f;
+    (void)4.5e+03f;
+    (void)126.0f;
+    (void)2e+01f;
+    (void)0.0f;
+}
+
+void BossStinkBugActionBase_FORCE_MATCH_STRINGS() {
+    MR::isEqualString("GroundWalk", "GroundWalk");
+    MR::isEqualString("SE_BV_BOSS_BUG_ATTACK_G", "SE_BV_BOSS_BUG_ATTACK_G");
+    MR::isEqualString("Find", "Find");
+    MR::isEqualString("GroundRide", "GroundRide");
+    MR::isEqualString("GroundRun", "GroundRun");
+    MR::isEqualString("SE_BM_LV_BOSS_BUG_RUN_ADD_WATER", "SE_BM_LV_BOSS_BUG_RUN_ADD_WATER");
+    MR::isEqualString("AttackSuccess", "AttackSuccess");
+    MR::isEqualString("SE_BV_BOSS_BUG_GLAD", "SE_BV_BOSS_BUG_GLAD");
+    MR::isEqualString("CoolDown", "CoolDown");
+    MR::isEqualString("SE_BM_LV_BOSS_BUG_BRAKE", "SE_BM_LV_BOSS_BUG_BRAKE");
+    MR::isEqualString("GroundTurnLeft", "GroundTurnLeft");
+    MR::isEqualString("GroundTurnRight", "GroundTurnRight");
+    MR::isEqualString("SE_BM_BOSS_BUG_PRESSED", "SE_BM_BOSS_BUG_PRESSED");
+    MR::isEqualString("GroundDamage", "GroundDamage");
+    MR::isEqualString("Fall", "Fall");
+    MR::isEqualString("SE_BV_BOSS_BUG_DAMAGE", "SE_BV_BOSS_BUG_DAMAGE");
+    MR::isEqualString("FlyWait", "FlyWait");
+    MR::isEqualString("FlyRide", "FlyRide");
+    MR::isEqualString("FlyRollRight", "FlyRollRight");
+    MR::isEqualString("FlyRollWaitRight", "FlyRollWaitRight");
+    MR::isEqualString("FlyRollEndRight", "FlyRollEndRight");
+}
+
 BossStinkBugActionBase::BossStinkBugActionBase(const char* pName, BossStinkBug* pStinkBug)
-    : ActorStateBase< BossStinkBug >(pName, pStinkBug), mSpringValue(nullptr), _14(0.0f, 0.0f, 0.0f), _20(0.0f, 0.0f, 1.0f), _38(15.0f), _3C(0.0f),
-      _40(0.0f), _44(0.0f), mThrowBombTimer(0), _50(true), _54(0.0f), _58(0.0f), _5C(0), _60(false), _61(false) {
+    : ActorStateBase< BossStinkBug >(pName, pStinkBug), mSpringValue(), _14(0.0f, 0.0f, 0.0f), _20(0.0f, 0.0f, 1.0f), _38(15.0f), _3C(), _40(), _44(),
+      mThrowBombTimer(), _50(true), _54(), _58(), _5C(), _60(), _61() {
     mSpringValue = new SpringValue(_3C, _3C, 0.02f, 0.95f, 0.0f);
 }
 
@@ -38,6 +94,7 @@ bool BossStinkBugActionBase::updateFlyRoll() {
     if (MR::isFirstStep(this)) {
         MR::startBck(getHost(), "FlyRollRight");
     }
+
     startSoundFly(0);
     _48 = _38;
 
@@ -52,8 +109,9 @@ bool BossStinkBugActionBase::updateFlyRoll() {
 
 bool BossStinkBugActionBase::updateFlyRollWait(s32 waitSteps) {
     if (MR::isFirstStep(this)) {
-        MR::startBck(getHost(), "FlyRollRight");
+        MR::startBck(getHost(), "FlyRollWaitRight");
     }
+
     startSoundFly(0);
     _48 = _38;
 
@@ -68,7 +126,7 @@ bool BossStinkBugActionBase::updateFlyRollWait(s32 waitSteps) {
 
 bool BossStinkBugActionBase::updateFlyRollEnd() {
     if (MR::isFirstStep(this)) {
-        MR::startBck(getHost(), "FlyRollRight");
+        MR::startBck(getHost(), "FlyRollEndRight");
     }
 
     startSoundFly(0);
@@ -132,7 +190,7 @@ f32 BossStinkBugActionBase::calcShakeOffSpeed() const {
 }
 
 f32 BossStinkBugActionBase::calcShakeOffEndSpeed() const {
-    return MR::calcNerveEaseInOutValue(this, MR::getBckFrameMax(getHost(), "FlyRollRight"), 35.0f, _38);
+    return MR::calcNerveEaseInOutValue(this, MR::getBckFrameMax(getHost(), "FlyRollEndRight"), 35.0f, _38);
 }
 
 s32 BossStinkBugActionBase::calcKeepRollTime(s32 a1) const {
@@ -146,10 +204,10 @@ s32 BossStinkBugActionBase::calcKeepRollTime(s32 a1) const {
     s32 keepRollTime = (flt1 - flt2) / 2;
 
     if (keepRollTime < 0) {
-        return 0;
-    } else {
-        return keepRollTime;
+        keepRollTime = 0;
     }
+
+    return keepRollTime;
 }
 
 s32 BossStinkBugActionBase::calcFlySoundVol() const {
@@ -215,7 +273,7 @@ void BossStinkBugActionBase::updateSoundFly() {
     }
 
     _58 = _54;
-    _54 = getHost()->mPosition.distance(MR::getCamPos());
+    _54 = MR::getCamPos().distance(getHost()->mPosition);
 
     if (_58 - _54 > 0.0f) {
         _5C = 12;
@@ -345,6 +403,7 @@ bool BossStinkBugActionBase::updateGroundTurn() {
 
         _48 = 0.0f;
     }
+
     BossStinkBugFunction::turnRailGround(getHost(), _20, MR::calcNerveRate(this, 120), _50);
 
     if (MR::isGreaterStep(this, 160)) {
@@ -453,7 +512,7 @@ bool BossStinkBugActionBase::updateFlyShakeOffWait(s32 numSteps) {
 
 bool BossStinkBugActionBase::updateFlyShakeOffEnd() {
     if (MR::isFirstStep(this)) {
-        MR::startBck(getHost(), "FlyRollRight");
+        MR::startBck(getHost(), "FlyRollEndRight");
     }
 
     startSoundFly(0);
@@ -680,6 +739,7 @@ void BossStinkBugActionBase::startSoundFly(s32 sound) {
         } else {
             MR::startLevelSound(getHost(), "SE_BM_LV_BOSS_BUG_FLY_BASE", flySoundVol, iIRCCutoff);
         }
+
         MR::startLevelSound(getHost(), "SE_BM_LV_BOSS_BUG_FLY_ADD", flySoundVol, iIRCCutoff);
         MR::startLevelSound(getHost(), "SE_BM_LV_BOSS_BUG_FLY_ALARM", flySoundVol, iIRCCutoff);
         break;
@@ -700,6 +760,7 @@ void BossStinkBugActionBase::startSoundFly(s32 sound) {
         } else {
             MR::startLevelSound(getHost(), "SE_BM_LV_BOSS_BUG_FLY_SHAKE", flySoundVol, iIRCCutoff);
         }
+
         MR::startLevelSound(getHost(), "SE_BM_LV_BOSS_BUG_FLY_ADD", flySoundVol, iIRCCutoff);
         MR::startLevelSound(getHost(), "SE_BM_LV_BOSS_BUG_FLY_ALARM", flySoundVol, iIRCCutoff);
     }
