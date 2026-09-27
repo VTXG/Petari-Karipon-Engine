@@ -137,6 +137,7 @@ class ProjectConfig:
     def __init__(self) -> None:
         # Paths
         self.build_dir: Path = Path("build")  # Output build files
+        self.orig_dir: Path = Path("orig")  # Base game files
         self.src_dir: Path = Path("src")  # C/C++/asm source files
         self.tools_dir: Path = Path("tools")  # Python scripts
         self.asm_dir: Optional[Path] = Path(
@@ -1193,11 +1194,7 @@ def generate_build_ninja(
             implicit=dtk,
             order_only="post-link",
         )
-
-        ###
-        # Generate RELs
-        ###
-        # TODO
+        n.newline()
 
         # Add all build steps needed post-build (re-building archives and such)
         write_custom_step("post-build", "post-link")
@@ -1250,6 +1247,29 @@ def generate_build_ninja(
             inputs="dol_apply",
         )
         n.newline()
+
+        ###
+        # Generate SEL
+        ###
+        sel_patch_script = config.tools_dir / "sel_patch.py"
+        sel_path = config.orig_dir / str(config.version) / "files" / "ModuleData" / "product.sel"
+        sel_out_path = config.out_path() / "product.sel"
+        n.comment("Patch the SEL file")
+        n.rule(
+            name="sel_patch",
+            command=f"$python {sel_patch_script} $in_elf $in $out",
+            description=f"PATCH $in",
+        )
+        n.build(
+            inputs=[sel_path],
+            outputs=[sel_out_path],
+            rule="sel_patch",
+            implicit=[link_steps[0].partial_output()],
+            variables={"in_elf": link_steps[0].partial_output()},
+        )
+        n.newline()
+        
+        link_outputs.append(sel_out_path)
 
     ###
     # Split DOL

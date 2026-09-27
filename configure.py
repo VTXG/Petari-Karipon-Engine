@@ -46,6 +46,13 @@ parser.add_argument(
     help="base build directory (default: build)",
 )
 parser.add_argument(
+    "--orig-dir",
+    metavar="DIR",
+    type=Path,
+    default=Path("orig"),
+    help="base game files directory (default: orig)",
+)
+parser.add_argument(
     "--binutils",
     metavar="BINARY",
     type=Path,
@@ -117,6 +124,7 @@ version_num = VERSIONS.index(config.version)
 
 # Apply arguments
 config.build_dir = args.build_dir
+config.orig_dir = args.orig_dir
 config.dtk_path = args.dtk
 config.objdiff_path = args.objdiff
 config.binutils_path = args.binutils

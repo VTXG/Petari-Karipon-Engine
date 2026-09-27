@@ -76,25 +76,4 @@ void GameSystemException::handleException(OSError error, OSContext* pContext, u3
     }
 
     AIRegisterDMACallback(nullptr);
-
-    if (::isBootWPAD()) {
-        s32 padCommandSuccessCounter = 0;
-        u32 padCommandTrigger = 0;
-        u32 padCommandHold = 0;
-
-        while (::cDispExceptionCommand[padCommandSuccessCounter]) {
-            JUTException::waitTime(100);
-            JUTException::sErrorManager->readPad(&padCommandTrigger, &padCommandHold);
-
-            if (padCommandTrigger == 0) {
-                continue;
-            }
-
-            if ((::cDispExceptionCommand[padCommandSuccessCounter] & padCommandTrigger) == ::cDispExceptionCommand[padCommandSuccessCounter]) {
-                padCommandSuccessCounter++;
-            } else {
-                padCommandSuccessCounter = 0;
-            }
-        }
-    }
 }
