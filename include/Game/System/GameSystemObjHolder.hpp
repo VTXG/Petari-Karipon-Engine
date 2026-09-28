@@ -16,6 +16,7 @@ class NetworkSystemWrapper;
 class ParticleResourceHolder;
 class ScreenPreserver;
 class StarPointerDirector;
+class SystemDebugLayout;
 class WPadHolder;
 
 class GameSystemObjHolder {
@@ -32,6 +33,7 @@ public:
     void clearRequestFileInfo(bool);
     void drawStarPointer();
     void drawBeforeEndRender();
+    void drawAfterHomeMenu();
     void captureIfAllowForScreenPreserver();
     GXRenderModeObj* getRenderModeObj() const;
     void initDvd();
@@ -61,6 +63,7 @@ public:
     /* 0x2C */ MessageHolder* mMessageHolder;
     /* 0x30 */ StarPointerDirector* mStarPointerDirector;
     /* 0x34 */ NetworkSystemWrapper* mNetworkSystem;
-    /* 0x38 */ JMath::TRandom_fast_ mRandom;
-    /* 0x3C */ u32 mLanguage;
+    /* 0x38 */ SystemDebugLayout* mDebugLayout;
+    /* 0x3C */ JMath::TRandom_fast_ mRandom;
+    /* 0x34 */ u32 mLanguage;
 };

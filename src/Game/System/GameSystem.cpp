@@ -214,6 +214,7 @@ void GameSystem::draw() {
 
     mErrorWatcher->draw();
     mHomeButtonLayout->draw();
+    mObjHolder->drawAfterHomeMenu();
     SingletonHolder< GameSystemResetAndPowerProcess >::get()->draw();
 }
 

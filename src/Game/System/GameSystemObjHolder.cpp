@@ -4,6 +4,7 @@
 #include "Game/Screen/CaptureScreenDirector.hpp"
 #include "Game/Screen/ScreenPreserver.hpp"
 #include "Game/Screen/StarPointerDirector.hpp"
+#include "Game/Screen/SystemDebugLayout.hpp"
 #include "Game/System/AudSystemWrapper.hpp"
 #include "Game/System/ErrorArchive.hpp"
 #include "Game/System/FileLoader.hpp"
@@ -105,6 +106,10 @@ void GameSystemObjHolder::drawBeforeEndRender() {
     mScreenPreserver->draw();
 }
 
+void GameSystemObjHolder::drawAfterHomeMenu() {
+    mDebugLayout->draw();
+}
+
 void GameSystemObjHolder::captureIfAllowForScreenPreserver() {
     mScreenPreserver->captureIfAllow();
 }
@@ -178,6 +183,7 @@ void GameSystemObjHolder::initDisplay() {
 
     mCaptureScreenDirector = new CaptureScreenDirector();
     mScreenPreserver = new ScreenPreserver();
+    mDebugLayout = new SystemDebugLayout();
 
     VISetTrapFilter(VI_TRUE);
     VISetTrapFilter(VI_FALSE);

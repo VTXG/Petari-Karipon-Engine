@@ -2398,6 +2398,7 @@ config.libs = [
             Object("Game/Screen/SuddenDeathMeter.cpp"),
             Object("Game/Screen/SurfingGuidance.cpp"),
             Object("Game/Screen/SysInfoWindow.cpp"),
+            Object("Game/Screen/SystemDebugLayout.cpp"),
             Object("Game/Screen/SystemWipeHolder.cpp"),
             Object("Game/Screen/THPSimplePlayerWrapper.cpp"),
             Object("Game/Screen/TimeLimitLayout.cpp"),
