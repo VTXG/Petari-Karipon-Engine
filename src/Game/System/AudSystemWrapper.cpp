@@ -42,6 +42,7 @@ void AudSystemWrapper::requestResourceForInitialize() {
     MR::mountAsyncArchive(sJaiMeArc, mSolidHeap);
     MR::mountAsyncArchive(AudSpeakerWrap::getResName(), mSpkHeap);
     MR::mountAsyncArchive(sJaiRemixArc, mSolidHeap);
+    MR::loadAsyncToMainRAM("/SystemData/StageWaveTable.byaml", nullptr, mSolidHeap, JKRDvdRipper::ALLOC_DIRECTION_FORWARD);
 }
 
 void AudSystemWrapper::createAudioSystem() {

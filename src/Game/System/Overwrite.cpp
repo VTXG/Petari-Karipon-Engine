@@ -1,3 +1,4 @@
+#include "Game/AudioLib/AudParams.hpp"
 #include "Game/System/ShapePacketUserData.hpp"
 #include "Game/System/WPad.hpp"
 #include "Game/Util/MathUtil.hpp"
@@ -1064,7 +1065,8 @@ void JKRAramPiece::startDMA(JKRAMCommand* pCommand) {
         return;
     }
 
-    if (pCommand->mDataLength > 0x00E00000) {
+    // TODO: Not sure if we want AudParams::aramSize or 0x00E00000 here
+    if (pCommand->mDataLength > AudParams::aramSize) {
         doneDMA(reinterpret_cast< u32 >(pCommand));
         return;
     }

@@ -1,4 +1,5 @@
 #include "Game/System/GameSystem.hpp"
+#include "Game/AudioLib/AudParams.hpp"
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/NameObj/NameObjRegister.hpp"
 #include "Game/Screen/HomeButtonLayout.hpp"
@@ -77,7 +78,7 @@ GameSystem::GameSystem()
 }
 
 void GameSystem::init() {
-    JKRAram::create(0xE00000, 0xFFFFFFFF, 8, 7, 3);
+    JKRAram::create(AudParams::aramSize, 0xFFFFFFFF, 8, 7, 3);
     mObjHolder = new GameSystemObjHolder();
     mFontHolder = new GameSystemFontHolder();
     mFontHolder->createFontFromEmbeddedData();
