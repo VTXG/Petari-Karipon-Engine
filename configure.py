@@ -2524,6 +2524,7 @@ config.libs = [
             Object("Game/System/GameSequenceDirector.cpp"),
             Object("Game/System/GameSequenceFunction.cpp"),
             Object("Game/System/GameSequenceProgress.cpp"),
+            Object("Game/System/GameStoryEventTable.cpp"),
             Object("Game/System/LuigiLeftSupplier.cpp"),
             Object("Game/System/SaveDataBannerCreator.cpp"),
             Object("Game/System/SaveDataFileAccessor.cpp"),

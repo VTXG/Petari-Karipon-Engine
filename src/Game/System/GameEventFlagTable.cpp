@@ -144,6 +144,10 @@ void GameEventFlagTableInstance::initSortTable() {
 
 namespace GameEventFlagTable {
     void init() {
+        if (sGameEventFlagTable.size() > 0) {
+            return;
+        }
+
         void* pFileData = MR::receiveFile("/SystemData/GameEventFlagTable.bcsv");
 
         JMapInfo info;

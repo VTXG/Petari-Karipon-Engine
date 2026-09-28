@@ -958,6 +958,16 @@ namespace MR {
             "/SystemData/GameEventFlagTable.bcsv",
         },
         {
+            StationedFileInfo::HEAP_TYPE_GDDR,
+            StationedFileInfo::LOAD_TYPE_FILE,
+            "/SystemData/GameEventValueTable.bcsv",
+        },
+        {
+            StationedFileInfo::HEAP_TYPE_GDDR,
+            StationedFileInfo::LOAD_TYPE_FILE,
+            "/SystemData/GameStoryEventTable.bcsv",
+        },
+        {
             StationedFileInfo::HEAP_TYPE_NAPA,
             StationedFileInfo::LOAD_TYPE_FILE,
             nullptr,

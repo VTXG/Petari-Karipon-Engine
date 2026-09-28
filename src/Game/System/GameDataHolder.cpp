@@ -5,15 +5,13 @@
 #include "Game/System/GameEventFlagStorage.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
 #include "Game/System/GameEventValueChecker.hpp"
+#include "Game/System/GameStoryEventTable.hpp"
 #include "Game/System/ScenarioProgressTestRun.hpp"
 #include "Game/System/SpinDriverPathStorage.hpp"
 #include "Game/System/StarPieceAlmsStorage.hpp"
 #include "Game/System/UserFile.hpp"
-#include "Game/Util/JMapInfo.hpp"
 #include "Game/Util/MathUtil.hpp"
 #include <cstdio>
-
-extern const u8 StoryEventBCSV[];
 
 namespace {
     const char cPictureBookChapterSuffix[] = "ABCDEFGHI";
@@ -21,7 +19,7 @@ namespace {
 
 GameDataHolder::GameDataHolder(const UserFile* pUserFile)
     : mUserFile(pUserFile), mEventFlagChecker(), mEventValueChecker(), mPlayerStatus(), mAllGalaxyStorage(), mSpinDriverPathStorage(),
-      mStarPieceAlmsStorage(), mMapInfo(), mScenarioProgressTestRun(), mChunkHolder() {
+      mStarPieceAlmsStorage(), mScenarioProgressTestRun(), mChunkHolder() {
     mScenarioProgressTestRun = new ScenarioProgressTestRun(this);
     mAllGalaxyStorage = new GameDataAllGalaxyStorage();
     mEventFlagChecker = new GameEventFlagChecker(this);
@@ -29,9 +27,6 @@ GameDataHolder::GameDataHolder(const UserFile* pUserFile)
     mPlayerStatus = new GameDataPlayerStatus();
     mSpinDriverPathStorage = new SpinDriverPathStorage();
     mStarPieceAlmsStorage = new StarPieceAlmsStorage();
-
-    mMapInfo = new JMapInfo();
-    mMapInfo->attach(StoryEventBCSV);
 
     mChunkHolder = new BinaryDataChunkHolder(4096, 6);
     mChunkHolder->addChunk(mPlayerStatus);
@@ -284,19 +279,11 @@ bool GameDataHolder::isCompleteMarioAndLuigi() const {
 }
 
 bool GameDataHolder::isPassedStoryEvent(const char* pEventName) const {
-    JMapInfoIter iter = mMapInfo->findElement("name", pEventName, 0);
-
-    u32 progress = 0;
-    iter.getValue("progress", &progress);
-    return progress <= mPlayerStatus->mStoryProgress;
+    return GameStoryEventTable::getStoryEventProgress(pEventName) <= mPlayerStatus->mStoryProgress;
 }
 
 void GameDataHolder::followStoryEventByName(const char* pEventName) {
-    JMapInfoIter iter = mMapInfo->findElement("name", pEventName, 0);
-
-    u32 progress = 0;
-    iter.getValue("progress", &progress);
-    mPlayerStatus->mStoryProgress = progress;
+    mPlayerStatus->mStoryProgress = GameStoryEventTable::getStoryEventProgress(pEventName);
 }
 
 void GameDataHolder::resetAllData() {
