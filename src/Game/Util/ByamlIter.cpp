@@ -52,7 +52,7 @@ s32 ByamlIter::getSize() const {
 ByamlIter ByamlIter::getIterByIndex(s32 index) const {
     ByamlData data;
 
-    if (!getByamlDataByIndex(&data, index)) {
+    if (!tryGetByamlDataByIndex(&data, index)) {
         return ByamlIter();
     }
 
@@ -67,7 +67,7 @@ ByamlIter ByamlIter::getIterByIndex(s32 index) const {
     return ByamlIter(mData, &mData[data.getValue()]);
 }
 
-bool ByamlIter::getByamlDataByIndex(ByamlData* pData, s32 index) const {
+bool ByamlIter::tryGetByamlDataByIndex(ByamlData* pData, s32 index) const {
     if (mRootNode == nullptr) {
         return false;
     }
@@ -88,7 +88,7 @@ bool ByamlIter::getByamlDataByIndex(ByamlData* pData, s32 index) const {
 ByamlIter ByamlIter::getIterByKey(const char* pKey) const {
     ByamlData data;
 
-    if (!getByamlDataByKey(&data, pKey)) {
+    if (!tryGetByamlDataByKey(&data, pKey)) {
         return ByamlIter();
     }
 
@@ -103,7 +103,7 @@ ByamlIter ByamlIter::getIterByKey(const char* pKey) const {
     return ByamlIter(mData, &mData[data.getValue()]);
 }
 
-bool ByamlIter::getByamlDataByKey(ByamlData* pData, const char* pKey) const {
+bool ByamlIter::tryGetByamlDataByKey(ByamlData* pData, const char* pKey) const {
     if (mRootNode == nullptr || *mRootNode != BYAML_TYPE_HASH) {
         return false;
     }

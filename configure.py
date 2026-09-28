@@ -2250,6 +2250,7 @@ config.libs = [
                 "Game/Scene/StageDataHolder.cpp", extra_cflags=["-sym off"]
             ),
             Object("Game/Scene/StageFileLoader.cpp"),
+            Object("Game/Scene/StageParamTable.cpp"),
             Object("Game/Scene/StageResourceLoader.cpp"),
             Object("Game/Scene/StopSceneController.cpp"),
         ],

@@ -9,6 +9,8 @@
 #include <JSystem/JUtility/JUTException.hpp>
 #include <JSystem/JUtility/JUTVideo.hpp>
 
+extern "C" void __OSStopAudioSystem(void);
+
 void* GameSystemException::sMapFileUsingBuffer;
 
 namespace {
@@ -17,16 +19,6 @@ namespace {
 
         return pObjHolder != nullptr && pObjHolder->mWPadHolder != nullptr;
     }
-
-    const u32 cDispExceptionCommand[] = {
-        0x0008,  // +Control Pad ↑
-        0x0004,  // +Control Pad ↓
-        0x0001,  // +Control Pad ←
-        0x0002,  // +Control Pad →
-        0x0100,  // A Button
-        0x0010,  // 1 Button + 2 Button
-        0x0000,
-    };
 };  // namespace
 
 void GameSystemException::init() {
@@ -76,4 +68,5 @@ void GameSystemException::handleException(OSError error, OSContext* pContext, u3
     }
 
     AIRegisterDMACallback(nullptr);
+    __OSStopAudioSystem();
 }

@@ -1,7 +1,6 @@
 #include "Game/Util/ByamlUtil.hpp"
 #include "Game/Util/ByamlHeader.hpp"
 #include "Game/Util/ByamlIter.hpp"
-#include "Game/Util/FileUtil.hpp"
 #include <revolution/types.h>
 
 namespace ByamlUtil {
@@ -13,11 +12,6 @@ namespace ByamlUtil {
         }
 
         return ByamlIter();
-    }
-
-    ByamlIter createByamlRootFromFile(const char* pFilePath) {
-        void* pData = MR::receiveFile(pFilePath);
-        return createByamlRoot(static_cast< u8* >(pData));
     }
 
     ByamlStringTableIter getHashKeyTable(const u8* pData) {

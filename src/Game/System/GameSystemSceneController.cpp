@@ -6,6 +6,7 @@
 #include "Game/Scene/ScenarioSelectScene.hpp"
 #include "Game/Scene/SceneFactory.hpp"
 #include "Game/Scene/SceneFunction.hpp"
+#include "Game/Scene/StageParamTable.hpp"
 #include "Game/System/AudSystemWrapper.hpp"
 #include "Game/System/GameSystem.hpp"
 #include "Game/System/GameSystemFunction.hpp"
@@ -13,6 +14,7 @@
 #include "Game/System/HeapMemoryWatcher.hpp"
 #include "Game/System/ScenarioDataParser.hpp"
 #include "Game/System/WPadHolder.hpp"
+#include "Game/Util/ByamlIter.hpp"
 #include "Game/Util/EventUtil.hpp"
 #include "Game/Util/FileUtil.hpp"
 #include "Game/Util/JMapIdInfo.hpp"
@@ -22,6 +24,7 @@
 #include "Game/Util/SingletonHolder.hpp"
 #include "Game/Util/StringUtil.hpp"
 #include "Game/Util/SystemUtil.hpp"
+#include "revolution/os.h"
 #include <JSystem/JKernel/JKRSolidHeap.hpp>
 #include <cstdio>
 
@@ -76,6 +79,8 @@ GameSystemSceneController::GameSystemSceneController()
 }
 
 void GameSystemSceneController::initAfterStationedResourceLoaded() {
+    StageParamTable::init();
+
     mScenarioParser = new ScenarioDataParser("シナリオデータ解析");
     mScenarioParser->initWithoutIter();
 
@@ -110,7 +115,14 @@ void GameSystemSceneController::initializeScene() {
     mSceneInitializeState = SceneInitializeState_Init;
 
     if (SingletonHolder< HeapMemoryWatcher >::get()->mFileCacheHeap == nullptr || !isSameAtNextSceneAndStage()) {
-        SingletonHolder< HeapMemoryWatcher >::get()->createFileCacheHeapOnGameHeap(0x1040400);
+        u32 fileCacheSize = 0x1040400;
+
+        ByamlIter params;
+        if (StageParamTable::tryGetParams(&params, mNextSceneControlInfo.mStage, mNextSceneControlInfo.mScenarioNo)) {
+            params.tryGetValueByKey(&fileCacheSize, "FileCacheSize");
+        }
+
+        SingletonHolder< HeapMemoryWatcher >::get()->createFileCacheHeapOnGameHeap(fileCacheSize);
     }
 
     SingletonHolder< HeapMemoryWatcher >::get()->createSceneHeapOnGameHeap();

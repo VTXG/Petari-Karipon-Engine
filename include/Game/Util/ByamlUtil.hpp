@@ -9,7 +9,6 @@ class ByamlStringTableIter;
 
 namespace ByamlUtil {
     ByamlIter createByamlRoot(const u8* pData);
-    ByamlIter createByamlRootFromFile(const char* pFilePath);
     ByamlStringTableIter getHashKeyTable(const u8* pData);
     ByamlStringTableIter getStringTable(const u8* pData);
     void getColorValue(const ByamlIter& rIter, GXColor* pValue);

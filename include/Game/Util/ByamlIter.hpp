@@ -23,16 +23,24 @@ public:
     s32 getSize() const;
 
     ByamlIter getIterByIndex(s32 index) const;
-    bool getByamlDataByIndex(ByamlData* pData, s32 index) const;
+    bool tryGetIterByIndex(ByamlIter* pIter, s32 index) const {
+        *pIter = getIterByIndex(index);
+        return pIter->isValid();
+    }
+    bool tryGetByamlDataByIndex(ByamlData* pData, s32 index) const;
 
     ByamlIter getIterByKey(const char* pKey) const;
-    bool getByamlDataByKey(ByamlData* pData, const char* pKey) const;
+    bool tryGetIterByKey(ByamlIter* pIter, const char* pKey) const {
+        *pIter = getIterByKey(pKey);
+        return pIter->isValid();
+    }
+    bool tryGetByamlDataByKey(ByamlData* pData, const char* pKey) const;
 
     template < typename T >
     bool tryGetValueByIndex(T* pValue, s32 index) const {
         ByamlData data;
 
-        if (!getByamlDataByIndex(&data, index)) {
+        if (!tryGetByamlDataByIndex(&data, index)) {
             return false;
         }
 
@@ -43,7 +51,7 @@ public:
     bool tryGetValueByKey(T* pValue, const char* pKey) const {
         ByamlData data;
 
-        if (!getByamlDataByKey(&data, pKey)) {
+        if (!tryGetByamlDataByKey(&data, pKey)) {
             return false;
         }
 

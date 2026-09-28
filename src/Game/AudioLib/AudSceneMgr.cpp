@@ -12,7 +12,9 @@
 AudSceneMgr::AudSceneMgr(JAUSectionHeap* pSectionHeap)
     : mSectionHeap(pSectionHeap), _4(), mStaticResource(), mStageResource(), mWaveSetStage(), mWaveSetScenario(), mPlayerMode(), mPrevPlayerMode(),
       mIsNewPlayerMode(), _1D() {
-    ByamlIter root = ByamlUtil::createByamlRootFromFile("/SystemData/StageWaveTable.byaml");
+    void* pFileData = MR::receiveFile("/SystemData/StageWaveTable.byaml");
+    ByamlIter root = ByamlUtil::createByamlRoot(static_cast< u8* >(pFileData));
+
     mStaticResource = root.getIterByKey("StaticResource");
     mStageResource = root.getIterByKey("StageResource");
 }
