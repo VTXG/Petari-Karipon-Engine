@@ -2474,6 +2474,7 @@ config.libs = [
             ),
             Object("Game/System/NANDManagerThread.cpp"),
             Object("Game/System/NerveExecutor.cpp"),
+            Object("Game/System/NetworkSystemWrapper.cpp"),
             Object("Game/System/OSThreadWrapper.cpp"),
             Object("Game/System/Overwrite.cpp"),
             Object("Game/System/PauseButtonCheckerInGame.cpp"),

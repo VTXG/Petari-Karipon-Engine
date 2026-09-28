@@ -12,6 +12,7 @@ class CaptureScreenDirector;
 class FunctionAsyncExecutor;
 class MessageHolder;
 class NameObjHolder;
+class NetworkSystemWrapper;
 class ParticleResourceHolder;
 class ScreenPreserver;
 class StarPointerDirector;
@@ -44,6 +45,7 @@ public:
     void initWPad();
     void initStarPointerDirector();
     void initDisplay();
+    void initNetwork();
 
     /* 0x00 */ NameObjHolder* mObjHolder;
     /* 0x04 */ ParticleResourceHolder* mParticleResHolder;
@@ -58,6 +60,7 @@ public:
     /* 0x28 */ FunctionAsyncExecutor* mFunctionAsyncExecutor;
     /* 0x2C */ MessageHolder* mMessageHolder;
     /* 0x30 */ StarPointerDirector* mStarPointerDirector;
-    /* 0x34 */ JMath::TRandom_fast_ mRandom;
-    /* 0x38 */ u32 mLanguage;
+    /* 0x34 */ NetworkSystemWrapper* mNetworkSystem;
+    /* 0x38 */ JMath::TRandom_fast_ mRandom;
+    /* 0x3C */ u32 mLanguage;
 };

@@ -13,6 +13,7 @@
 #include "Game/System/MainLoopFramework.hpp"
 #include "Game/System/MessageHolder.hpp"
 #include "Game/System/NANDManager.hpp"
+#include "Game/System/NetworkSystemWrapper.hpp"
 #include "Game/System/RenderMode.hpp"
 #include "Game/System/ResourceHolderManager.hpp"
 #include "Game/System/WPadHolder.hpp"
@@ -70,6 +71,7 @@ void GameSystemObjHolder::init() {
     initFunctionAsyncExecutor();
     initGameController();
     initDisplay();
+    initNetwork();
 }
 
 void GameSystemObjHolder::createAudioSystem() {
@@ -179,4 +181,9 @@ void GameSystemObjHolder::initDisplay() {
 
     VISetTrapFilter(VI_TRUE);
     VISetTrapFilter(VI_FALSE);
+}
+
+void GameSystemObjHolder::initNetwork() {
+    mNetworkSystem = new NetworkSystemWrapper();
+    mNetworkSystem->init(false);
 }
