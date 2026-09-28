@@ -908,10 +908,11 @@ namespace JGeometry {
             setTrans(rSrcTrans);
         }
 
-        void setRT(f32 rx, f32 ry, f32 rz, const TVec3f& rSrcTrans) {
-            // nonmatching, see
-            // see Mogucchi::updateReferenceMtx
+        void setRT(const TVec3f& rRot, const TVec3f& rSrcTrans) {
+            setRT(rRot.x, rRot.y, rRot.z, rSrcTrans);
+        }
 
+        void setRT(f32 rx, f32 ry, f32 rz, const TVec3f& rSrcTrans) {
             f32 sinX, sinY, sinZ;
             f32 cosX, cosY, cosZ;
 
@@ -922,13 +923,9 @@ namespace JGeometry {
             sinY = SIN(ry);
             sinX = SIN(rx);
 
-            this->mMtx[0][3] = rSrcTrans.x;
-            this->mMtx[1][3] = rSrcTrans.y;
-            this->mMtx[2][3] = rSrcTrans.z;
-
             f32 sXsY = sinX * sinY;
-            f32 cXcZ = cosX * cosZ;
             f32 cXsZ = cosX * sinZ;
+            f32 cXcZ = cosX * cosZ;
 
             this->mMtx[0][0] = cosY * cosZ;
             this->mMtx[1][0] = cosY * sinZ;
@@ -941,6 +938,11 @@ namespace JGeometry {
             this->mMtx[0][2] = cXcZ * sinY + sinX * sinZ;
             this->mMtx[1][2] = cXsZ * sinY - sinX * cosZ;
             this->mMtx[2][2] = cosX * cosY;
+
+            const TVec3f* pTrans = &rSrcTrans;
+            this->mMtx[0][3] = pTrans->x;
+            this->mMtx[1][3] = pTrans->y;
+            this->mMtx[2][3] = pTrans->z;
         }
 
         f32 get(int x, int y) const {

@@ -37,8 +37,8 @@ namespace {
 };  // namespace
 
 namespace {
-    Vec sBodyOffset;
-    Vec sHeadOffset;
+    const Vec sHeadOffset = {40.0f, 0.0f, -8.0f};
+    const Vec sBodyOffset = {0.0f, 0.0f, 0.0f};
 };  // namespace
 
 Mogucchi::Mogucchi(const char* pName)
@@ -438,16 +438,10 @@ bool Mogucchi::receiveAttackByBodySensor(u32 msg, HitSensor* pSender, HitSensor*
     return false;
 }
 
-// FIXME: special rotation + translation function in use
-// https://decomp.me/scratch/rUfad
 void Mogucchi::updateReferenceMtx() {
     TVec3f v1 = mRotation * (PI / 180.0f);
 
-    // mNewHolePos.setRotate(v1.x, v1.y, v1.z);
-    // mNewHolePos.setRotate(v1);
-    // mNewHolePos.setTrans(mHole->mPosition);
-    mNewHolePos.setRT(v1.x, v1.y, v1.z, mPosition);
-    // mNewHolePos.setRT(v1, mHole->mPosition);
+    mNewHolePos.setRT(v1, mPosition);
 
     mHole->mPosition.set(mPosition);
 }
