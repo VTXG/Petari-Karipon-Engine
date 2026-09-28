@@ -17,14 +17,14 @@ Based on:
 
 */
 
-#define RETRY_TIMES 5
-#define RETRY_TICKS OSSecondsToTicks(1)
-
 #define NCD_IOS_PATH "/dev/net/ncd/manage"
 #define NWC24_IOS_PATH "/dev/net/kd/request"
 #define SO_IOS_PATH "/dev/net/ip/top"
 
-enum NCDIoctl {
+#define RETRY_TIMES 5
+#define RETRY_TICKS OSSecondsToTicks(1)
+
+enum {
     IOCTLV_NCD_LOCK_WIRELESS_DRIVER = 0x01,
     IOCTLV_NCD_UNLOCK_WIRELESS_DRIVER = 0x02,
     IOCTLV_NCD_GET_CONFIG = 0x03,
@@ -35,7 +35,7 @@ enum NCDIoctl {
     IOCTLV_NCD_GET_WIRELESS_MAC_ADDRESS = 0x08,
 };
 
-enum NWC24Ioctl {
+enum {
     IOCTL_NWC24_SUSPEND_SCHEDULER = 0x01,
     IOCTL_NWC24_EXEC_TRY_SUSPEND_SCHEDULER = 0x02,
     IOCTL_NWC24_EXEC_RESUME_SCHEDULER = 0x03,
@@ -60,7 +60,7 @@ enum NWC24Ioctl {
     IOCTL_NWC24_REQUEST_SHUTDOWN = 0x28,
 };
 
-enum SOIoctl {
+enum {
     IOCTL_SO_ACCEPT = 0x01,
     IOCTL_SO_BIND = 0x02,
     IOCTL_SO_CLOSE = 0x03,

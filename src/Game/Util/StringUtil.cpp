@@ -262,7 +262,7 @@ namespace MR {
     }
 
     bool isNullOrEmptyString(const char* pStr) {
-        return pStr == nullptr || MR::isEqualString(pStr, "");
+        return pStr == nullptr || pStr[0] == '\0';
     }
 
     bool isMessageEditorNextTag(const wchar_t* pStr) {
