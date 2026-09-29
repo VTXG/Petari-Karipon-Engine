@@ -32,18 +32,18 @@ bool AudSceneMgr::isLoadDoneStaticResource() {
 }
 
 void AudSceneMgr::loadStageResource(const char* pSceneName, const char* pStageName) {
-    mIsNewPlayerMode = mPlayerMode != mPrevPlayerMode;
-
-    if (mIsNewPlayerMode) {
-        mSectionHeap->eraseWaveArc(34, 2);
-        mSectionHeap->eraseWaveArc(34, 4);
-        loadPlayerResource();
-        mPrevPlayerMode = mPlayerMode;
-    }
-
     ByamlIter waveSetStage = mStageResource.getIterByKey(pStageName).getIterByKey("Common");
 
-    if (waveSetStage != mWaveSetStage) {
+    mIsNewPlayerMode = mPlayerMode != mPrevPlayerMode;
+
+    if (waveSetStage != mWaveSetStage || mIsNewPlayerMode) {
+        if (mIsNewPlayerMode) {
+            mSectionHeap->eraseWaveArc(34, 2);
+            mSectionHeap->eraseWaveArc(34, 4);
+            loadPlayerResource();
+            mPrevPlayerMode = mPlayerMode;
+        }
+
         eraseWaveSet(mWaveSetStage);
         loadWaveSet(waveSetStage);
         mWaveSetStage = waveSetStage;
@@ -51,7 +51,11 @@ void AudSceneMgr::loadStageResource(const char* pSceneName, const char* pStageNa
 }
 
 bool AudSceneMgr::isLoadDoneStageResource() {
-    return isLoadDoneWaveSet(mWaveSetStage) && isPlayerResourceLoaded();
+    if (mIsNewPlayerMode && !isPlayerResourceLoaded()) {
+        return false;
+    }
+
+    return isLoadDoneWaveSet(mWaveSetStage);
 }
 
 void AudSceneMgr::loadScenarioResource(const char* pSceneName, const char* pStageName, s32 scenarioNo) {
