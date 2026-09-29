@@ -1,7 +1,7 @@
 #include "Game/Screen/GalaxyMapDomeIcon.hpp"
 #include "Game/Screen/GalaxyNamePlate.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
-#include "Game/System/GameDataConst.hpp"
+#include "Game/System/GameEmbeddedTable.hpp"
 #include "Game/Util/EventUtil.hpp"
 #include "Game/Util/LayoutUtil.hpp"
 #include "Game/Util/MessageUtil.hpp"
@@ -124,10 +124,7 @@ s32 GalaxyMapDomeIcon::calcDomeStatus() const {
 }
 
 bool GalaxyMapDomeIcon::isComplete() const {
-    JMapInfo mapInfo = JMapInfo();
-
-    // TODO: Replace with embedded BCSV file.
-    mapInfo.attach(&GalaxyIDBCSV);
+    JMapInfo mapInfo = GameEmbeddedTable::getGalaxyTable();
 
     CheckerIsComplete checker = CheckerIsComplete(_20);
 
@@ -185,10 +182,7 @@ void GalaxyMapDomeIcon::syncStatus() {
 }
 
 bool GalaxyMapDomeIcon::hasNewGalaxy() const {
-    JMapInfo mapInfo = JMapInfo();
-
-    // TODO: Replace with embedded BCSV file.
-    mapInfo.attach(&GalaxyIDBCSV);
+    JMapInfo mapInfo = GameEmbeddedTable::getGalaxyTable();
 
     CheckerIsExistNewGalaxy checker = CheckerIsExistNewGalaxy(_20);
 
@@ -212,7 +206,7 @@ namespace {
         const char* pName = nullptr;
 
         rIter.getValue("MapPaneName", &pMapPaneName);
-        rIter.getValue("name", &pName);
+        rIter.getValue("Name", &pName);
 
         if (pMapPaneName != nullptr && pName != nullptr && strstr(pMapPaneName, _4) != nullptr) {
             execute(pName);

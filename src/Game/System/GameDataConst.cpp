@@ -1,13 +1,14 @@
 #include "Game/System/GameDataConst.hpp"
+#include "Game/System/GameEmbeddedTable.hpp"
 #include "Game/System/GameEventFlag.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
-#include "Game/Util.hpp"
+#include "Game/Util/JMapInfo.hpp"
+#include "Game/Util/StringUtil.hpp"
 #include <cstdio>
 
 s32 GameDataConst::getPowerStarNumToOpenGalaxy(const char* pGalaxy) {
-    JMapInfo info;
-    info.attach(&GalaxyIDBCSV);
-    JMapInfoIter element = info.findElement< const char* >("name", pGalaxy, 0);
+    JMapInfoIter element = GameEmbeddedTable::getGalaxyIter(pGalaxy);
+
     u32 powerStarNum = 0;
     element.getValue< u32 >("PowerStarNum", &powerStarNum);
     return powerStarNum;
@@ -64,9 +65,8 @@ bool GameDataConst::isGalaxyAppearGreenDriver(const char* pGalaxyName) {
 }
 
 u32 GameDataConst::getIncludedGrandGalaxyId(const char* pGalaxy) {
-    JMapInfo info;
-    info.attach(&GalaxyIDBCSV);
-    JMapInfoIter element = info.findElement< const char* >("name", pGalaxy, 0);
+    JMapInfoIter element = GameEmbeddedTable::getGalaxyIter(pGalaxy);
+
     u32 grandGalaxyNo = 0;
     element.getValue< u32 >("GrandGalaxyNo", &grandGalaxyNo);
     return grandGalaxyNo;

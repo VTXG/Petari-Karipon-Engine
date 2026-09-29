@@ -1,4 +1,5 @@
 #include "Game/System/GameEventFlagTable.hpp"
+#include "Game/System/GameEmbeddedTable.hpp"
 #include "Game/Util/Array.hpp"
 #include "Game/Util/FileUtil.hpp"
 #include "Game/Util/HashUtil.hpp"
@@ -7,8 +8,6 @@
 #include "Game/Util/StringUtil.hpp"
 #include <algorithm>
 #include <cstdio>
-
-extern const JMapData GalaxyIDBCSV;
 
 namespace {
     static MR::AssignableArray< GameEventFlag > sGameEventFlagTable;
@@ -66,24 +65,6 @@ namespace {
         }
     }
 
-    static void initGameEventFlagTable() {
-        if (sGameEventFlagTable.size() > 0) {
-            return;
-        }
-
-        void* pFileData = MR::receiveFile("/SystemData/GameEventFlagTable.bcsv");
-
-        JMapInfo info;
-        info.attach(pFileData);
-
-        s32 numEntries = info.getNumEntries();
-        sGameEventFlagTable.init(numEntries);
-
-        for (s32 i = 0; i < numEntries; i++) {
-            initGameEventFlag(sGameEventFlagTable[i], info, i);
-        }
-    }
-
     struct GameEventFlagSortLt {
         bool operator()(GameEventFlagTableInstance::Key& key1, GameEventFlagTableInstance::Key& key2) {
             return (key1.mHashCode < key2.mHashCode) ? true : false;
@@ -118,7 +99,6 @@ bool GameEventFlagIter::isValid() const {
 }
 
 GameEventFlagTableInstance::GameEventFlagTableInstance() : mSortTable(nullptr), mLength(0) {
-    initGameEventFlagTable();
     initSortTable();
 }
 
@@ -163,10 +143,6 @@ void GameEventFlagTableInstance::initSortTable() {
 
 namespace GameEventFlagTable {
     void init() {
-        if (sGameEventFlagTable.size() > 0) {
-            return;
-        }
-
         void* pFileData = MR::receiveFile("/SystemData/GameEventFlagTable.bcsv");
 
         JMapInfo info;
@@ -359,25 +335,21 @@ namespace GameEventFlagTable {
     }
 
     s32 getGalaxyDependedFlags(const char** pFlags, int a1, const char* pName) {
-        JMapInfo info;
-        info.attach(&GalaxyIDBCSV);
-
-        JMapInfoIter iter = info.findElement("name", pName, 0);
-
+        JMapInfoIter iter = GameEmbeddedTable::getGalaxyIter(pName);
         s32 numFlags = 0;
+
         for (s32 idx = 0; idx < 3; idx++) {
             char key[32];
             snprintf(key, 32, "OpenCondition%1d", idx);
-            if (info.searchItemInfo(key) < 0) {
-                break;
-            }
 
             const char* openCondition = "";
             iter.getValue(key, &openCondition);
+
             if (!MR::isEqualString(openCondition, "")) {
                 pFlags[numFlags++] = openCondition;
             }
         }
+
         return numFlags;
     }
 };  // namespace GameEventFlagTable

@@ -12,6 +12,7 @@
 #include "Game/Screen/LayoutManager.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
 #include "Game/System/GameDataConst.hpp"
+#include "Game/System/GameEmbeddedTable.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
 #include "Game/Util/GamePadUtil.hpp"
 #include "Game/Util/LayoutUtil.hpp"
@@ -399,8 +400,8 @@ namespace {
 }  // namespace
 
 void GalaxyMap::initPaneCtrlPointing() {
-    JMapInfo galaxyInfo;
-    galaxyInfo.attach(&GalaxyIDBCSV);
+    JMapInfo galaxyInfo = GameEmbeddedTable::getGalaxyTable();
+
     ::initIconArray(mIcon, new GalaxyMapIcon*[galaxyInfo.getNumEntries()], galaxyInfo.getNumEntries());
     ::initIconArray(mCometIcon, new GalaxyMapCometIcon*[galaxyInfo.getNumEntries()], galaxyInfo.getNumEntries());
     initPointingTarget(galaxyInfo.getNumEntries());
@@ -417,7 +418,7 @@ void GalaxyMap::initPaneCtrlPointing() {
         }
 
         const char* pGalaxyName = nullptr;
-        galaxyInfo.getValue(i, "name", &pGalaxyName);
+        galaxyInfo.getValue(i, "Name", &pGalaxyName);
         GalaxyStatusAccessor accessor = MR::makeGalaxyStatusAccessor(pGalaxyName);
         MR::createAndAddPaneCtrl(this, pPaneName, 1);
         MR::addStarPointerTargetCircle(this, pPaneName, ::sPointingRange, TVec2f(0.0f, 0.0f), nullptr);

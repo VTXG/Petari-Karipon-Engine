@@ -2518,6 +2518,7 @@ config.libs = [
             Object("Game/System/GameDataHolder.cpp"),
             Object("Game/System/GameDataPlayerStatus.cpp"),
             Object("Game/System/GameDataTemporaryInGalaxy.cpp"),
+            Object("Game/System/GameEmbeddedTable.cpp"),
             Object("Game/System/GameEventFlag.cpp"),
             Object("Game/System/GameEventFlagTable.cpp"),
             Object("Game/System/GameEventFlagChecker.cpp"),
@@ -2526,7 +2527,6 @@ config.libs = [
             Object("Game/System/GameSequenceDirector.cpp"),
             Object("Game/System/GameSequenceFunction.cpp"),
             Object("Game/System/GameSequenceProgress.cpp"),
-            Object("Game/System/GameStoryEventTable.cpp"),
             Object("Game/System/LuigiLeftSupplier.cpp"),
             Object("Game/System/SaveDataBannerCreator.cpp"),
             Object("Game/System/SaveDataFileAccessor.cpp"),
@@ -2539,7 +2539,6 @@ config.libs = [
             Object("Game/System/StorySequenceExecutor.cpp"),
             Object("Game/System/SysConfigFile.cpp"),
             Object("Game/System/UserFile.cpp"),
-            Object("Game/System/BCSVInclude.s"),
         ],
     ),
     GameLib(

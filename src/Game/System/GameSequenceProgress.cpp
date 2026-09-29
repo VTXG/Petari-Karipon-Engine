@@ -8,7 +8,6 @@
 #include "Game/System/GameDataFunction.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
 #include "Game/System/GameSequenceFunction.hpp"
-#include "Game/System/GameStoryEventTable.hpp"
 #include "Game/System/GameSystem.hpp"
 #include "Game/System/GameSystemFunction.hpp"
 #include "Game/System/GameSystemSceneController.hpp"
@@ -52,8 +51,6 @@ GameSequenceProgress::GameSequenceProgress()
 }
 
 void GameSequenceProgress::initAfterResourceLoaded() {
-    GameStoryEventTable::init();
-
     mGalaxyCometScheduler = new GalaxyCometScheduler();
 
     mPlayerMissLeft = new PlayerMissLeft("ミス時のプレイヤー残機表示");

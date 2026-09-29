@@ -10,10 +10,6 @@ namespace {
 
 namespace StageParamTable {
     void init() {
-        if (sStageParamTable.isValid()) {
-            return;
-        }
-
         void* pFileData = MR::receiveFile("/SystemData/StageParamTable.byaml");
         sStageParamTable = ByamlUtil::createByamlRoot(static_cast< u8* >(pFileData));
     }

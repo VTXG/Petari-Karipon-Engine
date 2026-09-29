@@ -2,6 +2,9 @@
 #include "Game/NWC24/NWC24Messenger.hpp"
 #include "Game/System/FindingLuigiEventScheduler.hpp"
 #include "Game/System/GameDataTemporaryInGalaxy.hpp"
+#include "Game/System/GameEmbeddedTable.hpp"
+#include "Game/System/GameEventFlagTable.hpp"
+#include "Game/System/GameEventValueChecker.hpp"
 #include "Game/System/GameSequenceProgress.hpp"
 #include "Game/System/SaveDataHandleSequence.hpp"
 #include <JSystem/JKernel/JKRHeap.hpp>
@@ -18,6 +21,10 @@ GameSequenceDirector::GameSequenceDirector()
 }
 
 void GameSequenceDirector::initAfterResourceLoaded() {
+    GameEmbeddedTable::init();
+    GameEventFlagTable::init();
+    GameEventValueTable::init();
+
     mSaveDataHandleSequence->initAfterResourceLoaded();
     mGameSequenceProgress->initAfterResourceLoaded();
     mNWC24Messenger->initAfterResourceLoaded();

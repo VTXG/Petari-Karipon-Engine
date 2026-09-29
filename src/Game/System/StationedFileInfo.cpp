@@ -965,6 +965,11 @@ namespace MR {
         {
             StationedFileInfo::HEAP_TYPE_GDDR,
             StationedFileInfo::LOAD_TYPE_FILE,
+            "/SystemData/GameGalaxyTable.bcsv",
+        },
+        {
+            StationedFileInfo::HEAP_TYPE_GDDR,
+            StationedFileInfo::LOAD_TYPE_FILE,
             "/SystemData/GameStoryEventTable.bcsv",
         },
         {

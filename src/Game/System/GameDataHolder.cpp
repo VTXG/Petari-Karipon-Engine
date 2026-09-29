@@ -1,11 +1,11 @@
 #include "Game/System/GameDataHolder.hpp"
 #include "Game/System/GameDataGalaxyStorage.hpp"
 #include "Game/System/GameDataPlayerStatus.hpp"
+#include "Game/System/GameEmbeddedTable.hpp"
 #include "Game/System/GameEventFlagChecker.hpp"
 #include "Game/System/GameEventFlagStorage.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
 #include "Game/System/GameEventValueChecker.hpp"
-#include "Game/System/GameStoryEventTable.hpp"
 #include "Game/System/ScenarioProgressTestRun.hpp"
 #include "Game/System/SpinDriverPathStorage.hpp"
 #include "Game/System/StarPieceAlmsStorage.hpp"
@@ -279,11 +279,11 @@ bool GameDataHolder::isCompleteMarioAndLuigi() const {
 }
 
 bool GameDataHolder::isPassedStoryEvent(const char* pEventName) const {
-    return GameStoryEventTable::getStoryEventProgress(pEventName) <= mPlayerStatus->mStoryProgress;
+    return GameEmbeddedTable::getStoryEventProgress(pEventName) <= mPlayerStatus->mStoryProgress;
 }
 
 void GameDataHolder::followStoryEventByName(const char* pEventName) {
-    mPlayerStatus->mStoryProgress = GameStoryEventTable::getStoryEventProgress(pEventName);
+    mPlayerStatus->mStoryProgress = GameEmbeddedTable::getStoryEventProgress(pEventName);
 }
 
 void GameDataHolder::resetAllData() {
