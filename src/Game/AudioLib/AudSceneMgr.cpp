@@ -33,9 +33,17 @@ bool AudSceneMgr::isLoadDoneStaticResource() {
 }
 
 void AudSceneMgr::loadStageResource(const char* pSceneName, const char* pStageName) {
+    mIsNewPlayerMode = false;
+
+    if (!MR::isEqualString(pSceneName, "Game")) {
+        return;
+    }
+
     ByamlIter waveSetStage = mStageResource[pStageName]["Common"];
 
-    mIsNewPlayerMode = mPlayerMode != mPrevPlayerMode;
+    if (mPlayerMode != mPrevPlayerMode) {
+        mIsNewPlayerMode = true;
+    }
 
     eraseWaveSet(mWaveSetScenario);
 
@@ -61,6 +69,10 @@ bool AudSceneMgr::isLoadDoneStageResource() {
 }
 
 void AudSceneMgr::loadScenarioResource(const char* pSceneName, const char* pStageName, s32 scenarioNo) {
+    if (!MR::isEqualString(pSceneName, "Game")) {
+        return;
+    }
+
     char key[16];
     snprintf(key, sizeof(key), "Scenario%d", scenarioNo);
 
@@ -104,7 +116,7 @@ void AudSceneMgr::eraseWaveSet(const ByamlIter& rWaveSet) {
 
     s32 size = rWaveSet.getSize();
 
-    for (s32 i = 0; i < size; i++) {
+    for (s32 i = size - 1; i >= 0; i--) {
         const char* pName = nullptr;
         rWaveSet.tryGetValueByIndex(&pName, i);
 
