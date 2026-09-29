@@ -7,6 +7,7 @@
 #include "Game/AudioLib/AudSystem.hpp"
 #include "Game/AudioLib/CSSoundNameConverter.hpp"
 #include "Game/Util/FileUtil.hpp"
+#include "Game/Util/MemoryUtil.hpp"
 #include "Game/Util/SingletonHolder.hpp"
 #include <JSystem/JKernel/JKRDvdRipper.hpp>
 #include <JSystem/JKernel/JKRExpHeap.hpp>
@@ -42,7 +43,8 @@ void AudSystemWrapper::requestResourceForInitialize() {
     MR::mountAsyncArchive(sJaiMeArc, mSolidHeap);
     MR::mountAsyncArchive(AudSpeakerWrap::getResName(), mSpkHeap);
     MR::mountAsyncArchive(sJaiRemixArc, mSolidHeap);
-    MR::loadAsyncToMainRAM("/SystemData/StageWaveTable.byaml", nullptr, mSolidHeap, JKRDvdRipper::ALLOC_DIRECTION_FORWARD);
+
+    MR::loadAsyncToMainRAM("/SystemData/StageWaveTable.byaml", nullptr, MR::getStationedHeapGDDR3(), JKRDvdRipper::ALLOC_DIRECTION_FORWARD);
 }
 
 void AudSystemWrapper::createAudioSystem() {

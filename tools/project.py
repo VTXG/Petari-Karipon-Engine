@@ -1159,8 +1159,6 @@ def generate_build_ninja(
         link_step = LinkStep(build_config)
         for obj in objects.values():
             add_obj(obj, link_step)
-        # for unit in build_config["units"]:
-        #     add_unit(unit, link_step)
         link_steps.append(link_step)
 
         # Check if all compiler versions exist

@@ -6,6 +6,7 @@
 #include "Game/Util/ByamlIter.hpp"
 #include "Game/Util/ByamlUtil.hpp"
 #include "Game/Util/FileUtil.hpp"
+#include "Game/Util/StringUtil.hpp"
 #include "JSystem/JAudio2/JASWaveArcLoader.hpp"
 #include <JSystem/JAudio2/JAUSectionHeap.hpp>
 
@@ -36,17 +37,18 @@ void AudSceneMgr::loadStageResource(const char* pSceneName, const char* pStageNa
 
     mIsNewPlayerMode = mPlayerMode != mPrevPlayerMode;
 
+    eraseWaveSet(mWaveSetScenario);
+
     if (waveSetStage != mWaveSetStage || mIsNewPlayerMode) {
+        eraseWaveSet(mWaveSetStage);
+
         if (mIsNewPlayerMode) {
-            mSectionHeap->eraseWaveArc(34, 2);
-            mSectionHeap->eraseWaveArc(34, 4);
             loadPlayerResource();
             mPrevPlayerMode = mPlayerMode;
         }
 
-        eraseWaveSet(mWaveSetStage);
-        loadWaveSet(waveSetStage);
         mWaveSetStage = waveSetStage;
+        loadWaveSet(mWaveSetStage);
     }
 }
 
@@ -62,31 +64,26 @@ void AudSceneMgr::loadScenarioResource(const char* pSceneName, const char* pStag
     char key[16];
     snprintf(key, sizeof(key), "Scenario%d", scenarioNo);
 
-    ByamlIter waveSetScenario = mStageResource[pStageName][key];
-
-    if (waveSetScenario != mWaveSetScenario) {
-        eraseWaveSet(mWaveSetScenario);
-        loadWaveSet(waveSetScenario);
-        mWaveSetScenario = waveSetScenario;
-    }
+    mWaveSetScenario = mStageResource[pStageName][key];
+    loadWaveSet(mWaveSetScenario);
 }
 
 bool AudSceneMgr::isLoadDoneScenarioResource() {
     return isLoadDoneWaveSet(mWaveSetScenario);
 }
 
-void AudSceneMgr::loadWaveSet(const ByamlIter& rIter) {
-    if (!rIter.isValid()) {
+void AudSceneMgr::loadWaveSet(const ByamlIter& rWaveSet) {
+    if (!rWaveSet.isValid()) {
         return;
     }
 
-    s32 size = rIter.getSize();
+    s32 size = rWaveSet.getSize();
 
     for (s32 i = 0; i < size; i++) {
         const char* pName = nullptr;
-        rIter.tryGetValueByIndex(&pName, i);
+        rWaveSet.tryGetValueByIndex(&pName, i);
 
-        if (pName == nullptr || pName[0] == '\0') {
+        if (MR::isNullOrEmptyString(pName)) {
             continue;
         }
 
@@ -100,18 +97,18 @@ void AudSceneMgr::loadWaveSet(const ByamlIter& rIter) {
     }
 }
 
-void AudSceneMgr::eraseWaveSet(const ByamlIter& rIter) {
-    if (!rIter.isValid()) {
+void AudSceneMgr::eraseWaveSet(const ByamlIter& rWaveSet) {
+    if (!rWaveSet.isValid()) {
         return;
     }
 
-    s32 size = rIter.getSize();
+    s32 size = rWaveSet.getSize();
 
     for (s32 i = 0; i < size; i++) {
         const char* pName = nullptr;
-        rIter.tryGetValueByIndex(&pName, i);
+        rWaveSet.tryGetValueByIndex(&pName, i);
 
-        if (pName == nullptr || pName[0] == '\0') {
+        if (MR::isNullOrEmptyString(pName)) {
             continue;
         }
 
@@ -125,18 +122,18 @@ void AudSceneMgr::eraseWaveSet(const ByamlIter& rIter) {
     }
 }
 
-bool AudSceneMgr::isLoadDoneWaveSet(const ByamlIter& rIter) const {
-    if (!rIter.isValid()) {
+bool AudSceneMgr::isLoadDoneWaveSet(const ByamlIter& rWaveSet) const {
+    if (!rWaveSet.isValid()) {
         return true;
     }
 
-    s32 size = rIter.getSize();
+    s32 size = rWaveSet.getSize();
 
     for (s32 i = 0; i < size; i++) {
         const char* pName = nullptr;
-        rIter.tryGetValueByIndex(&pName, i);
+        rWaveSet.tryGetValueByIndex(&pName, i);
 
-        if (pName == nullptr || pName[0] == '\0') {
+        if (MR::isNullOrEmptyString(pName)) {
             continue;
         }
 
@@ -165,6 +162,9 @@ void AudSceneMgr::startScene() {
 }
 
 bool AudSceneMgr::loadPlayerResource() {
+    mSectionHeap->eraseWaveArc(34, 2);
+    mSectionHeap->eraseWaveArc(34, 4);
+
     switch (mPlayerMode) {
     case PlayerMode_Mario:
         return mSectionHeap->loadWaveArc(34, 2);

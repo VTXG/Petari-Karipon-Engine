@@ -18,7 +18,7 @@ namespace AudParams {
     const int numFreeStream = 3;
     const int numFreeSoundChild = 160;
     const int aramAddr = nullptr;
-    const int aramSize = 0xE80000;
+    const int aramSize = 0xE00000;
     const int workAreaSize = 0x1000;
     const int audioThreadPriority = 2;
     const int dvdThreadPriority = 5;

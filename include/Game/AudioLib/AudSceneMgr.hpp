@@ -21,9 +21,9 @@ public:
     bool isLoadDoneStageResource();
     void loadScenarioResource(const char*, const char*, s32);
     bool isLoadDoneScenarioResource();
-    void loadWaveSet(const ByamlIter& rIter);
-    void eraseWaveSet(const ByamlIter& rIter);
-    bool isLoadDoneWaveSet(const ByamlIter& rIter) const;
+    void loadWaveSet(const ByamlIter& rWaveSet);
+    void eraseWaveSet(const ByamlIter& rWaveSet);
+    bool isLoadDoneWaveSet(const ByamlIter& rWaveSet) const;
     void startScene();
     bool loadPlayerResource();
     bool isPlayerResourceLoaded();
