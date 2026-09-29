@@ -7,12 +7,6 @@ struct GameEventValue {
     /* 0x04 */ u16 mDefaultValue;
 };
 
-namespace GameEventValueTable {
-    void init();
-    s32 findIndex(const char*);
-    s32 findIndexFromHashCode(u16);
-}
-
 class GameEventValueChecker : public BinaryDataChunkBase {
 public:
     GameEventValueChecker();

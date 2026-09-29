@@ -16,10 +16,8 @@ namespace {
         rInfo.getValue(idx, "DefaultValue", &defaultValue);
         rValue.mDefaultValue = defaultValue;
     }
-}  // namespace
 
-namespace GameEventValueTable {
-    void init() {
+    static void initGameEventValueTable() {
         if (sGameEventValueTable.size() > 0) {
             return;
         }
@@ -37,7 +35,7 @@ namespace GameEventValueTable {
         }
     }
 
-    s32 findIndex(const char* pName) {
+    static s32 findIndex(const char* pName) {
         for (s32 idx = 0; idx < sGameEventValueTable.mMaxSize; idx++) {
             if (MR::isEqualString(pName, ::sGameEventValueTable[idx].mName)) {
                 return idx;
@@ -47,7 +45,7 @@ namespace GameEventValueTable {
         return -1;
     }
 
-    s32 findIndexFromHashCode(u16 hash) {
+    static s32 findIndexFromHashCode(u16 hash) {
         for (s32 idx = 0; idx < sGameEventValueTable.mMaxSize; idx++) {
             if (hash == static_cast< u16 >(MR::getHashCode(::sGameEventValueTable[idx].mName))) {
                 return idx;
@@ -56,21 +54,21 @@ namespace GameEventValueTable {
 
         return -1;
     }
-};
+}  // namespace
 
 GameEventValueChecker::GameEventValueChecker() : mValues(), mNumValues() {
-    GameEventValueTable::init();
+    initGameEventValueTable();
     mNumValues = sGameEventValueTable.mMaxSize;
     mValues = new u16[mNumValues];
     initializeData();
 }
 
 u32 GameEventValueChecker::getValue(const char* pName) const {
-    return mValues[GameEventValueTable::findIndex(pName)];
+    return mValues[findIndex(pName)];
 }
 
 void GameEventValueChecker::setValue(const char* pName, u16 value) {
-    mValues[GameEventValueTable::findIndex(pName)] = value;
+    mValues[findIndex(pName)] = value;
 }
 
 u32 GameEventValueChecker::makeHeaderHashCode() const {
@@ -107,7 +105,7 @@ s32 GameEventValueChecker::deserialize(const u8* pData, u32 maxBufferSize) {
     for (s32 idx = 0; idx < numEntries; idx++) {
         u16 hash = stream.readU16();
         u16 value = stream.readU16();
-        s32 valueIndex = GameEventValueTable::findIndexFromHashCode(hash);
+        s32 valueIndex = findIndexFromHashCode(hash);
 
         if (valueIndex >= 0) {
             mValues[valueIndex] = value;

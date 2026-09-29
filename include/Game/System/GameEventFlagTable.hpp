@@ -30,7 +30,6 @@ public:
 };
 
 namespace GameEventFlagTable {
-    void init();
     GameEventFlagIter getBeginIter();
     GameEventFlagAccessor makeAccessor(const char*);
     s32 getTableSize();

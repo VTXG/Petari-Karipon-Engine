@@ -52,8 +52,9 @@ namespace {
             rFlag.mCondition4 = nullptr;
         }
 
+        rFlag.mType = GameEventFlag::Type_None;
+
         if (MR::isNullOrEmptyString(pType)) {
-            rFlag.mType = GameEventFlag::Type_None;
             return;
         }
 
@@ -62,6 +63,24 @@ namespace {
                 rFlag.mType = i;
                 break;
             }
+        }
+    }
+
+    static void initGameEventFlagTable() {
+        if (sGameEventFlagTable.size() > 0) {
+            return;
+        }
+
+        void* pFileData = MR::receiveFile("/SystemData/GameEventFlagTable.bcsv");
+
+        JMapInfo info;
+        info.attach(pFileData);
+
+        s32 numEntries = info.getNumEntries();
+        sGameEventFlagTable.init(numEntries);
+
+        for (s32 i = 0; i < numEntries; i++) {
+            initGameEventFlag(sGameEventFlagTable[i], info, i);
         }
     }
 
@@ -99,7 +118,7 @@ bool GameEventFlagIter::isValid() const {
 }
 
 GameEventFlagTableInstance::GameEventFlagTableInstance() : mSortTable(nullptr), mLength(0) {
-    GameEventFlagTable::init();
+    initGameEventFlagTable();
     initSortTable();
 }
 
