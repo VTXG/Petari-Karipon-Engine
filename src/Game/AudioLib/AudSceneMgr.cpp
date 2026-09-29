@@ -15,8 +15,8 @@ AudSceneMgr::AudSceneMgr(JAUSectionHeap* pSectionHeap)
     void* pFileData = MR::receiveFile("/SystemData/StageWaveTable.byaml");
     ByamlIter root = ByamlUtil::createByamlRoot(static_cast< u8* >(pFileData));
 
-    mStaticResource = root.getIterByKey("StaticResource");
-    mStageResource = root.getIterByKey("StageResource");
+    mStaticResource = root["StaticResource"];
+    mStageResource = root["StageResource"];
 }
 
 bool AudSceneMgr::isLoadDoneSystemInit() {
@@ -32,7 +32,7 @@ bool AudSceneMgr::isLoadDoneStaticResource() {
 }
 
 void AudSceneMgr::loadStageResource(const char* pSceneName, const char* pStageName) {
-    ByamlIter waveSetStage = mStageResource.getIterByKey(pStageName).getIterByKey("Common");
+    ByamlIter waveSetStage = mStageResource[pStageName]["Common"];
 
     mIsNewPlayerMode = mPlayerMode != mPrevPlayerMode;
 
@@ -62,7 +62,7 @@ void AudSceneMgr::loadScenarioResource(const char* pSceneName, const char* pStag
     char key[16];
     snprintf(key, sizeof(key), "Scenario%d", scenarioNo);
 
-    ByamlIter waveSetScenario = mStageResource.getIterByKey(pStageName).getIterByKey(key);
+    ByamlIter waveSetScenario = mStageResource[pStageName][key];
 
     if (waveSetScenario != mWaveSetScenario) {
         eraseWaveSet(mWaveSetScenario);

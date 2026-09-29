@@ -61,6 +61,8 @@ public:
     template < typename T >
     bool tryConvertValue(T* pValue, const ByamlData* pData) const;
 
+    ByamlIter operator[](s32 index) const { return getIterByIndex(index); }
+    ByamlIter operator[](const char* pKey) const { return getIterByKey(pKey); }
     bool operator==(const ByamlIter& rOther) const { return mData == rOther.mData && mRootNode == rOther.mRootNode; }
     bool operator!=(const ByamlIter& rOther) const { return !(*this == rOther); }
 
