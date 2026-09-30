@@ -191,5 +191,5 @@ void GameSystemObjHolder::initDisplay() {
 
 void GameSystemObjHolder::initNetwork() {
     mNetworkSystem = new NetworkSystemWrapper();
-    mNetworkSystem->init(false);
+    mNetworkSystem->initSystem(false);
 }

@@ -1,5 +1,8 @@
 #include "Game/System/NetworkSystemWrapper.hpp"
+#include "Game/System/GameSystem.hpp"
+#include "Game/System/GameSystemObjHolder.hpp"
 #include "Game/Util/Functor.hpp"
+#include "Game/Util/SingletonHolder.hpp"
 #include "Game/Util/SystemUtil.hpp"
 #include <cstring>
 #include <mem.h>
@@ -107,12 +110,12 @@ NetworkSystemWrapper::~NetworkSystemWrapper() {
     closeSystem();
 }
 
-void NetworkSystemWrapper::init(bool wait) {
+void NetworkSystemWrapper::initSystem(bool wait) {
     if (mState == STATE_INACTIVE) {
-        MR::startFunctionAsyncExecute(MR::Functor(this, &NetworkSystemWrapper::procInit), 10, "NetworkSystemWrapper::procInit");
+        MR::startFunctionAsyncExecute(MR::Functor(this, &NetworkSystemWrapper::callbackInit), 10, "NetworkSystemWrapper::callbackInit");
 
         if (wait) {
-            MR::waitForEndFunctionAsyncExecute("NetworkSystemWrapper::procInit");
+            MR::waitForEndFunctionAsyncExecute("NetworkSystemWrapper::callbackInit");
         }
     }
 }
@@ -125,20 +128,20 @@ void NetworkSystemWrapper::closeSystem() {
     resetInternalState(STATE_INACTIVE);
 }
 
-IOSFd NetworkSystemWrapper::socket(u32 domain, u32 type, u32 protocol) {
+IOSFd NetworkSystemWrapper::socket(SOFamily domain, SOType type, u32 protocol) {
     if (mFd < 0) {
         return SO_ERR_NXIO;
     }
 
     struct {
-        u32 mDomain;
-        u32 mType;
-        u32 mProtocol;
+        u32 domain;
+        u32 type;
+        u32 protocol;
     } params ATTRIBUTE_ALIGN(32);
 
-    params.mDomain = domain;
-    params.mType = type;
-    params.mProtocol = protocol;
+    params.domain = domain;
+    params.type = type;
+    params.protocol = protocol;
 
     return IOS_Ioctl(mFd, IOCTL_SO_SOCKET, &params, sizeof(params), nullptr, 0);
 }
@@ -149,10 +152,10 @@ IOSError NetworkSystemWrapper::close(IOSFd fd) {
     }
 
     struct {
-        IOSFd mFd;
+        IOSFd fd;
     } params ATTRIBUTE_ALIGN(32);
 
-    params.mFd = fd;
+    params.fd = fd;
 
     return IOS_Ioctl(mFd, IOCTL_SO_CLOSE, &params, sizeof(params), nullptr, 0);
 }
@@ -163,14 +166,14 @@ IOSError NetworkSystemWrapper::bind(IOSFd fd, const SockAddress& rAddress) {
     }
 
     struct {
-        IOSFd mFd;
-        BOOL mHasAddress;
-        SockAddress mAddress;
+        IOSFd fd;
+        BOOL hasAddress;
+        SockAddress address;
     } params ATTRIBUTE_ALIGN(32);
 
-    params.mFd = fd;
-    params.mHasAddress = TRUE;
-    memcpy(&params.mAddress, &rAddress, sizeof(params.mAddress));
+    params.fd = fd;
+    params.hasAddress = TRUE;
+    memcpy(&params.address, &rAddress, sizeof(params.address));
 
     return IOS_Ioctl(mFd, IOCTL_SO_BIND, &params, sizeof(params), nullptr, 0);
 }
@@ -181,30 +184,30 @@ IOSError NetworkSystemWrapper::connect(IOSFd fd, const SockAddress& rAddress) {
     }
 
     struct {
-        IOSFd mFd;
-        BOOL mHasAddress;
-        SockAddress mAddress;
+        IOSFd fd;
+        BOOL hasAddress;
+        SockAddress address;
     } params ATTRIBUTE_ALIGN(32);
 
-    params.mFd = fd;
-    params.mHasAddress = TRUE;
-    memcpy(&params.mAddress, &rAddress, sizeof(params.mAddress));
+    params.fd = fd;
+    params.hasAddress = TRUE;
+    memcpy(&params.address, &rAddress, sizeof(params.address));
 
     return IOS_Ioctl(mFd, IOCTL_SO_CONNECT, &params, sizeof(params), nullptr, 0);
 }
 
-IOSError NetworkSystemWrapper::recv(IOSFd fd, void* pBuffer, u32 size, u32 flags, SockAddress* pFrom) {
+IOSError NetworkSystemWrapper::recv(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, SockAddress* pFrom) {
     if (mFd < 0 || fd < 0) {
         return SO_ERR_NXIO;
     }
 
     struct {
-        IOSFd mFd;
-        u32 mFlags;
+        IOSFd fd;
+        u32 flags;
     } params ATTRIBUTE_ALIGN(32);
 
-    params.mFd = fd;
-    params.mFlags = flags;
+    params.fd = fd;
+    params.flags = flags;
 
     IOSIoVector iov[3] ATTRIBUTE_ALIGN(32);
     iov[0].base = reinterpret_cast< u8* >(&params);
@@ -217,27 +220,27 @@ IOSError NetworkSystemWrapper::recv(IOSFd fd, void* pBuffer, u32 size, u32 flags
     return IOS_Ioctlv(mFd, IOCTLV_SO_RECV_FROM, 1, pFrom != nullptr ? 2 : 1, iov);
 }
 
-IOSError NetworkSystemWrapper::send(IOSFd fd, void* pBuffer, u32 size, u32 flags, SockAddress* pTo) {
+IOSError NetworkSystemWrapper::send(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, SockAddress* pTo) {
     if (mFd < 0 || fd < 0) {
         return SO_ERR_NXIO;
     }
 
     struct {
-        IOSFd mFd;
-        u32 mFlags;
-        BOOL mHasAddress;
-        SockAddress mAddress;
+        IOSFd fd;
+        u32 flags;
+        BOOL hasAddress;
+        SockAddress address;
     } params ATTRIBUTE_ALIGN(32);
 
-    params.mFd = fd;
-    params.mFlags = flags;
+    params.fd = fd;
+    params.flags = flags;
 
-    if (pTo) {
-        params.mHasAddress = TRUE;
-        memcpy(&params.mAddress, pTo, sizeof(params.mAddress));
+    if (pTo != nullptr) {
+        params.hasAddress = TRUE;
+        params.address = *pTo;
     } else {
-        params.mHasAddress = FALSE;
-        memset(&params.mAddress, 0, sizeof(params.mAddress));
+        params.hasAddress = FALSE;
+        memset(&params.address, 0, sizeof(params.address));
     }
 
     IOSIoVector iov[2] ATTRIBUTE_ALIGN(32);
@@ -249,7 +252,12 @@ IOSError NetworkSystemWrapper::send(IOSFd fd, void* pBuffer, u32 size, u32 flags
     return IOS_Ioctlv(mFd, IOCTLV_SO_SEND_TO, 2, 0, iov);
 }
 
-void NetworkSystemWrapper::procInit() {
+NetworkSystemWrapper* NetworkSystemWrapper::get() {
+    GameSystemObjHolder* pObjHolder = SingletonHolder< GameSystem >::get()->mObjHolder;
+    return pObjHolder != nullptr ? pObjHolder->mNetworkSystem : nullptr;
+}
+
+void NetworkSystemWrapper::callbackInit() {
     BOOL interrupts = OSDisableInterrupts();
 
     resetInternalState(STATE_BUSY);

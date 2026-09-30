@@ -3,7 +3,7 @@
 #include "Game/Util/JMapInfo.hpp"
 
 s32 GalaxyNameSortTable::getGalaxySortIndex(const char* pName) {
-    JMapInfoIter iter = GameEmbeddedTable::getGalaxyIter(pName);
+    JMapInfoIter iter = GameEmbeddedTable::getGalaxyEntry(pName);
 
     if (!iter.isValid()) {
         return -1;

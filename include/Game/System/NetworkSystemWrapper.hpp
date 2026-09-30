@@ -21,26 +21,23 @@ struct SockAddress {
     /* 0x04 */ IPAddress mIP;
 };
 
-// Socket family
-enum {
+enum SOFamily {
     SO_AF_INET = 2,
 };
 
-// Socket type
-enum {
+enum SOType {
     SO_SOCK_STREAM = 1,
     SO_SOCK_DGRAM = 2,
 };
 
-// Socket message flags
-enum {
+enum SOMessageFlags {
+    SO_MSG_NONE = 0x00,
     SO_MSG_OOB = 0x01,
     SO_MSG_PEEK = 0x02,
     SO_MSG_NONBLOCK = 0x04,
 };
 
-// Soctet option flags
-enum {
+enum SOOptionsFlags {
     SO_OPT_REUSEADDR = 0x4,
     SO_OPT_LINGER = 0x80,
     SO_OPT_OOBINLINE = 0x100,
@@ -52,8 +49,7 @@ enum {
     SO_OPT_ERROR = 0x1009,
 };
 
-// Socket error
-enum {
+enum SOReturnCode {
     SO_SUCCESS = 0,
     SO_ERR_2BIG = -1,
     SO_ERR_ACCES = -2,
@@ -146,17 +142,28 @@ public:
     NetworkSystemWrapper();
     ~NetworkSystemWrapper();
 
-    void init(bool wait = false);
+    void initSystem(bool wait = false);
     void closeSystem();
 
-    IOSFd socket(u32 domain, u32 type, u32 protocol);
+    IOSFd socket(SOFamily domain, SOType type, u32 protocol);
     IOSError close(IOSFd fd);
     IOSError bind(IOSFd fd, const SockAddress& rAddress);
     IOSError connect(IOSFd fd, const SockAddress& rAddress);
-    IOSError recv(IOSFd fd, void* pBuffer, u32 size, u32 flags, SockAddress* pFrom);
-    IOSError send(IOSFd fd, void* pBuffer, u32 size, u32 flags, SockAddress* pTo);
+    IOSError recv(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, SockAddress* pFrom);
+    IOSError send(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, SockAddress* pTo);
 
-    void procInit();
+    bool isActive() const {
+        return mState == STATE_ACTIVE;
+    }
+
+    const IPAddress& getLocalIP() const {
+        return mIP;
+    }
+
+    static NetworkSystemWrapper* get();
+
+private:
+    void callbackInit();
     void resetInternalState(State state);
 
     /* 0x00 */ IOSFd mFd;

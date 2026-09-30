@@ -17,7 +17,7 @@ namespace GameEmbeddedTable {
         return sGameGalaxyTable;
     }
 
-    JMapInfoIter getGalaxyIter(const char* pName) {
+    JMapInfoIter getGalaxyEntry(const char* pName) {
         return sGameGalaxyTable.findElement("Name", pName, 0);
     }
 

@@ -8,6 +8,6 @@ class JMapInfoIter;
 namespace GameEmbeddedTable {
     void init();
     JMapInfo getGalaxyTable();
-    JMapInfoIter getGalaxyIter(const char* pName);
+    JMapInfoIter getGalaxyEntry(const char* pName);
     u8 getStoryEventProgress(const char* pName);
 }

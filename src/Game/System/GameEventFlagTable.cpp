@@ -335,7 +335,7 @@ namespace GameEventFlagTable {
     }
 
     s32 getGalaxyDependedFlags(const char** pFlags, int a1, const char* pName) {
-        JMapInfoIter iter = GameEmbeddedTable::getGalaxyIter(pName);
+        JMapInfoIter iter = GameEmbeddedTable::getGalaxyEntry(pName);
         s32 numFlags = 0;
 
         for (s32 idx = 0; idx < 3; idx++) {
