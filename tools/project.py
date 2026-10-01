@@ -1509,6 +1509,7 @@ def generate_compile_commands(
             "arguments": [
                 "clang",
                 "-nostdinc",
+                "-nostdinc++",
                 "-fno-builtin",
                 "-fdeclspec",
                 "-Wno-ignored-attributes",
