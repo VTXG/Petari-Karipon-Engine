@@ -20,7 +20,7 @@ void CometEventKeeper::init() {
         u32 timeLimit = 0;
 
         if (isExistParams) {
-            params.tryGetValueByKey(&timeLimit, "TimeLimit");
+            params.tryGetValueByKey("TimeLimit", &timeLimit);
         }
 
         mExecutorTimeLimit = new CometEventExecutorTimeLimit(timeLimit);
@@ -31,7 +31,7 @@ void CometEventKeeper::init() {
     const char* pCometFilterName = mCometName;
 
     if (isExistParams) {
-        params.tryGetValueByKey(&pCometFilterName, "CometFilter");
+        params.tryGetValueByKey("CometFilter", &pCometFilterName);
     }
 
     if (pCometFilterName != nullptr) {

@@ -1,4 +1,5 @@
 #include "Game/System/GameDataFunction.hpp"
+#include "Game/System/DomeParamTable.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
 #include "Game/System/GameDataGalaxyStorage.hpp"
 #include "Game/System/GameDataHolder.hpp"
@@ -11,6 +12,7 @@
 #include "Game/System/ScenarioDataParser.hpp"
 #include "Game/System/SysConfigFile.hpp"
 #include "Game/System/UserFile.hpp"
+#include "Game/Util/ByamlIter.hpp"
 #include "Game/Util/SingletonHolder.hpp"
 #include <cstdio>
 
@@ -301,6 +303,19 @@ namespace GameDataFunction {
         }
 
         return grandStarNum;
+    }
+
+    s32 calcOpenedAstroDomeNum(const GameDataHolder* pGameDataHolder) {
+        s32 astroDomeNum = 0;
+        s32 entryNum = DomeParamTable::getDomeNum();
+
+        for (int i = 1; i <= entryNum; i++) {
+            if (DomeParamTable::isOpenDome(pGameDataHolder, i)) {
+                astroDomeNum++;
+            }
+        }
+
+        return astroDomeNum;
     }
 
     void resetGameDataGoToGalaxyFirst() {

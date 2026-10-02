@@ -65,6 +65,7 @@ namespace GameDataFunction {
     GameDataHolder* getSceneStartGameDataHolder();
     s32 calcTicoGalaxyNum(const GameDataHolder*);
     s32 calcGrandStarNum(const GameDataHolder*);
+    s32 calcOpenedAstroDomeNum(const GameDataHolder*);
     void resetGameDataGoToGalaxyFirst();
     void resetGameDataGoToGalaxyRetry();
     void onCompleteEndingCurrentPlayer();

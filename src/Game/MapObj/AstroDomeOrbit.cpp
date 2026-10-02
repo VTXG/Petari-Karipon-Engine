@@ -2,6 +2,7 @@
 #include "Game/Map/SphereSelector.hpp"
 #include "Game/MapObj/MiniatureGalaxyHolder.hpp"
 #include "Game/Scene/SceneFunction.hpp"
+#include "Game/Util/ByamlUtil.hpp"
 #include "Game/Util/CameraUtil.hpp"
 #include "Game/Util/Color.hpp"
 #include "Game/Util/LiveActorUtil.hpp"
@@ -9,9 +10,6 @@
 #include "Game/Util/ObjUtil.hpp"
 
 namespace {
-    const static Vec cRotateOutermost = {20.0f, 45.0f, 0.0f};
-    const static f32 cRadius[] = {4000.0f, 6200.0f, 8100.0f, 10300.0f, 12000.0f};
-    const static f32 cRadiusLastDome[] = {4000.0f, 6700.0f, 9100.0f, 11800.0f};
     const static s32 cDevideNum = 64;
     const static f32 cWidth = 100.0f;
     const static f32 cHeight = 50.0f;
@@ -24,7 +22,8 @@ namespace {
     const static Color8 cBloomColor(0x00, 0xB4, 0x64, 0xFF);
 };  // namespace
 
-AstroDomeOrbit::AstroDomeOrbit() : LiveActor("天文ドームの軌道"), mOrbitRadius(5000.0f), mAngle() {
+AstroDomeOrbit::AstroDomeOrbit()
+    : LiveActor("天文ドームの軌道"), mOrbitRadius(5000.0f), mAngle(), mSpeed(cGalaxyRotateSpeed), mColor(cColor), mBloomColor(cBloomColor) {
 }
 
 void AstroDomeOrbit::init(const JMapInfoIter& rIter) {
@@ -42,7 +41,7 @@ void AstroDomeOrbit::draw() const {
         return;
     }
 
-    initDraw(::cColor);
+    initDraw(mColor);
 
     drawCelling(::cWidth, true, ::cHeight);
     drawCelling(::cWidth, false, ::cHeight);
@@ -56,7 +55,7 @@ void AstroDomeOrbit::drawBloom() const {
         return;
     }
 
-    initDraw(::cBloomColor);
+    initDraw(mBloomColor);
 
     drawCelling(::cBloomWidth, true, ::cBloomHeight);
     drawCelling(::cBloomWidth, false, ::cBloomHeight);
@@ -66,23 +65,18 @@ void AstroDomeOrbit::drawBloom() const {
 }
 
 void AstroDomeOrbit::setup(s32 radiusIdx) {
-    s32 miniNum = MiniatureGalaxyFunction::getMiniatureGalaxyNum();
-    const f32* radii = ::cRadiusLastDome;
-
-    if (miniNum == 5) {
-        radii = ::cRadius;
-    }
-
-    mOrbitRadius = radii[radiusIdx];
     mAngle = ::cGalaxyRotateCoordOffset * radiusIdx;
 
-    if (radiusIdx >= 4) {
-        mRotation.set(::cRotateOutermost);
-    }
+    ByamlIter params = MiniatureGalaxyFunction::getMiniatureGalaxyOrbitParams(radiusIdx);
+    ByamlUtil::getValueColor8(params["Color"], &mColor);
+    ByamlUtil::getValueColor8(params["Bloom"], &mBloomColor);    
+    params.tryGetValueByKey("Radius", &mOrbitRadius);
+    params.tryGetValueByKey("Speed", &mSpeed);
+    ByamlUtil::getValueTVec3f(params["Rotate"], &mRotation);
 }
 
 void AstroDomeOrbit::moveCoord() {
-    mAngle = calcRepeatedRotateCoord(::cGalaxyRotateSpeed + mAngle);
+    mAngle = calcRepeatedRotateCoord(mSpeed + mAngle);
 }
 
 void AstroDomeOrbit::calcGalaxyPos(TVec3f* pPos) const {

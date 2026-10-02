@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Game/LiveActor/LiveActor.hpp"
-
-class Color8;
+#include "Game/Util/Color.hpp"
 
 class AstroDomeOrbit : public LiveActor {
 public:
@@ -23,4 +22,7 @@ public:
 
     /* 0x8C */ f32 mOrbitRadius;
     /* 0x90 */ f32 mAngle;
+    /* 0x94 */ f32 mSpeed;
+    /* 0x98 */ Color8 mColor;
+    /* 0x9C */ Color8 mBloomColor;
 };

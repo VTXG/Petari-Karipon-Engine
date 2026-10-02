@@ -2442,6 +2442,7 @@ config.libs = [
             Object("Game/System/DrawBufferGroup.cpp"),
             Object("Game/System/DrawBufferHolder.cpp"),
             Object("Game/System/DrawSyncManager.cpp"),
+            Object("Game/System/DomeParamTable.cpp"),
             Object("Game/System/FileHolder.cpp"),
             Object("Game/System/FileLoader.cpp"),
             Object("Game/System/FileLoaderThread.cpp"),

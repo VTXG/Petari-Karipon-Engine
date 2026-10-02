@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Game/LiveActor/LiveActor.hpp"
+#include "Game/Util/ByamlIter.hpp"
 
 class LiveActorGroup;
 class MiniatureGalaxy;
@@ -16,6 +17,7 @@ public:
     MiniatureGalaxy* findMiniatureGalaxy(const char*) const;
     void killAllMiniatureGalaxy();
     s32 calcIndex(const LiveActor*) const;
+    ByamlIter getOrbitParams(s32 idx);
     void updateCometStatus();
 
     /* 0x8C */ LiveActorGroup* mMiniatureGalaxyGroup;
@@ -23,13 +25,18 @@ public:
     /* 0x94 */ MiniatureGalaxy* mCometGalaxy;
     /* 0x98 */ s32 mCometID;
     /* 0x9C */ s32 _9C;
+    /* 0x100 */ ByamlIter mParamTable;
 };
 
 class MiniatureGalaxyFunction {
 public:
-    static void registerMiniatureGalaxyToHolder(LiveActor*, const JMapInfoIter&);
+    static void createHolder();
+    static MiniatureGalaxyHolder* getHolder();
+
+    static s32 calcMiniatureGalaxyIndex(const LiveActor* pActor);
+    static ByamlIter getMiniatureGalaxyOrbitParams(s32 idx);
+
     static s32 getMiniatureGalaxyNum();
-    static s32 calcMiniatureGalaxyIndex(const LiveActor*);
     static void updateCometStatus();
     static MiniatureGalaxy* getCometLandMiniatureGalaxy();
     static s32 getCometNameId();

@@ -3,6 +3,7 @@
 #include "Game/Scene/SceneObjHolder.hpp"
 #include "Game/Scene/ScenePlayingResult.hpp"
 #include "Game/Screen/InformationObserver.hpp"
+#include "Game/System/DomeParamTable.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
 #include "Game/System/GameDataConst.hpp"
 #include "Game/System/GameDataFunction.hpp"
@@ -256,7 +257,7 @@ namespace MR {
     }
 
     bool isOnGameEventFlagChildsRoom() {
-        return MR::calcOpenedAstroDomeNum() >= 6;
+        return MR::isOpenAstroDome(6);
     }
 
     bool isOnGameEventFlagLibraryRoom() {
@@ -432,19 +433,19 @@ namespace MR {
     }
 
     s32 calcOpenedAstroDomeNum() {
-        s32 openedAstroDomeNum;
-
         if (GameSequenceFunction::hasStageResultSequence()) {
-            openedAstroDomeNum = GameDataFunction::calcGrandStarNum(GameDataFunction::getSceneStartGameDataHolder());
-        } else {
-            openedAstroDomeNum = GameDataFunction::calcGrandStarNum(GameDataFunction::getCurrentGameDataHolder());
+            return GameDataFunction::calcOpenedAstroDomeNum(GameDataFunction::getSceneStartGameDataHolder());
         }
 
-        if (GameDataFunction::hasGrandStar(7)) {
-            openedAstroDomeNum -= 1;
+        return GameDataFunction::calcOpenedAstroDomeNum(GameDataFunction::getCurrentGameDataHolder());
+    }
+
+    bool isOpenAstroDome(s32 domeID) {
+        if (GameSequenceFunction::hasStageResultSequence()) {
+            return DomeParamTable::isOpenDome(GameDataFunction::getSceneStartGameDataHolder(), domeID);
         }
 
-        return openedAstroDomeNum;
+        return DomeParamTable::isOpenDome(GameDataFunction::getCurrentGameDataHolder(), domeID);
     }
 
     s32 calcCurrentGreenStarNum() {

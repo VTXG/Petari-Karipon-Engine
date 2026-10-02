@@ -1,16 +1,15 @@
 #pragma once
 
 #include <JSystem/JGeometry/TVec.hpp>
-#include <revolution/gx/GXStruct.h>
-#include <revolution/types.h>
 
 class ByamlIter;
 class ByamlStringTableIter;
+class Color8;
 
 namespace ByamlUtil {
     ByamlIter createByamlRoot(const u8* pData);
     ByamlStringTableIter getHashKeyTable(const u8* pData);
     ByamlStringTableIter getStringTable(const u8* pData);
-    void getColorValue(const ByamlIter& rIter, GXColor* pValue);
-    void getVector3Value(const ByamlIter& rIter, TVec3f* pValue);
+    void getValueColor8(const ByamlIter& rIter, Color8* pValue);
+    void getValueTVec3f(const ByamlIter& rIter, TVec3f* pValue);
 } // namespace ByamlUtil

@@ -17,10 +17,10 @@ namespace StageParamTable {
     bool tryGetParams(ByamlIter* pIter, const char* pStageName, s32 scenarioNo) {
         ByamlIter stageEntry;
 
-        if (sStageParamTable.tryGetIterByKey(&stageEntry, pStageName)) {
+        if (sStageParamTable.tryGetIterByKey(pStageName, &stageEntry)) {
             char key[16];
             snprintf(key, sizeof(key), "Scenario%d", scenarioNo);
-            return stageEntry.tryGetIterByKey(pIter, key) || stageEntry.tryGetIterByKey(pIter, "Common");
+            return stageEntry.tryGetIterByKey(key, pIter) || stageEntry.tryGetIterByKey("Common", pIter);
         }
 
         return false;

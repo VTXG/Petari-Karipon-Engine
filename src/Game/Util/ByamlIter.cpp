@@ -137,7 +137,7 @@ bool ByamlIter::tryGetByamlDataByKey(ByamlData* pData, const char* pKey) const {
 }
 
 template <>
-bool ByamlIter::tryConvertValue(const char** pValue, const ByamlData* pData) const {
+bool ByamlIter::tryConvertValue(const ByamlData* pData, const char** pValue) const {
     if (pData->getType() != BYAML_TYPE_STRING) {
         return false;
     }
@@ -152,7 +152,7 @@ bool ByamlIter::tryConvertValue(const char** pValue, const ByamlData* pData) con
 }
 
 template <>
-bool ByamlIter::tryConvertValue(bool* pValue, const ByamlData* pData) const {
+bool ByamlIter::tryConvertValue(const ByamlData* pData, bool* pValue) const {
     if (pData->getType() != BYAML_TYPE_BOOL) {
         return false;
     }
@@ -162,7 +162,7 @@ bool ByamlIter::tryConvertValue(bool* pValue, const ByamlData* pData) const {
 }
 
 template <>
-bool ByamlIter::tryConvertValue(s32* pValue, const ByamlData* pData) const {
+bool ByamlIter::tryConvertValue(const ByamlData* pData, s32* pValue) const {
     u32 val = pData->getValue< u32 >();
 
     if (pData->getType() == BYAML_TYPE_INT || pData->getType() == BYAML_TYPE_UINT) {
@@ -174,7 +174,7 @@ bool ByamlIter::tryConvertValue(s32* pValue, const ByamlData* pData) const {
 }
 
 template <>
-bool ByamlIter::tryConvertValue(u32* pValue, const ByamlData* pData) const {
+bool ByamlIter::tryConvertValue(const ByamlData* pData, u32* pValue) const {
     s32 val = pData->getValue< s32 >();
 
     if (pData->getType() == BYAML_TYPE_INT || pData->getType() == BYAML_TYPE_UINT) {
@@ -186,7 +186,7 @@ bool ByamlIter::tryConvertValue(u32* pValue, const ByamlData* pData) const {
 }
 
 template <>
-bool ByamlIter::tryConvertValue(f32* pValue, const ByamlData* pData) const {
+bool ByamlIter::tryConvertValue(const ByamlData* pData, f32* pValue) const {
     if (pData->getType() != BYAML_TYPE_FLOAT) {
         return false;
     }

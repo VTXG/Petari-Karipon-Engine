@@ -216,7 +216,7 @@ void WarpPod::init(const JMapInfoIter& rIter) {
 
     bool isNonActive = false;
 
-    if (MR::calcOpenedAstroDomeNum() < mGrandstarReq) {
+    if (MR::isOpenAstroDome(mGrandstarReq)) {
         isNonActive = true;
     }
 

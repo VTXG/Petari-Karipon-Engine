@@ -93,7 +93,7 @@ void AudSceneMgr::loadWaveSet(const ByamlIter& rWaveSet) {
 
     for (s32 i = 0; i < size; i++) {
         const char* pName = nullptr;
-        rWaveSet.tryGetValueByIndex(&pName, i);
+        rWaveSet.tryGetValueByIndex(i, &pName);
 
         if (MR::isNullOrEmptyString(pName)) {
             continue;
@@ -118,7 +118,7 @@ void AudSceneMgr::eraseWaveSet(const ByamlIter& rWaveSet) {
 
     for (s32 i = size - 1; i >= 0; i--) {
         const char* pName = nullptr;
-        rWaveSet.tryGetValueByIndex(&pName, i);
+        rWaveSet.tryGetValueByIndex(i, &pName);
 
         if (MR::isNullOrEmptyString(pName)) {
             continue;
@@ -143,7 +143,7 @@ bool AudSceneMgr::isLoadDoneWaveSet(const ByamlIter& rWaveSet) const {
 
     for (s32 i = 0; i < size; i++) {
         const char* pName = nullptr;
-        rWaveSet.tryGetValueByIndex(&pName, i);
+        rWaveSet.tryGetValueByIndex(i, &pName);
 
         if (MR::isNullOrEmptyString(pName)) {
             continue;

@@ -8,6 +8,7 @@
 #include "Game/Scene/SceneFunction.hpp"
 #include "Game/Scene/StageParamTable.hpp"
 #include "Game/System/AudSystemWrapper.hpp"
+#include "Game/System/DomeParamTable.hpp"
 #include "Game/System/GameSystem.hpp"
 #include "Game/System/GameSystemFunction.hpp"
 #include "Game/System/GameSystemObjHolder.hpp"
@@ -79,6 +80,7 @@ GameSystemSceneController::GameSystemSceneController()
 }
 
 void GameSystemSceneController::initAfterStationedResourceLoaded() {
+    DomeParamTable::init();
     StageParamTable::init();
 
     mScenarioParser = new ScenarioDataParser("シナリオデータ解析");
@@ -119,7 +121,7 @@ void GameSystemSceneController::initializeScene() {
 
         ByamlIter params;
         if (StageParamTable::tryGetParams(&params, mNextSceneControlInfo.mStage, mNextSceneControlInfo.mScenarioNo)) {
-            params.tryGetValueByKey(&fileCacheSize, "FileCacheSize");
+            params.tryGetValueByKey("FileCacheSize", &fileCacheSize);
         }
 
         SingletonHolder< HeapMemoryWatcher >::get()->createFileCacheHeapOnGameHeap(fileCacheSize);

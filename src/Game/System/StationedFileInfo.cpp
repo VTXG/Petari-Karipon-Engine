@@ -952,7 +952,12 @@ namespace MR {
             StationedFileInfo::LOAD_TYPE_MOUNT_RESOURCE_LAYOUT,
             "/LayoutData/GameOver.arc",
         },
-        {
+        {            
+            StationedFileInfo::HEAP_TYPE_GDDR,
+            StationedFileInfo::LOAD_TYPE_FILE,
+            "/SystemData/DomeParamTable.byaml",
+        },
+        {            
             StationedFileInfo::HEAP_TYPE_GDDR,
             StationedFileInfo::LOAD_TYPE_FILE,
             "/SystemData/GameEventFlagTable.bcsv",

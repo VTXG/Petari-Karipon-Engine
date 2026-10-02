@@ -23,6 +23,7 @@
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StarPointerUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
+#include "revolution/types.h"
 
 void MiniatureGalaxy_FORCE_MATCH_SDATA2() {
     (void)1.0f;
@@ -81,6 +82,7 @@ MiniatureGalaxy::MiniatureGalaxy(const char* pName)
     : LiveActor(pName), mType(-1), mState(MiniatureGalaxyState_Open), mUnknownModel(), mShadowModel(), mSelectModel(), mStarPlateModel(),
       mProjmapEffectMtxSetter(), mInitPos(gZeroVec), mObjectName(), mGalaxyName(), mCanZoomIn(1), mZoomLevel(::cZoomFrame), mOnesTexMtx(),
       mTensTexMtx(), mOrbit(), mNamePlate() {
+    MiniatureGalaxyFunction::createHolder();
     mShadowBaseMtx.identity();
     mPosMtx.identity();
 }
@@ -120,7 +122,7 @@ void MiniatureGalaxy::init(const JMapInfoIter& rIter) {
     }
 
     SphereSelectorFunction::registerTarget(this);
-    MiniatureGalaxyFunction::registerMiniatureGalaxyToHolder(this, rIter);
+    MiniatureGalaxyFunction::getHolder()->registerActor(this, rIter);
 
     mOrbit = new AstroDomeOrbit();
     mOrbit->initWithoutIter();
@@ -139,7 +141,7 @@ void MiniatureGalaxy::initAfterPlacement() {
 
 void MiniatureGalaxy::appear() {
     const f32 rotations[] = {0.0f, 210.0f, 80.0f, 330.0f, 130.0f};
-    ::setInitialRotation(mRotation, rotations[MiniatureGalaxyFunction::calcMiniatureGalaxyIndex(this)]);
+    ::setInitialRotation(mRotation, rotations[MiniatureGalaxyFunction::calcMiniatureGalaxyIndex(this) % ARRAY_SIZE(rotations)]);
 
     mCanZoomIn = 1;
     mZoomLevel = ::cZoomFrame;

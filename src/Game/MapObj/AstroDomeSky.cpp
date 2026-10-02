@@ -2,10 +2,10 @@
 #include "Game/LiveActor/MaterialCtrl.hpp"
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/Map/SphereSelector.hpp"
+#include "Game/MapObj/MiniatureGalaxyHolder.hpp"
 #include "Game/Scene/SceneFunction.hpp"
 #include "Game/Util/CameraUtil.hpp"
 #include "Game/Util/DrawUtil.hpp"
-#include "Game/Util/JMapUtil.hpp"
 #include "Game/Util/LiveActorUtil.hpp"
 #include "Game/Util/MathUtil.hpp"
 #include "Game/Util/ModelUtil.hpp"
@@ -15,7 +15,6 @@
 
 namespace {
     const Vec cJumpOutDemoRotate = {347.0f, 0.0f, 0.0f};
-    const char* cAstroDomeSkyTable[] = {"AstroDomeSkyA", "AstroDomeSkyB", "AstroDomeSkyC", "AstroDomeSkyA", "AstroDomeSkyB", "AstroDomeSkyC"};
     const s32 cAppearanceBrkTotalFrame = 200;
     const s32 cRotateDisappearBrkFrame = 30;
     const s32 cRotateAppearBrkFrame = 59;
@@ -37,13 +36,12 @@ namespace NrvAstroDomeSky {
 };  // namespace NrvAstroDomeSky
 
 AstroDomeSky::AstroDomeSky(const char* pName) : LiveActor(pName), mBrkFrame(), mColor(0x00, 0x00, 0x00, 0xFF), mProjmap() {
+    MiniatureGalaxyFunction::createHolder();
 }
 
 void AstroDomeSky::init(const JMapInfoIter& rIter) {
-    s32 arg0 = -1;
-    MR::getJMapInfoArg0NoInit(rIter, &arg0);
-
-    const char* pSkyName = ::cAstroDomeSkyTable[arg0 - 1];
+    const char* pSkyName = nullptr;
+    MiniatureGalaxyFunction::getHolder()->mParamTable.tryGetValueByKey("Sky", &pSkyName);
     initModelManagerWithAnm(pSkyName, nullptr, true);
 
     mProjmap = MR::initDLMakerProjmapEffectMtxSetter(this);
