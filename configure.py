@@ -664,7 +664,10 @@ config.libs = [
             Object("Runtime/__mem.c"),
             Object("Runtime/__va_arg.c"),
             Object("Runtime/global_destructor_chain.c"),
-            Object("Runtime/NMWException.cpp"),
+            Object(
+                "Runtime/NMWException.cpp",
+                cflags=[*cflags_runtime, "-Cpp_exceptions on"],
+            ),
             Object("Runtime/ptmf.c"),
             Object("Runtime/runtime.c"),
             Object("Runtime/__init_cpp_exceptions.cpp"),
