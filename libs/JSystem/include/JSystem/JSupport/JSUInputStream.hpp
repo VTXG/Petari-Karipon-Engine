@@ -32,5 +32,10 @@ public:
         return ret;
     }
 
+    template < typename T >
+    inline void read(T* pVal) {
+        read(pVal, sizeof(*pVal));
+    }
+
     // TODO: probably a lot of other helpers for different types
 };

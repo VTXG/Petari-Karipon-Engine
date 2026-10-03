@@ -25,5 +25,10 @@ public:
         write(&val, sizeof(u32));
     }
 
+    template < typename T >
+    inline void write(T val) {
+        write(&val, sizeof(val));
+    }
+
     // TODO: probably a lot of other helpers for different types
 };

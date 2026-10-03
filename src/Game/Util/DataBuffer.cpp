@@ -1,4 +1,4 @@
-#include "Game/Util/IODataBuffer.hpp"
+#include "Game/Util/DataBuffer.hpp"
 
 namespace MR {
     void fastCopy(void* pFrom, void* pTo, u32 size) {

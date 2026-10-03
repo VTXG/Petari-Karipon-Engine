@@ -9,6 +9,7 @@
 #include "Game/System/ErrorArchive.hpp"
 #include "Game/System/FileLoader.hpp"
 #include "Game/System/FunctionAsyncExecutor.hpp"
+#include "Game/System/GameOnlineManager.hpp"
 #include "Game/System/HeapMemoryWatcher.hpp"
 #include "Game/System/Language.hpp"
 #include "Game/System/MainLoopFramework.hpp"
@@ -86,6 +87,7 @@ void GameSystemObjHolder::update() {
     mWPadHolder->update();
     mFunctionAsyncExecutor->update();
     mStarPointerDirector->update();
+    SingletonHolder< GameOnlineManager >::get()->update();
 }
 
 void GameSystemObjHolder::updateAudioSystem() {
@@ -192,4 +194,6 @@ void GameSystemObjHolder::initDisplay() {
 void GameSystemObjHolder::initNetwork() {
     mNetworkSystem = new NetworkSystemWrapper();
     mNetworkSystem->initSystem(false);
+
+    SingletonHolder< GameOnlineManager >::init();
 }

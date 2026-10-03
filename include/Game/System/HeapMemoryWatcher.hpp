@@ -46,5 +46,6 @@ public:
     /* 0x1C */ JKRExpHeap* mWPadHeap;
     /* 0x20 */ JKRExpHeap* mHomeButtonLayoutHeap;
     /* 0x24 */ JKRSolidHeap* mAudSystemHeap;
+    /* 0x28 */ JKRSolidHeap* mGameOnlineHeap;
     static JKRExpHeap* sRootHeapGDDR3;
 };

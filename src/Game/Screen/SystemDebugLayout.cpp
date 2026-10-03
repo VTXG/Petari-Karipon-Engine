@@ -71,6 +71,7 @@ namespace {
             printHeapInfo(pMenu, "WPadHeap", pWatcher->mWPadHeap);
             printHeapInfo(pMenu, "HomeButtonLayoutHeap", pWatcher->mHomeButtonLayoutHeap);
             printHeapInfo(pMenu, "AudSystemHeap", pWatcher->mAudSystemHeap);
+            printHeapInfo(pMenu, "GameOnlineHeap", pWatcher->mGameOnlineHeap);
         }
     }  // namespace DiagnosticsPage
 
