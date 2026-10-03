@@ -21,12 +21,6 @@
 #include <JSystem/JUtility/JUTTexture.hpp>
 #include <revolution/wpad.h>
 
-void StarPointerLayout_FORCE_MATCH_SDATA2() {
-    (void)1.0f;
-    (void)0.0f;
-    (void)2.0f;
-}
-
 namespace {
     // TODO: names
     static GXColor sColorA[] = {
@@ -44,9 +38,9 @@ namespace {
     };
 
     static const s32 sTouchCount = 1;
-    static const vf32 sNormalRadius = 15.0f;
-    static const vf32 sHoldRadius = 45.0f;
-    static const vf32 sHandRadius = 20.0f;
+    static const f32 sNormalRadius = 15;
+    static const f32 sHoldRadius = 45;
+    static const f32 sHandRadius = 20;
 
     // static const _32 sStepRadian =
     static const s32 hGripTime = 20;

@@ -25,10 +25,6 @@
 #include "Game/Util/StringUtil.hpp"
 #include "revolution/types.h"
 
-void MiniatureGalaxy_FORCE_MATCH_SDATA2() {
-    (void)1.0f;
-    (void)0.0f;
-}
 namespace {
     const Vec cNamePlateOffset = {0.0f, 1500.0f, 0.0f};
     const f32 cPointingRadius = 2500.0f;

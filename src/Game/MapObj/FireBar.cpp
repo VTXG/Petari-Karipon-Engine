@@ -5,11 +5,6 @@
 #include "Game/Util.hpp"
 #include <JSystem/JMath/JMath.hpp>
 
-void FireBar_FORCE_MATCH_SDATA2() {
-    (void)0.0f;
-    (void)-1.0f;
-}
-
 namespace NrvFireBar {
     NEW_NERVE(FireBarNrvWait, FireBar, Wait);
 };  // namespace NrvFireBar
@@ -252,9 +247,7 @@ void FireBar::fixFireBarBall() {
     scaled.scale(100.0f, _94);
 
     TVec3f final_pos;
-    final_pos.z = 0.0f;
-    final_pos.y = 0.0f;
-    final_pos.x = 0.0f;
+    final_pos.zero();
 
     s32 totalNum = mFireBallCount / mStickCount;
 
