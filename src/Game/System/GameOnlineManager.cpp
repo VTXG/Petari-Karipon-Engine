@@ -1,81 +1,58 @@
 #include "Game/System/GameOnlineManager.hpp"
 #include "Game/LiveActor/Nerve.hpp"
-#include "Game/System/HeapMemoryWatcher.hpp"
-#include "Game/Util/SingletonHolder.hpp"
-#include "revolution/os.h"
-#include "revolution/os/OSThread.h"
-#include <JSystem/JKernel/JKRSolidHeap.hpp>
+#include "Game/System/GameOnlineFunction.hpp"
+#include "Game/System/NetworkSystemWrapper.hpp"
+#include "Game/Util/DataBuffer.hpp"
+#include <JSystem/JKernel/JKRUnitHeap.hpp>
+
+#define MAX_PLAYER_COUNT 4
+#define MAX_PACKET_SIZE 0x200
 
 namespace {
     NEW_NERVE(NrvGameOnlineManagerInactive, GameOnlineManager, Inactive);
     NEW_NERVE(NrvGameOnlineManagerConnecting, GameOnlineManager, Connecting);
-    NEW_NERVE(NrvGameOnlineManagerActive,GameOnlineManager, Active);
+    NEW_NERVE(NrvGameOnlineManagerActive, GameOnlineManager, Active);
+} // namespace
 
-    JKRSolidHeap* getGameOnlineHeap() {
-        return SingletonHolder< HeapMemoryWatcher >::get()->mGameOnlineHeap;
-    }
-}  // namespace
-
-void GameOnlinePacketHeader::read(JSUMemoryInputStream& rStream) {
+void GameOnlinePacketHeader::read(MR::DataStream& rStream) {
     rStream.read(&mMagic);
     rStream.read(&mPacketID);
     rStream.read(&mTimestamp);
 }
 
-void GameOnlinePacketHeader::write(JSUMemoryOutputStream& rStream) const {
-    rStream.write(mMagic);
-    rStream.write(mPacketID);
-    rStream.write(mTimestamp);
-}
-
-GameOnlineManagerThread::GameOnlineManagerThread(int priority, int msgCount, JKRHeap* pHeap) : OSThreadWrapper(0x8000, msgCount, priority, pHeap) {
-}
-
-void* GameOnlineManagerThread::run() {
-    OSInitFastCast();
-
-    while (true) {
-        OSSleepTicks(OSMillisecondsToTicks(1000/60));
-        OSYieldThread();
-    }
+void GameOnlinePacketHeader::write(MR::DataStream& rStream) const {
+    rStream.write(&mMagic);
+    rStream.write(&mPacketID);
+    rStream.write(&mTimestamp);
 }
 
 GameOnlineManager::GameOnlineManager()
-    : NerveExecutor("GameOnlineManager"), mSocket(-1), mPlayerStates(MAX_PLAYER_COUNT), mTemporaryBuffer(MAX_PACKET_SIZE) {
-    mManagerThread = new GameOnlineManagerThread(10, 1, ::getGameOnlineHeap());
-    // OSResumeThread(mManagerThread->mThread);
-    OSInitMutex(&mMutex);
+    : NerveExecutor("GameOnlineManager"), mSocket(-1), mPlayerStates(MAX_PLAYER_COUNT), mTemporaryBuffer(), mPingTime(OSGetTime()) {
+    initPacketBuffers();
     initNerve(GET_NERVE_ANON(NrvGameOnlineManagerInactive));
+}
+
+void GameOnlineManager::initPacketBuffers() {
+    JKRUnitHeap* pHeap = GameOnlineFunction::createGameOnlineHeap(MAX_PACKET_SIZE);
+    mTemporaryBuffer.init(MAX_PACKET_SIZE, pHeap);
 }
 
 void GameOnlineManager::update() {
     updateNerve();
 }
 
-bool GameOnlineManager::recv(SockAddress* pAddress) {
-    s32 inSize = NetworkSystemWrapper::get()->recv(mSocket, mTemporaryBuffer.mBuffer, mTemporaryBuffer.mSize, SO_MSG_NONBLOCK, pAddress);
-    if (inSize < 0) {
-        return false; // TODO: Error handling
-    }
-
-    JSUMemoryInputStream inStream = mTemporaryBuffer.createInputStream();
+bool GameOnlineManager::handlePacket(MR::DataStream& rInStream, SockAddress& rAddress) {
     GameOnlinePacketHeader inHeader;
-    inHeader.read(inStream);
+    inHeader.read(rInStream);
 
     switch (inHeader.mMagic) {
-    case GameOnlinePacketHeader::MAGIC_PING: {
-        GameOnlinePacketHeader outHeader = {GameOnlinePacketHeader::MAGIC_PONG, -1, OSGetTime()};
-        JSUMemoryOutputStream outStream = mTemporaryBuffer.createOutputStream();
-        outHeader.write(outStream);
+    case GameOnlinePacketHeader::MAGIC_PING:
+        handlePacketPing(rAddress);
         break;
-    }
-    case GameOnlinePacketHeader::MAGIC_PONG: {
-        u8 inGlobalID;
-        inStream.read(&inGlobalID);
-        getGlobalPlayer(inGlobalID)->mLastReplyTime = inHeader.mTimestamp;
+    case GameOnlinePacketHeader::MAGIC_PONG:
+        handlePacketPong(inHeader, rInStream);
         break;
-    }
-    default:
+    default: {
         char inMagicName[5] = {
             static_cast< char >((inHeader.mMagic >> 24) & 0xFF),
             static_cast< char >((inHeader.mMagic >> 16) & 0xFF),
@@ -84,11 +61,42 @@ bool GameOnlineManager::recv(SockAddress* pAddress) {
             '\0',
         };
 
-        OSReport("[%s:%d\n] Unknown packet '%s' size 0x%X\n", __FILE__, __LINE__, inMagicName, inSize);
+        OSReport("[%s:%d\n] Unknown packet '%s' size 0x%X\n", __FILE__, __LINE__, inMagicName, rInStream.mSize);
         break;
+    }
     }
 
     return true;
+}
+
+void GameOnlineManager::handlePacketPing(SockAddress& rAddress) {
+    MR::DataStream outStream(mTemporaryBuffer);
+
+    GameOnlinePacketHeader outHeader = {GameOnlinePacketHeader::MAGIC_PONG, -1, OSGetTime()};
+    outHeader.write(outStream);
+    outStream.write< u8 >(&getCurrentPlayer()->mGlobalID);
+
+    sendTo(outStream, rAddress);
+}
+
+void GameOnlineManager::handlePacketPong(GameOnlinePacketHeader& rInHeader, MR::DataStream& rInStream) {
+    u8 inGlobalID;
+    rInStream.read(&inGlobalID);
+    getGlobalPlayer(inGlobalID)->mPingTime = rInHeader.mTimestamp;
+}
+
+void GameOnlineManager::sendTo(MR::DataStream& rStream, SockAddress& rAddress) {
+    NetworkSystemWrapper::get()->send(mSocket, rStream.mBuffer, rStream.mSize, SO_MSG_NONBLOCK, rAddress);
+}
+
+void GameOnlineManager::sendAll(MR::DataStream& rStream) {
+    for (GameOnlinePlayerState* pPlayerState = &mPlayerStates[1]; pPlayerState != mPlayerStates.end(); pPlayerState++) {
+        if (!pPlayerState->mIsActive) {
+            continue;
+        }
+
+        sendTo(rStream, pPlayerState->mAddress);
+    }
 }
 
 GameOnlinePlayerState* GameOnlineManager::getGlobalPlayer(u8 globalID) {
@@ -104,11 +112,26 @@ GameOnlinePlayerState* GameOnlineManager::getGlobalPlayer(u8 globalID) {
 void GameOnlineManager::exeConnecting() {}
 
 void GameOnlineManager::exeActive() {
-    while (recv(&mServerAddress)) {
+    while (true) {
+        SockAddress address;
+        s32 size = NetworkSystemWrapper::get()->recv(mSocket, mTemporaryBuffer.mBuffer, mTemporaryBuffer.mSize, SO_MSG_NONBLOCK, &address);
+        if (size < 0) {
+            break; // TODO: Error handling
+        }
+
+        MR::DataStream inStream(mTemporaryBuffer.mBuffer, size);
+        handlePacket(inStream, address);
     }
 
-    for (u8 i = 1; i < mPlayerStates.size(); i++) {
-        while (recv(&mPlayerStates[i].mAddress)) {
-        }
+    OSTime time = OSGetTime();
+
+    if (OSTicksToSeconds(mPingTime - time) > 3) {
+        MR::DataStream outStream(mTemporaryBuffer);
+
+        GameOnlinePacketHeader outHeader = {GameOnlinePacketHeader::MAGIC_PING, -1, time};
+        outHeader.write(outStream);
+
+        sendAll(outStream);
+        mPingTime = time;
     }
 }

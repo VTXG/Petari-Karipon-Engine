@@ -139,7 +139,6 @@ void HeapMemoryWatcher::createRootHeap() {
 void HeapMemoryWatcher::createHeaps() {
     MR::CurrentHeapRestorer heapRestorer = MR::CurrentHeapRestorer(JKRHeap::sRootHeap);
     ::createExpHeap(0x40000, JKRHeap::sRootHeap, false)->becomeSystemHeap();
-    mGameOnlineHeap = ::createSolidHeap(0x1E000, JKRHeap::sSystemHeap);
     mAudSystemHeap = ::createSolidHeap(0x1E0000, JKRHeap::sRootHeap);
     mStationedHeapNapa = ::createExpHeap(0x900000, JKRHeap::sRootHeap, false);
     JKRHeap* pRootHeapGDDR = HeapMemoryWatcher::sRootHeapGDDR3;
@@ -162,8 +161,8 @@ HeapMemoryWatcher::HeapMemoryWatcher()
     createHeaps();
 }
 
-void HeapMemoryWatcher::memoryErrorCallback(void*, u32, int) {
-    OSPanic(__FILE__, 537, "");
+void HeapMemoryWatcher::memoryErrorCallback(void* pHeap, u32 size, int alignment) {
+    OSPanic(__FILE__, __LINE__, "Failed to allocate 0x%X bytes with %d-byte alignment", size, alignment);
 }
 
 void HeapMemoryWatcher::checkRestMemory() {

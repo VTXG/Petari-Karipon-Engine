@@ -1,8 +1,6 @@
 #pragma once
 
 #include <JSystem/JKernel/JKRHeap.hpp>
-#include <JSystem/JSupport/JSUMemoryInputStream.hpp>
-#include <JSystem/JSupport/JSUMemoryOutputStream.hpp>
 #include <revolution/types.h>
 
 namespace MR {
@@ -31,20 +29,30 @@ namespace MR {
             MR::fastCopy(mBuffer, pTo, mSize);
         }
 
+        /* 0x00 */ u8* mBuffer;
+        /* 0x04 */ u32 mSize;
+    };
+
+    class DataStream {
+    public:
+        DataStream(u8* pBuffer, u32 size) : mBuffer(pBuffer), mSize(size), mPosition() {}
+        DataStream(DataBuffer& rDataBuffer) : mBuffer(rDataBuffer.mBuffer), mSize(rDataBuffer.mSize), mPosition() {}
+
+        bool readData(void* pData, s32 size);
+        bool writeData(const void* pData, s32 size);
+
         template < typename T >
-        T* as(u32 offset = 0) {
-            return reinterpret_cast< T* >(mBuffer + offset);
+        bool read(T* pData) {
+            return readData(pData, sizeof(*pData));
         }
 
-        JSUMemoryInputStream createInputStream() const {
-            return JSUMemoryInputStream(mBuffer, mSize);
-        }
-
-        JSUMemoryOutputStream createOutputStream() const {
-            return JSUMemoryOutputStream(mBuffer, mSize);
+        template < typename T >
+        bool write(const T* pData) {
+            return writeData(pData, sizeof(*pData));
         }
 
         /* 0x00 */ u8* mBuffer;
         /* 0x04 */ u32 mSize;
+        /* 0x08 */ u32 mPosition;
     };
-}  // namespace MR
+} // namespace MR

@@ -196,7 +196,7 @@ IOSError NetworkSystemWrapper::connect(IOSFd fd, const SockAddress& rAddress) {
     return IOS_Ioctl(mFd, IOCTL_SO_CONNECT, &params, sizeof(params), nullptr, 0);
 }
 
-IOSError NetworkSystemWrapper::recv(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, SockAddress* pFrom) {
+IOSError NetworkSystemWrapper::recv(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, SockAddress* pAddress) {
     if (mFd < 0 || fd < 0) {
         return SO_ERR_NXIO;
     }
@@ -214,13 +214,12 @@ IOSError NetworkSystemWrapper::recv(IOSFd fd, void* pBuffer, u32 size, SOMessage
     iov[0].length = sizeof(params);
     iov[1].base = static_cast< u8* >(pBuffer);
     iov[1].length = size;
-    iov[2].base = reinterpret_cast< u8* >(pFrom);
-    iov[2].length = pFrom != nullptr ? sizeof(*pFrom) : 0;
-
-    return IOS_Ioctlv(mFd, IOCTLV_SO_RECV_FROM, 1, pFrom != nullptr ? 2 : 1, iov);
+    iov[2].base = reinterpret_cast< u8* >(pAddress);
+    iov[2].length = pAddress != nullptr ? sizeof(*pAddress) : 0;
+    return IOS_Ioctlv(mFd, IOCTLV_SO_RECV_FROM, 1, pAddress != nullptr ? 2 : 1, iov);
 }
 
-IOSError NetworkSystemWrapper::send(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, SockAddress* pTo) {
+IOSError NetworkSystemWrapper::send(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, const SockAddress& rAddress) {
     if (mFd < 0 || fd < 0) {
         return SO_ERR_NXIO;
     }
@@ -234,21 +233,14 @@ IOSError NetworkSystemWrapper::send(IOSFd fd, void* pBuffer, u32 size, SOMessage
 
     params.fd = fd;
     params.flags = flags;
-
-    if (pTo != nullptr) {
-        params.hasAddress = TRUE;
-        params.address = *pTo;
-    } else {
-        params.hasAddress = FALSE;
-        memset(&params.address, 0, sizeof(params.address));
-    }
+    params.hasAddress = TRUE;
+    params.address = rAddress;
 
     IOSIoVector iov[2] ATTRIBUTE_ALIGN(32);
     iov[0].base = static_cast< u8* >(pBuffer);
     iov[0].length = size;
     iov[1].base = reinterpret_cast< u8* >(&params);
     iov[1].length = sizeof(params);
-
     return IOS_Ioctlv(mFd, IOCTLV_SO_SEND_TO, 2, 0, iov);
 }
 

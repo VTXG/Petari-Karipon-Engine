@@ -139,27 +139,76 @@ public:
         STATE_ACTIVE,
     };
 
+    /// @brief Creates a new `NetworkSystemWrapper`.
     NetworkSystemWrapper();
+
+    /// @brief Destroys the `NetworkSystemWrapper`.
     ~NetworkSystemWrapper();
 
+    /// @brief Initializes the network system asynchronously.
+    /// @param wait If this function should wait for the initialization process to end.
     void initSystem(bool wait = false);
+
+    /// @brief Closes the network system.
     void closeSystem();
 
+    /// @brief Creates a socket.
+    /// @param domain Socket family.
+    /// @param type Socket type.
+    /// @param protocol Socket protocol.
+    /// @return The new socket file descriptor or an error code.
     IOSFd socket(SOFamily domain, SOType type, u32 protocol);
-    IOSError close(IOSFd fd);
-    IOSError bind(IOSFd fd, const SockAddress& rAddress);
-    IOSError connect(IOSFd fd, const SockAddress& rAddress);
-    IOSError recv(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, SockAddress* pFrom);
-    IOSError send(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, SockAddress* pTo);
 
+    /// @brief Closes a socket.
+    /// @param fd Socket file descriptor.
+    /// @return An error code.
+    IOSError close(IOSFd fd);
+
+    /// @brief Binds a socket to a specific address.
+    /// @param fd Socket file descriptor.
+    /// @param rAddress Address to bind to.
+    /// @return An error code.
+    IOSError bind(IOSFd fd, const SockAddress& rAddress);
+
+    /// @brief Connects a socket to a specific address.
+    /// @param fd Socket file descriptor.
+    /// @param rAddress Address to connect to.
+    /// @note This function should only be used with TCP sockets.
+    /// @return An error code.
+    IOSError connect(IOSFd fd, const SockAddress& rAddress);
+
+    /// @brief Receives data through a socket.
+    /// @param fd Socket file descriptor.
+    /// @param pBuffer Pointer to the buffer to copy the data to.
+    /// @param size Size of the buffer to copy the data to.
+    /// @param flags Operation flags.
+    /// @param pAddress Optional sender socket address.
+    /// @return An error code.
+    IOSError recv(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, SockAddress* pAddress = nullptr);
+
+    /// @brief Sends data through a socket.
+    /// @param fd Socket file descriptor.
+    /// @param pBuffer Pointer to the data to send.
+    /// @param size Size of the data to send.
+    /// @param flags Operation flags.
+    /// @param rAddress Reference to the address to send the data to.
+    /// @return An error code.
+    IOSError send(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, const SockAddress& rAddress);
+
+    /// @brief Checks if the network system state is active.
+    /// @returns True if the network system state is active; Otherwise false.
     bool isActive() const {
         return mState == STATE_ACTIVE;
     }
 
+    /// @brief Gets the local IP address.
+    /// @returns Reference to the local IP address.
     const IPAddress& getLocalIP() const {
         return mIP;
     }
 
+    /// @brief Gets a `NetworkSystemWrapper` instance.
+    /// @returns Pointer to the `NetworkSystemWrapper` instance.
     static NetworkSystemWrapper* get();
 
 private:

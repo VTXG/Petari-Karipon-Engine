@@ -1,4 +1,5 @@
 #include "Game/Util/DataBuffer.hpp"
+#include <cstring>
 
 namespace MR {
     void fastCopy(void* pFrom, void* pTo, u32 size) {
@@ -22,5 +23,27 @@ namespace MR {
             pTo = static_cast< u8* >(pTo) + blockSize;
             size -= blockSize;
         }
+    }
+
+    bool DataStream::readData(void* pData, s32 size) {
+        u32 end = mPosition + size;
+        if (end > mSize) {
+            return false;
+        }
+
+        memcpy(pData, mBuffer + mPosition, size);
+        mPosition = end;
+        return true;
+    }
+
+    bool DataStream::writeData(const void* pData, s32 size) {
+        u32 end = mPosition + size;
+        if (end > mSize) {
+            return false;
+        }
+
+        memcpy(mBuffer + mPosition, pData, size);
+        mPosition = end;
+        return true;
     }
 }

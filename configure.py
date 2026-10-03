@@ -2529,6 +2529,7 @@ config.libs = [
             Object("Game/System/GameEventFlagChecker.cpp"),
             Object("Game/System/GameEventFlagStorage.cpp"),
             Object("Game/System/GameEventValueChecker.cpp"),
+            Object("Game/System/GameOnlineFunction.cpp"),
             Object("Game/System/GameOnlineManager.cpp"),
             Object("Game/System/GameSequenceDirector.cpp"),
             Object("Game/System/GameSequenceFunction.cpp"),
