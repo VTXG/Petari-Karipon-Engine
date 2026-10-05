@@ -89,12 +89,20 @@ namespace {
         static void update(SystemDebugLayout::PrintContext& rContext) {
             GameOnlineManager* pOnlineManager = getOnlineManager();
 
-            if (rContext.printText(true, L"[Create]\n")) {
-                pOnlineManager->requestRoomMake("Test");
+            if (pOnlineManager->isConnected()) {
+                if (rContext.printText(true, L"[Create]\n")) {
+                    pOnlineManager->requestRoomMake("Test");
+                }
+
+                if (rContext.printText(true, L"[Join]\n")) {
+                    pOnlineManager->requestRoomJoin("Test");
+                }
             }
 
-            if (rContext.printText(true, L"[Join]\n")) {
-                pOnlineManager->requestRoomJoin("Test");
+            if (pOnlineManager->isConnectedInRoom()) {
+                for (GameOnlineClient* pClient = pOnlineManager->mClients.begin(); pClient != pOnlineManager->mClients.end(); pClient++) {
+                    rContext.printTextF(false, L"[%d] ID: %d Stage: %s Scenario: %d\n", pClient - pOnlineManager->mClients.mArr, pClient->mGlobalID, pClient->mStageName, pClient->mScenarioNo);
+                }
             }
         }
     } // namespace OnlinePage

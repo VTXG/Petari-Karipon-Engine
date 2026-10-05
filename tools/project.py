@@ -1419,11 +1419,7 @@ def generate_compile_commands(
 
     clangd_config = []
 
-    def add_unit(build_obj: BuildConfigUnit) -> None:
-        obj = objects.get(build_obj["name"])
-        if obj is None:
-            return
-
+    def add_obj(obj: Object) -> None:
         # Skip unresolved objects
         if (
             obj.src_path is None
@@ -1523,9 +1519,16 @@ def generate_compile_commands(
         }
         clangd_config.append(unit_config)
 
+    def add_unit(build_obj: BuildConfigUnit) -> None:
+        obj = objects.get(build_obj["name"])
+        if obj is None:
+            return
+
+        add_obj(obj)
+
     # Add DOL units
-    for unit in build_config["units"]:
-        add_unit(unit)
+    for obj in objects.values():
+        add_obj(obj)
 
     # Write compile_commands.json
     with open("compile_commands.json", "w", encoding="utf-8") as w:

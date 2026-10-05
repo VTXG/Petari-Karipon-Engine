@@ -2,7 +2,10 @@
 #include "Game/Animation/XanimeCore.hpp"
 #include "Game/Animation/XanimePlayer.hpp"
 #include "Game/Animation/XanimeResource.hpp"
+#include "Game/LiveActor/LiveActor.hpp"
 #include "Game/LiveActor/ModelManager.hpp"
+#include "Game/Scene/SceneFunction.hpp"
+#include "Game/System/GameOnlineManager.hpp"
 #include "Game/Util/ActorSensorUtil.hpp"
 #include "Game/Util/ActorShadowUtil.hpp"
 #include "Game/Util/DemoUtil.hpp"
@@ -21,7 +24,7 @@ extern XanimeBckTable3 tripleAnimeTable[];
 extern XanimeBckTable4 quadAnimeTable[];
 extern XanimeSwapTable luigiAnimeSwapTable[];
 
-OnlinePlayer::OnlinePlayer(const char* pName) : LiveActor(pName), mResourceTable(), mXanimePlayer(), mXanimePlayerUpper(), mHasJetTurtle() {}
+OnlinePlayer::OnlinePlayer(const char* pName) : LiveActor(pName), mClient(), mXanimePlayer(), mXanimePlayerUpper(), mHasJetTurtle(), mIsHidden(true) {}
 
 void OnlinePlayer::init(const JMapInfoIter& rIter) {
     mPosition.zero();
@@ -29,19 +32,17 @@ void OnlinePlayer::init(const JMapInfoIter& rIter) {
     mScale.set(1.0f);
 
     initModelManagerWithAnm("GhostMario", nullptr, true);
-    MR::initDLMakerFog(this, true);
-    MR::newDifferedDLBuffer(this);
 
-    mResourceTable =
+    XanimeResourceTable* pResourceTable =
         new XanimeResourceTable(MR::getResourceHolder(this), marioAnimeTable, marioAnimeAuxTable, marioAnimeOfsTable,
                                 reinterpret_cast< XanimeBckTable* >(singleAnimeTable), doubleAnimeTable, tripleAnimeTable, quadAnimeTable, nullptr);
 
-    mXanimePlayer = new XanimePlayer(MR::getJ3DModel(this), mResourceTable);
+    mXanimePlayer = new XanimePlayer(MR::getJ3DModel(this), pResourceTable);
     mXanimePlayer->duplicateSimpleGroup();
     mModelManager->mXanimePlayer = mXanimePlayer;
     mXanimePlayer->setDefaultAnimation("基本");
     mXanimePlayer->getCore()->enableJointTransform(MR::getJ3DModelData(this));
-    mXanimePlayerUpper = new XanimePlayer(MR::getJ3DModel(this), mResourceTable, mXanimePlayer);
+    mXanimePlayerUpper = new XanimePlayer(MR::getJ3DModel(this), pResourceTable, mXanimePlayer);
     mXanimePlayerUpper->changeAnimation("基本");
 
     initHitSensor(1);
@@ -59,31 +60,57 @@ void OnlinePlayer::init(const JMapInfoIter& rIter) {
 
     MR::connectToSceneMapObj(this);
     makeActorAppeared();
+
+    // mIsHidden = true;
+    // MR::hideModel(this);
+    // MR::invalidateHitSensors(this);
+    // MR::invalidateShadowAll(this);
+}
+
+void OnlinePlayer::movement() {
+    /*
+    if (mIsHidden) {
+        if (mClient->isEqualCurrentStage()) {
+            MR::showModel(this);
+            MR::validateHitSensors(this);
+            MR::validateShadowAll(this);
+            mIsHidden = false;
+        }
+    }
+    else if (!mClient->isEqualCurrentStage()) {
+        MR::hideModel(this);
+        MR::invalidateHitSensors(this);
+        MR::invalidateShadowAll(this);
+        mIsHidden = true;
+    }
+    */
+
+    LiveActor::movement();
 }
 
 void OnlinePlayer::playAnimation(u32 animHash) {
     mXanimePlayer->changeAnimationByHash(animHash);
+    const char* pAnimName = mXanimePlayer->getCurrentAnimationName();
 
-    const char* pCurrentAnimName = mXanimePlayer->getCurrentAnimationName();
-
-    if (strstr(pCurrentAnimName, "水泳ジェット") != nullptr) {
+    if (strstr(pAnimName, "水泳ジェット") != nullptr) {
         mHasJetTurtle = true;
-    } else if (strstr(pCurrentAnimName, "カメ持ち") != nullptr) {
+    } else if (strstr(pAnimName, "カメ持ち") != nullptr) {
         mHasJetTurtle = true;
-    } else if (strstr(pCurrentAnimName, "投げ") != nullptr) {
+    } else if (strstr(pAnimName, "投げ") != nullptr) {
         mHasJetTurtle = false;
         mXanimePlayerUpper->stopAnimation();
         MR::getJoint(this, "Spine1")->setMtxCalc(nullptr);
     }
 
-    if (mHasJetTurtle && (strcmp(pCurrentAnimName, "基本") != 0 || strcmp(pCurrentAnimName, "ジャンプ") != 0)) {
+    if (mHasJetTurtle && (strcmp(pAnimName, "基本") != 0 || strcmp(pAnimName, "ジャンプ") != 0)) {
         mXanimePlayerUpper->changeAnimation("ひろいウエイト");
         mXanimePlayerUpper->overWriteMtxCalc(MR::getJointIndex(this, "PartsControl"));
     }
 }
 
 void OnlinePlayer::playAnimationSimple(const char* pAnimName) {
-    mXanimePlayer->changeAnimationBck(pAnimName);
+    // TODO figure this out
+    MR::startBck(this, pAnimName);
 }
 
 void OnlinePlayer::setAnimationFrame(f32 frame) {

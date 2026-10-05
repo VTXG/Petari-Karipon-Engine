@@ -78,7 +78,7 @@ GameScene::~GameScene() {
     MR::destroySceneMessage();
     NPCFunction::deleteNPCData();
     MR::onStarPointerSceneOut();
-    getGameOnlineManager()->destroyAllActor();
+    getGameOnlineManager()->destroyActors();
 }
 
 void GameScene::init() {
@@ -138,7 +138,7 @@ void GameScene::init() {
             MR::createSceneObj(SceneObj_CometRetryButton);
         }
 
-        getGameOnlineManager()->initAllActor();
+        getGameOnlineManager()->initActors();
 
         LightFunction::initLightData();
         initSequences();
