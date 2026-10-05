@@ -134,9 +134,9 @@ enum SOReturnCode {
 class NetworkSystemWrapper {
 public:
     enum State {
-        STATE_INACTIVE,
-        STATE_BUSY,
-        STATE_ACTIVE,
+        STATE_DISCONNECTED,
+        STATE_CONNECTING,
+        STATE_CONNECTED,
     };
 
     /// @brief Creates a new `NetworkSystemWrapper`.
@@ -195,10 +195,16 @@ public:
     /// @return An error code.
     IOSError send(IOSFd fd, void* pBuffer, u32 size, SOMessageFlags flags, const SockAddress& rAddress);
 
-    /// @brief Checks if the network system state is active.
-    /// @returns True if the network system state is active; Otherwise false.
-    bool isActive() const {
-        return mState == STATE_ACTIVE;
+    /// @brief Checks if the network system is connecting.
+    /// @returns True if the network system is connecting; Otherwise false.
+    bool isConnecting() const {
+        return mState == STATE_CONNECTING;
+    }
+
+    /// @brief Checks if the network system is connected.
+    /// @returns True if the network system is connected; Otherwise false.
+    bool isConnected() const {
+        return mState == STATE_CONNECTED;
     }
 
     /// @brief Gets the local IP address.
@@ -206,10 +212,6 @@ public:
     const IPAddress& getLocalIP() const {
         return mIP;
     }
-
-    /// @brief Gets a `NetworkSystemWrapper` instance.
-    /// @returns Pointer to the `NetworkSystemWrapper` instance.
-    static NetworkSystemWrapper* get();
 
 private:
     void callbackInit();

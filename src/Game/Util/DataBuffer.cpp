@@ -31,7 +31,7 @@ namespace MR {
             return false;
         }
 
-        memcpy(pData, mBuffer + mPosition, size);
+        memcpy(pData, mData + mPosition, size);
         mPosition = end;
         return true;
     }
@@ -42,7 +42,7 @@ namespace MR {
             return false;
         }
 
-        memcpy(mBuffer + mPosition, pData, size);
+        memcpy(mData + mPosition, pData, size);
         mPosition = end;
         return true;
     }

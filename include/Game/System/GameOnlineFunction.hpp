@@ -1,10 +1,18 @@
 #pragma once
 
-#include <revolution/types.h>
+#include "Game/Util/DataBuffer.hpp"
 
-class JKRUnitHeap;
+struct SockAddress;
 
 namespace GameOnlineFunction {
-    JKRUnitHeap* createGameOnlineHeap(u32 packetSize);
-    JKRUnitHeap* getGameOnlineHeap();
-}
+    JKRHeap* createGameOnlineHeap(u32 packetSize);
+    JKRHeap* getGameOnlineHeap();
+
+    void initSockAddress(SockAddress& rAddress);
+    void readSockAddress(MR::DataStream& rStream, SockAddress& rAddress);
+    void writeSockAddress(MR::DataStream& rStream, const SockAddress& rAddress);
+
+    bool readPacketHeader(MR::DataStream& rStream, u32* pType, OSTime* pTimestamp);
+    void initPacketHeader(MR::DataStream& rStream);
+    bool writePacketHeader(MR::DataStream& rStream, u32 type);
+} // namespace GameOnlineFunction

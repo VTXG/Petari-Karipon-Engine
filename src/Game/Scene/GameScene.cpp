@@ -22,7 +22,10 @@
 #include "Game/Screen/OdhConverter.hpp"
 #include "Game/Screen/ScreenAlphaCapture.hpp"
 #include "Game/System/GalaxyMapController.hpp"
+#include "Game/System/GameOnlineManager.hpp"
 #include "Game/System/GameSequenceFunction.hpp"
+#include "Game/System/GameSystem.hpp"
+#include "Game/System/GameSystemObjHolder.hpp"
 #include "Game/Util/CameraUtil.hpp"
 #include "Game/Util/DemoUtil.hpp"
 #include "Game/Util/DrawUtil.hpp"
@@ -35,16 +38,22 @@
 #include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/ScreenUtil.hpp"
 #include "Game/Util/SequenceUtil.hpp"
+#include "Game/Util/SingletonHolder.hpp"
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StarPointerUtil.hpp"
 #include "Game/Util/SystemUtil.hpp"
 #include <JSystem/J3DGraphBase/J3DSys.hpp>
 
 namespace {
+    GameOnlineManager* getGameOnlineManager() {
+        return SingletonHolder< GameSystem >::get()->mObjHolder->mOnlineManager;
+    }
+
     CometRetryButton* getCometRetryButton() {
         return MR::getSceneObj< CometRetryButton >(SceneObj_CometRetryButton);
     }
-};  // namespace
+
+}; // namespace
 
 namespace NrvGameScene {
     NEW_NERVE(GameSceneScenarioOpeningCamera, GameScene, ScenarioOpeningCamera);
@@ -60,16 +69,16 @@ namespace NrvGameScene {
     NEW_NERVE(GameSceneTimeUp, GameScene, TimeUp);
     NEW_NERVE(GameSceneGalaxyMap, GameScene, GalaxyMap);
     NEW_NERVE(GameSceneStaffRoll, GameScene, StaffRoll);
-};  // namespace NrvGameScene
+}; // namespace NrvGameScene
 
 GameScene::GameScene()
-    : Scene("GameScene"), _14(0), mScenarioCamera(nullptr), mPauseCtrl(nullptr), mPauseSeq(nullptr), mStageClearSeq(nullptr), mDraw3D(true), _29(1) {
-}
+    : Scene("GameScene"), _14(0), mScenarioCamera(nullptr), mPauseCtrl(nullptr), mPauseSeq(nullptr), mStageClearSeq(nullptr), mDraw3D(true), _29(1) {}
 
 GameScene::~GameScene() {
     MR::destroySceneMessage();
     NPCFunction::deleteNPCData();
     MR::onStarPointerSceneOut();
+    getGameOnlineManager()->destroyAllActor();
 }
 
 void GameScene::init() {
@@ -128,6 +137,8 @@ void GameScene::init() {
         if (MR::isGalaxyAnyCometAppearInCurrentStage()) {
             MR::createSceneObj(SceneObj_CometRetryButton);
         }
+
+        getGameOnlineManager()->initAllActor();
 
         LightFunction::initLightData();
         initSequences();

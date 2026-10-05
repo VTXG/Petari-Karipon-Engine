@@ -30,7 +30,8 @@
 
 GameSystemObjHolder::GameSystemObjHolder()
     : mObjHolder(), mParticleResHolder(), mRenderModeObj(), mCaptureScreenDirector(), mScreenPreserver(), mAudioSystem(), mWPadHolder(),
-      mFunctionAsyncExecutor(), mMessageHolder(), mStarPointerDirector(), mRandom(0), mLanguage(MR::getDecidedLanguageFromIPL()) {
+      mFunctionAsyncExecutor(), mMessageHolder(), mStarPointerDirector(), mNetworkSystem(), mOnlineManager(), mRandom(0),
+      mLanguage(MR::getDecidedLanguageFromIPL()) {
     initDvd();
     initNAND();
     initNameObj();
@@ -87,7 +88,7 @@ void GameSystemObjHolder::update() {
     mWPadHolder->update();
     mFunctionAsyncExecutor->update();
     mStarPointerDirector->update();
-    SingletonHolder< GameOnlineManager >::get()->update();
+    mOnlineManager->update();
 }
 
 void GameSystemObjHolder::updateAudioSystem() {
@@ -193,7 +194,5 @@ void GameSystemObjHolder::initDisplay() {
 
 void GameSystemObjHolder::initNetwork() {
     mNetworkSystem = new NetworkSystemWrapper();
-    mNetworkSystem->initSystem(false);
-
-    SingletonHolder< GameOnlineManager >::init();
+    mOnlineManager = new GameOnlineManager();
 }

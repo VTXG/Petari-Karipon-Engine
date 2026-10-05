@@ -1,76 +1,82 @@
 #pragma once
 
+#include "Game/System/GameOnlineConst.hpp"
 #include "Game/System/NerveExecutor.hpp"
 #include "Game/System/NetworkSystemWrapper.hpp"
 #include "Game/Util/Array.hpp"
 #include "Game/Util/DataBuffer.hpp"
-#include "revolution/os/OSTime.h"
 
-struct GameOnlinePacketHeader {
-    enum Magic {
-        MAGIC_PING = 'PING',
-        MAGIC_PONG = 'PONG',
-        MAGIC_PLAYER_DATA = 'PLAY',
-    };
+class OnlinePlayer;
 
-    void read(MR::DataStream& rStream);
-    void write(MR::DataStream& rStream) const;
-
-    /* 0x00 */ u32 mMagic;
-    /* 0x04 */ u32 mPacketID;
-    /* 0x08 */ OSTime mTimestamp;
-};
-
-class GameOnlinePlayerState {
+class GameOnlineClient {
 public:
-    GameOnlinePlayerState() : mPingTime(), mAddress(), mActor() {
-        reset();
+    GameOnlineClient();
+
+    void init();
+    void reset();
+    void initActor();
+    void destroyActor();
+
+    bool isHost() const {
+        return mGlobalID == 0;
     }
 
-    void reset() {
-        mGlobalID = -1;
-        mIsActive = false;
+    bool isConnected() const {
+        return mGlobalID != GameOnlineConst::INVALID_PLAYER_ID;
     }
 
-    /* 0x00 */ OSTime mPingTime;
-    /* 0x08 */ SockAddress mAddress;
-    /* 0x10 */ void* mActor;
-    /* 0x14 */ u8 mGlobalID;
-    /* 0x15 */ bool mIsActive;
-    /* 0x16 */ u8 _16; // padding
-    /* 0x17 */ u8 _17; // padding
+    u8 mGlobalID;
+    SockAddress mAddress;
+    OnlinePlayer* mActor;
+    OSTime mLastPingTimestamp;
+    OSTime mLastPlayerDataTimestamp;
 };
 
 class GameOnlineManager : public NerveExecutor {
 public:
     GameOnlineManager();
 
-    virtual ~GameOnlineManager() {}
-
-    void initPacketBuffers();
     void update();
+    void initAllActor();
+    void destroyAllActor();
 
-    bool handlePacket(MR::DataStream& rInStream, SockAddress& rAddress);
-    void handlePacketPing(SockAddress& rAddress);
-    void handlePacketPong(GameOnlinePacketHeader& rInHeader, MR::DataStream& rInStream);
+    bool receive(MR::DataBuffer& rBuffer, s32* pSize, SockAddress* pAddress);
+    void send(MR::DataStream& rStream, const SockAddress& rAddress);
+    void broadcast(MR::DataStream& rStream, bool isNeedEqualStage = false);
 
-    void sendTo(MR::DataStream& rStream, SockAddress& rAddress);
-    void sendAll(MR::DataStream& rStream);
-
-    GameOnlinePlayerState* getCurrentPlayer() { return mPlayerStates.begin(); }
-    GameOnlinePlayerState* getGlobalPlayer(u8 globalID);
-
-    void exeInactive() {}
-    void exeConnecting();
-    void exeActive();
-
-    MR::DataBuffer& getTemporaryPacketBuffer() {
-        return mTemporaryBuffer;
+    GameOnlineClient* getClientByLocalID(u8 localID);
+    GameOnlineClient* getClientByGlobalID(u8 globalID);
+    GameOnlineClient* getFreeClient();
+    GameOnlineClient* getLocalClient() {
+        return &mClients[0];
     }
+    u8 getFreeClientGlobalID();
+    u8 getConnectedClientNum();
 
-    /* 0x08 */ IOSFd mSocket;
-    /* 0x0C */ SockAddress mServerAddress;
-    /* 0x14 */ MR::AssignableArray< GameOnlinePlayerState > mPlayerStates;
-    /* 0x1C */ MR::DataBuffer mTemporaryBuffer;
-    /* 0x24 */ OSTime mPingTime;
+    bool requestRoomMake(const char* pCode);
+    bool requestRoomJoin(const char* pCode);
+
+    void handlePing(const SockAddress& rAddress);
+    void handlePong(OSTime timestamp, MR::DataStream& rStream);
+    // receiveRoomMakeRequest is handled by server code
+    void handleRoomMakeInfo(MR::DataStream& rStream);
+    void handleRoomJoinRequest(MR::DataStream& rStream);
+    void handleRoomJoinInfo(MR::DataStream& rStream);
+    void handlePlayerData(OSTime timestamp, MR::DataStream& rStream);
+
+    void sendPing();
+    void sendPong(const SockAddress& rAddress);
+    // sendRoomMakeInfo is handled by server code
+    void sendRoomJoinInfo(const SockAddress& rAddress);
+    void sendPlayerData();
+
+    void exeDisconnected();
+    void exeConnecting();
+    void exeConnected();
+    void exeConnectedInRoom();
+
+    IOSFd mSocket;
+    SockAddress mServerAddress;
+    MR::AssignableArray< GameOnlineClient > mClients;
+    MR::DataBuffer mTemporaryBuffer;
 };

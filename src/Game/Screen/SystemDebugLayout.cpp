@@ -2,7 +2,9 @@
 #include "Game/NameObj/NameObjHolder.hpp"
 #include "Game/System/FileLoader.hpp"
 #include "Game/System/GameOnlineFunction.hpp"
+#include "Game/System/GameOnlineManager.hpp"
 #include "Game/System/GameSystem.hpp"
+#include "Game/System/GameSystemObjHolder.hpp"
 #include "Game/System/GameSystemSceneController.hpp"
 #include "Game/System/HeapMemoryWatcher.hpp"
 #include "Game/System/WPad.hpp"
@@ -12,13 +14,14 @@
 #include "Game/Util/ScreenUtil.hpp"
 #include "Game/Util/SingletonHolder.hpp"
 #include "Game/Util/SystemUtil.hpp"
-#include <nw4r/ut/Font.h>
 #include <JSystem/JKernel/JKRExpHeap.hpp>
 #include <JSystem/JKernel/JKRHeap.hpp>
 #include <JSystem/JKernel/JKRSolidHeap.hpp>
 #include <JSystem/JKernel/JKRUnitHeap.hpp>
+#include <nw4r/ut/Font.h>
 #include <revolution/wpad.h>
 #include <wstring.h>
+
 
 extern "C" int vswprintf(wchar_t* s, size_t n, const wchar_t* format, va_list arg);
 
@@ -56,8 +59,8 @@ namespace {
             ArchiveHolder* pArchiveHolder = pFileLoader->mArchiveHolder;
             FileHolder* pFileHolder = pFileLoader->mFileHolder;
             rContext.printTextF(false, L"File Info : %d requests, %d/%d archives, %d/%d files\n", pFileLoader->mRequestedFileCount,
-                              pArchiveHolder->mEntries.mCount, pArchiveHolder->mEntries.capacity(), pFileHolder->mEntries.mCount,
-                              pFileHolder->mEntries.capacity());
+                                pArchiveHolder->mEntries.mCount, pArchiveHolder->mEntries.capacity(), pFileHolder->mEntries.mCount,
+                                pFileHolder->mEntries.capacity());
 
             NameObjHolder* pNameObjHolder = SingletonHolder< GameSystem >::get()->mSceneController->mObjHolder;
             rContext.printTextF(false, L"Object Info : %d/%d objects\n", pNameObjHolder->getObjArraySize(), pNameObjHolder->getObjArrayCapacity());
@@ -78,6 +81,24 @@ namespace {
         }
     } // namespace DiagnosticsPage
 
+    namespace OnlinePage {
+        static GameOnlineManager* getOnlineManager() {
+            return SingletonHolder< GameSystem >::get()->mObjHolder->mOnlineManager;
+        }
+
+        static void update(SystemDebugLayout::PrintContext& rContext) {
+            GameOnlineManager* pOnlineManager = getOnlineManager();
+
+            if (rContext.printText(true, L"[Create]\n")) {
+                pOnlineManager->requestRoomMake("Test");
+            }
+
+            if (rContext.printText(true, L"[Join]\n")) {
+                pOnlineManager->requestRoomJoin("Test");
+            }
+        }
+    } // namespace OnlinePage
+
     static const f32 cFontSizeWidth = 10.0f;
     static const f32 cFontSizeHeight = 12.0f;
     static const f32 cFontLineSpace = 2.0f;
@@ -85,6 +106,7 @@ namespace {
 
     static const PageUpdateInfo cPageUpdateFunc[] = {
         {"Diagnostics", ::DiagnosticsPage::update},
+        {"Online", ::OnlinePage::update},
     };
 
     static s32 wrap(s32 num, s32 min, s32 max) {
@@ -187,7 +209,6 @@ bool SystemDebugLayout::PrintContext::printTextF(bool isSelectable, const wchar_
 
     return printText(isSelectable, text);
 }
-
 
 void SystemDebugLayout::PrintContext::printFillBox(const TVec2f& tl, const TVec2f& br, u32 color) {
     prepareDraw(0xFFFFFFFF);

@@ -1,8 +1,6 @@
 #include "Game/System/NetworkSystemWrapper.hpp"
-#include "Game/System/GameSystem.hpp"
 #include "Game/System/GameSystemObjHolder.hpp"
 #include "Game/Util/Functor.hpp"
-#include "Game/Util/SingletonHolder.hpp"
 #include "Game/Util/SystemUtil.hpp"
 #include <cstring>
 #include <mem.h>
@@ -103,7 +101,7 @@ enum {
 };
 
 NetworkSystemWrapper::NetworkSystemWrapper() {
-    resetInternalState(STATE_INACTIVE);
+    resetInternalState(STATE_DISCONNECTED);
 }
 
 NetworkSystemWrapper::~NetworkSystemWrapper() {
@@ -111,7 +109,7 @@ NetworkSystemWrapper::~NetworkSystemWrapper() {
 }
 
 void NetworkSystemWrapper::initSystem(bool wait) {
-    if (mState == STATE_INACTIVE) {
+    if (mState == STATE_DISCONNECTED) {
         MR::startFunctionAsyncExecute(MR::Functor(this, &NetworkSystemWrapper::callbackInit), 10, "NetworkSystemWrapper::callbackInit");
 
         if (wait) {
@@ -125,7 +123,7 @@ void NetworkSystemWrapper::closeSystem() {
         IOS_Close(mFd);
     }
 
-    resetInternalState(STATE_INACTIVE);
+    resetInternalState(STATE_DISCONNECTED);
 }
 
 IOSFd NetworkSystemWrapper::socket(SOFamily domain, SOType type, u32 protocol) {
@@ -244,15 +242,10 @@ IOSError NetworkSystemWrapper::send(IOSFd fd, void* pBuffer, u32 size, SOMessage
     return IOS_Ioctlv(mFd, IOCTLV_SO_SEND_TO, 2, 0, iov);
 }
 
-NetworkSystemWrapper* NetworkSystemWrapper::get() {
-    GameSystemObjHolder* pObjHolder = SingletonHolder< GameSystem >::get()->mObjHolder;
-    return pObjHolder != nullptr ? pObjHolder->mNetworkSystem : nullptr;
-}
-
 void NetworkSystemWrapper::callbackInit() {
     BOOL interrupts = OSDisableInterrupts();
 
-    resetInternalState(STATE_BUSY);
+    resetInternalState(STATE_CONNECTING);
 
     IOSError err;
 
@@ -338,14 +331,14 @@ void NetworkSystemWrapper::callbackInit() {
 Error:
     mFd = -1;
     mError = err;
-    mState = STATE_INACTIVE;
+    mState = STATE_DISCONNECTED;
     mIP.mAddress = 0;
     OSRestoreInterrupts(interrupts);
     return;
 
 Success:
     mError = SO_SUCCESS;
-    mState = STATE_ACTIVE;
+    mState = STATE_CONNECTED;
     return;
 }
 

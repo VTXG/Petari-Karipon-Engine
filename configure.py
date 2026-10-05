@@ -2161,6 +2161,7 @@ config.libs = [
             Object("Game/Player/RushEndInfo.cpp"),
             Object("Game/Player/TornadoMario.cpp"),
             Object("Game/Player/ModelHolder.cpp"),
+            Object("Game/Player/OnlinePlayer.cpp"),
             Object("Game/Player/MarioShadow.cpp", cflags=cflags_game_noprefix),
             Object("Game/Player/MarioMapCode.cpp"),
             Object("Game/Player/MarioActorWipe.cpp"),

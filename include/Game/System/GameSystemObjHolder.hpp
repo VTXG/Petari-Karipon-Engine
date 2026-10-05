@@ -5,11 +5,12 @@
 
 namespace JMath {
     struct TRandom_fast_;
-};  // namespace JMath
+}; // namespace JMath
 
 class AudSystemWrapper;
 class CaptureScreenDirector;
 class FunctionAsyncExecutor;
+class GameOnlineManager;
 class MessageHolder;
 class NameObjHolder;
 class NetworkSystemWrapper;
@@ -63,7 +64,8 @@ public:
     /* 0x2C */ MessageHolder* mMessageHolder;
     /* 0x30 */ StarPointerDirector* mStarPointerDirector;
     /* 0x34 */ NetworkSystemWrapper* mNetworkSystem;
-    /* 0x38 */ SystemDebugLayout* mDebugLayout;
-    /* 0x3C */ JMath::TRandom_fast_ mRandom;
-    /* 0x34 */ u32 mLanguage;
+    /* 0x38 */ GameOnlineManager* mOnlineManager;
+    /* 0x3C */ SystemDebugLayout* mDebugLayout;
+    /* 0x40 */ JMath::TRandom_fast_ mRandom;
+    /* 0x44 */ u32 mLanguage;
 };

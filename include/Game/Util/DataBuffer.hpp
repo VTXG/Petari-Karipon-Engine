@@ -8,35 +8,35 @@ namespace MR {
 
     class DataBuffer {
     public:
-        DataBuffer() : mBuffer(), mSize() {}
+        DataBuffer() : mData(), mSize() {}
 
-        DataBuffer(u32 size, JKRHeap* pHeap = nullptr) {
-            init(size, pHeap);
+        DataBuffer(u32 capacity, JKRHeap* pHeap = nullptr) {
+            init(capacity, pHeap);
         }
 
         ~DataBuffer() {
-            if (mBuffer != nullptr) {
-                delete[] mBuffer;
+            if (mData != nullptr) {
+                delete[] mData;
             }
         }
 
-        void init(u32 size, JKRHeap* pHeap = nullptr) {
-            mSize = size;
-            mBuffer = new (pHeap, 0x20) u8[size];
+        void init(u32 capacity, JKRHeap* pHeap = nullptr) {
+            mSize = capacity;
+            mData = new (pHeap, 0x20) u8[capacity];
         }
 
         void copy(u8* pTo) {
-            MR::fastCopy(mBuffer, pTo, mSize);
+            MR::fastCopy(mData, pTo, mSize);
         }
 
-        /* 0x00 */ u8* mBuffer;
+        /* 0x00 */ u8* mData;
         /* 0x04 */ u32 mSize;
     };
 
     class DataStream {
     public:
-        DataStream(u8* pBuffer, u32 size) : mBuffer(pBuffer), mSize(size), mPosition() {}
-        DataStream(DataBuffer& rDataBuffer) : mBuffer(rDataBuffer.mBuffer), mSize(rDataBuffer.mSize), mPosition() {}
+        DataStream(u8* pBuffer, u32 size) : mData(pBuffer), mSize(size), mPosition() {}
+        DataStream(DataBuffer& rDataBuffer) : mData(rDataBuffer.mData), mSize(rDataBuffer.mSize), mPosition() {}
 
         bool readData(void* pData, s32 size);
         bool writeData(const void* pData, s32 size);
@@ -51,7 +51,16 @@ namespace MR {
             return writeData(pData, sizeof(*pData));
         }
 
-        /* 0x00 */ u8* mBuffer;
+        template < typename T >
+        T as() {
+            return reinterpret_cast< T >(mData + mPosition);
+        }
+
+        u32 adjust() {
+            return mSize = mPosition;
+        }
+
+        /* 0x00 */ u8* mData;
         /* 0x04 */ u32 mSize;
         /* 0x08 */ u32 mPosition;
     };
