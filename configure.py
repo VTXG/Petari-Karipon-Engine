@@ -2641,13 +2641,16 @@ config.libs = [
             Object(MatchingFor(), "Game/System/StorySequenceExecutor.cpp"),
             Object(MatchingFor(ALL), "Game/System/SysConfigFile.cpp"),
             Object(MatchingFor(ALL), "Game/System/UserFile.cpp"),
+            Object(MatchingFor(KOR), "Game/System/ErrorArchive.cpp"),
 
             # Karipon
             Object(MatchingFor(), "Game/System/GameEmbeddedTable.cpp"),
             Object(MatchingFor(), "Game/System/GameOnlineFunction.cpp"),
             Object(MatchingFor(), "Game/System/GameOnlineManager.cpp"),
             Object(MatchingFor(), "Game/System/NetworkSystemWrapper.cpp"),
-            # Removed - Object(MatchingFor(ALL), "Game/System/BCSVInclude.s"),
+
+            # Removed
+            # Object(MatchingFor(ALL), "Game/System/BCSVInclude.s"),
         ],
     ),
     GameLib(
