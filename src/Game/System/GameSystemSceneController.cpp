@@ -1,6 +1,7 @@
 #include "Game/System/GameSystemSceneController.hpp"
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/NameObj/NameObjHolder.hpp"
+#include "Game/Scene/DomeParamTable.hpp"
 #include "Game/Scene/IntermissionScene.hpp"
 #include "Game/Scene/PlayTimerScene.hpp"
 #include "Game/Scene/ScenarioSelectScene.hpp"
@@ -8,7 +9,6 @@
 #include "Game/Scene/SceneFunction.hpp"
 #include "Game/Scene/StageParamTable.hpp"
 #include "Game/System/AudSystemWrapper.hpp"
-#include "Game/System/DomeParamTable.hpp"
 #include "Game/System/GameSystem.hpp"
 #include "Game/System/GameSystemFunction.hpp"
 #include "Game/System/GameSystemObjHolder.hpp"
@@ -25,7 +25,6 @@
 #include "Game/Util/SingletonHolder.hpp"
 #include "Game/Util/StringUtil.hpp"
 #include "Game/Util/SystemUtil.hpp"
-#include "revolution/os.h"
 #include <JSystem/JKernel/JKRSolidHeap.hpp>
 #include <cstdio>
 
@@ -37,7 +36,7 @@ namespace {
     AudSystemWrapper* getAudioSystemWrapper() NO_INLINE {
         return SingletonHolder< GameSystem >::get()->mObjHolder->mAudioSystem;
     }
-};  // namespace
+}; // namespace
 
 namespace NrvGameSystemSceneController {
     NEW_NERVE(GameSystemSceneControllerNotInitialized, GameSystemSceneController, NotInitialized);
@@ -51,7 +50,7 @@ namespace NrvGameSystemSceneController {
     NEW_NERVE(GameSystemSceneControllerWaitDrawDoneSceneForDestroy, GameSystemSceneController, WaitDrawDoneScene);
     NEW_NERVE(GameSystemSceneControllerDestroySceneForDestroy, GameSystemSceneController, DestroyScene);
     NEW_NERVE(GameSystemSceneControllerDestroyed, GameSystemSceneController, Destroyed);
-};  // namespace NrvGameSystemSceneController
+}; // namespace NrvGameSystemSceneController
 
 SceneControlInfo::SceneControlInfo() : mStartIdInfo() {
     mScene[0] = '\0';
@@ -334,8 +333,7 @@ void GameSystemSceneController::exeNotInitialized() {
     }
 }
 
-void GameSystemSceneController::exeNormal() {
-}
+void GameSystemSceneController::exeNormal() {}
 
 void GameSystemSceneController::exeWaitDrawDoneScene() {
     const Nerve* pNerve;

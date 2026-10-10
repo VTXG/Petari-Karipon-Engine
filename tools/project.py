@@ -49,7 +49,7 @@ PrecompiledHeader = Dict[str, Any]
 
 
 class Object:
-    def __init__(self, name: str, **options: Any) -> None:
+    def __init__(self, unused: bool, name: str, **options: Any) -> None:
         self.name = name
         self.options: Dict[str, Any] = {
             "add_to_all": None,
@@ -79,7 +79,7 @@ class Object:
 
     def resolve(self, config: "ProjectConfig", lib: Library) -> "Object":
         # Use object options, then library options
-        obj = Object(self.name, **lib)
+        obj = Object(True, self.name, **lib)
         for key, value in self.options.items():
             if value is not None or key not in obj.options:
                 obj.options[key] = value

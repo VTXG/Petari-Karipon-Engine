@@ -1,5 +1,5 @@
 #include "Game/System/GameDataFunction.hpp"
-#include "Game/System/DomeParamTable.hpp"
+#include "Game/Scene/DomeParamTable.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
 #include "Game/System/GameDataGalaxyStorage.hpp"
 #include "Game/System/GameDataHolder.hpp"
@@ -12,7 +12,6 @@
 #include "Game/System/ScenarioDataParser.hpp"
 #include "Game/System/SysConfigFile.hpp"
 #include "Game/System/UserFile.hpp"
-#include "Game/Util/ByamlIter.hpp"
 #include "Game/Util/SingletonHolder.hpp"
 #include <cstdio>
 
@@ -28,7 +27,7 @@ namespace {
     GameSequenceProgress* getGameSequenceProgress() NO_INLINE {
         return SingletonHolder< GameSystem >::get()->mSequenceDirector->mGameSequenceProgress;
     }
-};  // namespace
+}; // namespace
 
 namespace GameDataFunction {
     bool isDataMario() {
@@ -458,4 +457,4 @@ namespace GameDataFunction {
 
         return greenStarNum;
     }
-};  // namespace GameDataFunction
+}; // namespace GameDataFunction

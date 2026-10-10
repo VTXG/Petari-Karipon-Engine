@@ -1,13 +1,12 @@
 #include "Game/Map/RaceManager.hpp"
 #include "Game/NPC/EventDirector.hpp"
+#include "Game/Scene/DomeParamTable.hpp"
 #include "Game/Scene/SceneObjHolder.hpp"
 #include "Game/Scene/ScenePlayingResult.hpp"
 #include "Game/Screen/InformationObserver.hpp"
-#include "Game/System/DomeParamTable.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
 #include "Game/System/GameDataConst.hpp"
 #include "Game/System/GameDataFunction.hpp"
-
 #include "Game/System/GameDataGalaxyStorage.hpp"
 #include "Game/System/GameEventFlag.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
@@ -72,7 +71,7 @@ namespace {
     ScenePlayingResult* getScenePlayingResult() {
         return MR::getSceneObj< ScenePlayingResult >(SceneObj_ScenePlayingResult);
     }
-};  // namespace
+}; // namespace
 
 namespace MR {
     s32 getPlayerLeft() {
@@ -1089,4 +1088,4 @@ namespace MR {
     void onMsgLedPattern() {
         GameDataFunction::setGameEventValue("MsgLedPattern", 1);
     }
-}  // namespace MR
+} // namespace MR

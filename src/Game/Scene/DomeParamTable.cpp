@@ -1,4 +1,5 @@
-#include "Game/System/DomeParamTable.hpp"
+#include "Game/Scene/DomeParamTable.hpp"
+#include "Game/System/GameDataHolder.hpp"
 #include "Game/Util/ByamlIter.hpp"
 #include "Game/Util/ByamlUtil.hpp"
 #include "Game/Util/FileUtil.hpp"
@@ -29,4 +30,4 @@ namespace DomeParamTable {
 
         return pEventName == nullptr || pGameDataHolder->isOnGameEventFlag(pEventName);
     }
-}
+} // namespace DomeParamTable

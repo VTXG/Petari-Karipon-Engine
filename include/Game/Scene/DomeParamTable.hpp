@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Game/System/GameDataHolder.hpp"
 #include "Game/Util/ByamlIter.hpp"
+
+class GameDataHolder;
 
 namespace DomeParamTable {
     void init();

@@ -543,7 +543,7 @@ def SDKLib_KPAD(lib_name: str, objects: List[Object]) -> Dict[str, Any]:
             "progress_category": "sdk",
             "objects": objects,
         }
-    elif config.version == "RMGK01":
+    else:
         return {
             "lib": lib_name,
             "mw_version": "Wii/1.0",
@@ -2250,6 +2250,9 @@ config.libs = [
             Object(MatchingFor(), "Game/Player/PlayerEventFireDown.cpp"),
             Object(MatchingFor(), "Game/Player/PlayerEventRaceDown.cpp"),
             Object(MatchingFor(), "Game/Player/PlayerEventGhostRaceDown.cpp"),
+
+            # Karipon
+            Object(MatchingFor(), "Game/Player/OnlinePlayer.cpp"),
         ],
     ),
     GameLib(
@@ -2339,6 +2342,10 @@ config.libs = [
             Object(MatchingFor(ALL), "Game/Scene/StageFileLoader.cpp"),
             Object(MatchingFor(ALL), "Game/Scene/StageResourceLoader.cpp"),
             Object(MatchingFor(ALL), "Game/Scene/StopSceneController.cpp"),
+
+            # Karipon
+            Object(MatchingFor(), "Game/Scene/DomeParamTable.cpp"),
+            Object(MatchingFor(), "Game/Scene/StageParamTable.cpp"),
         ],
     ),
     GameLib(
@@ -2502,6 +2509,9 @@ config.libs = [
             Object(MatchingFor(ALL), "Game/Screen/WipeRing.cpp"),
             Object(MatchingFor(ALL), "Game/Screen/YesNoController.cpp"),
             Object(MatchingFor(ALL), "Game/Screen/YesNoLayout.cpp"),
+
+            # Karipon
+            Object(MatchingFor(), "Game/Screen/SystemDebugLayout.cpp"),
         ],
     ),
     GameLib(
@@ -2631,7 +2641,13 @@ config.libs = [
             Object(MatchingFor(), "Game/System/StorySequenceExecutor.cpp"),
             Object(MatchingFor(ALL), "Game/System/SysConfigFile.cpp"),
             Object(MatchingFor(ALL), "Game/System/UserFile.cpp"),
-            Object(MatchingFor(ALL), "Game/System/BCSVInclude.s"),
+
+            # Karipon
+            Object(MatchingFor(), "Game/System/GameEmbeddedTable.cpp"),
+            Object(MatchingFor(), "Game/System/GameOnlineFunction.cpp"),
+            Object(MatchingFor(), "Game/System/GameOnlineManager.cpp"),
+            Object(MatchingFor(), "Game/System/NetworkSystemWrapper.cpp"),
+            # Removed - Object(MatchingFor(ALL), "Game/System/BCSVInclude.s"),
         ],
     ),
     GameLib(
@@ -2720,6 +2736,12 @@ config.libs = [
             Object(MatchingFor(KOR), "Game/Util/TriangleFilter.cpp"),
             Object(MatchingFor(ALL), "Game/Util/TriggerChecker.cpp"),
             Object(MatchingFor(KOR), "Game/Util/ValueControl.cpp"),
+
+            # Karipon
+            Object(MatchingFor(), "Game/Util/ByamlData.cpp"),
+            Object(MatchingFor(), "Game/Util/ByamlHeader.cpp"),
+            Object(MatchingFor(), "Game/Util/ByamlIter.cpp"),
+            Object(MatchingFor(), "Game/Util/ByamlUtil.cpp"),
         ],
     ),
     SDKLib("ai", [Object(MatchingFor(ALL), "RVL_SDK/ai/ai.c")]),
