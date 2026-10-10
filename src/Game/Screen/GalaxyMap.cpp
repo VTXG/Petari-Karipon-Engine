@@ -39,7 +39,10 @@ namespace {
 
 GalaxyMap::GalaxyMap()
     : LayoutActor("ギャラクシー・天文台マップ", true), mMarioIcon1(), mMarioIcon2(), mGalaxyPlain(), mGalaxyDetail(), mPointingIcon(), mGalaxyName(),
-      mIconAButton(), _70(), _71(true) {
+#if (VERSION != RMGJ01 && VERSION != RMGE01)
+      mIconAButton(),
+#endif
+      _70(), _71(true) {
 }
 
 template <>
@@ -75,10 +78,12 @@ void GalaxyMap::init(const JMapInfoIter& rIter) {
     mTitle = new GalaxyMapTitle();
     mTitle->initWithoutIter();
 
+#if (VERSION != RMGJ01 && VERSION != RMGE01)
     mIconAButton = new IconAButton(false, false);
     mIconAButton->initWithoutIter();
     mIconAButton->setFollowActorPane(this, "AButtonPosition");
     mIconAButton->kill();
+#endif
 
     kill();
 }
@@ -112,7 +117,9 @@ void GalaxyMap::kill() {
     mGalaxyDetail->kill();
     mMarioIcon1->kill();
     mTitle->kill();
+#if (VERSION != RMGJ01 && VERSION != RMGE01)
     mIconAButton->kill();
+#endif
 
     if (mMarioIcon2 != nullptr) {
         mMarioIcon2->kill();
@@ -138,7 +145,9 @@ void GalaxyMap::movement() {
     mGalaxyDetail->movement();
     mGalaxyPlain->movement();
     mTitle->movement();
+#if (VERSION != RMGJ01 && VERSION != RMGE01)
     mIconAButton->movement();
+#endif
 }
 
 void GalaxyMap::calcAnim() {
@@ -153,7 +162,9 @@ void GalaxyMap::calcAnim() {
     mGalaxyDetail->calcAnim();
     mGalaxyPlain->calcAnim();
     mTitle->calcAnim();
+#if (VERSION != RMGJ01 && VERSION != RMGE01)
     mIconAButton->calcAnim();
+#endif
 
     if (mMarioIcon2 != nullptr) {
         mMarioIcon2->calcAnim();
@@ -180,7 +191,10 @@ void GalaxyMap::draw() const {
     drawGalaxyIconWithOrder(3);
     std::for_each(mCometIcon.begin(), mCometIcon.end(), std::mem_func(&GalaxyMapCometIcon::draw));
     drawGalaxyIconWithOrder(2);
+
+#if (VERSION != RMGJ01 && VERSION != RMGE01)
     mIconAButton->draw();
+#endif
 }
 
 void GalaxyMap::movementForCapture() {
@@ -263,10 +277,14 @@ void GalaxyMap::setModeTicoCometPray() {
 
 void GalaxyMap::setModeCapture() {
     appear();
+
     forceToGalaxyMap();
+
     mTitle->kill();
     mMarioIcon1->kill();
+#if (VERSION != RMGJ01 && VERSION != RMGE01)
     mIconAButton->kill();
+#endif
 
     if (mMarioIcon2 != nullptr) {
         mMarioIcon2->kill();
@@ -294,9 +312,11 @@ bool GalaxyMap::isShowDetail() const {
     return !MR::isDead(this) && isNerve(GET_NERVE_ANON(GalaxyMapShowDetail));
 }
 
+#if (VERSION != RMGJ01 && VERSION != RMGE01)
 void GalaxyMap::dispIconAButton() {
     mIconAButton->openWithoutMessage();
 }
+#endif
 
 void GalaxyMap::changeToGalaxyMap() {
     appear();

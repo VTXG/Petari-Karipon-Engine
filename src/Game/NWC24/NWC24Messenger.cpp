@@ -49,8 +49,13 @@ void NWC24Messenger::draw() const {
     mSendState->draw();
 }
 
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
+void NWC24Messenger::send(const char* pTaskName, const wchar_t* pMessage, const wchar_t* pAltName, const u8* pPicture, u32 pictureSize, bool isBG)
+#elif (VERSION == RMGK01)
 void NWC24Messenger::send(const char* pTaskName, const wchar_t* pMessage, const wchar_t* pAltName, const u8* pPicture, u32 pictureSize, bool isBG,
-                          bool isMsgLedPattern, u16 tag, u8 delayHours) {
+                          bool isMsgLedPattern, u16 tag, u8 delayHours)
+#endif
+{
     if (_1C) {
         return;
     }
@@ -75,12 +80,16 @@ void NWC24Messenger::send(const char* pTaskName, const wchar_t* pMessage, const 
         pTask->_0 = true;
         pTask->mIsBG = isBG;
         pTask->_2 = false;
+#if (VERSION == RMGK01)
         pTask->mIsMsgLedPattern = isMsgLedPattern;
+#endif
         pTask->mRetryNo = 0;
         pTask->mErr = NWC24_OK;
         pTask->mErrCode = 0;
+#if (VERSION == RMGK01)
         pTask->mTag = tag;
         pTask->mDelayHours = delayHours;
+#endif
         pTask->mTaskName = pTaskName;
         pTask->mMessage = pMessage;
         pTask->mAltName = pAltName;
@@ -598,7 +607,18 @@ namespace NWC24MessengerSub {
 
         return err == NWC24_ERR_MUTEX || err == NWC24_ERR_BUSY || err == NWC24_ERR_INPROGRESS;
     }
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
+    bool SendState::send() {
+        if (!mHost->mSystem->send(reinterpret_cast< const u16* >(mTask->mMessage), reinterpret_cast< const u16* >(mTask->mAltName), nullptr, 0,
+                                  mTask->mPicture, mTask->mPictureSize)) {
+            setNerve(GET_NERVE_GLOBAL(SendStateNrvRetry));
 
+            return false;
+        }
+
+        return true;
+    }
+#else
     bool SendState::send() {
         if (!mHost->mSystem->send(reinterpret_cast< const u16* >(mTask->mMessage), reinterpret_cast< const u16* >(mTask->mAltName), nullptr, 0,
                                   mTask->mPicture, mTask->mPictureSize, mTask->mTag, mTask->mIsMsgLedPattern, mTask->mDelayHours)) {
@@ -609,7 +629,7 @@ namespace NWC24MessengerSub {
 
         return true;
     }
-
+#endif
     bool SendState::checkFinish() {
         return mHost->mSystem->isSent(&mTask->mErr, &mTask->mSentSize);
     }
@@ -675,6 +695,14 @@ namespace NWC24MessengerSub {
 };  // namespace NWC24MessengerSub
 
 namespace MR {
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
+
+    void sendMail(const char* pTaskName, const wchar_t* pMessage, const char* pMessageId, const u8* pImage, u32 imageSize, bool isBG) {
+        ::getNWC24Messenger()->send(pTaskName, pMessage, MR::getMailSender(pMessageId), pImage, imageSize, isBG);
+    }
+
+#elif (VERSION == RMGK01)
+
     SendMailObj::SendMailObj(const char* pTaskName)
         : mTaskName(pTaskName), mMessage(), mSenderID(), mImage(), mImageSize(), mIsBG(true), mIsLed(true), mTag(), mDelay() {
     }
@@ -715,6 +743,8 @@ namespace MR {
     void SendMailObj::send() {
         ::getNWC24Messenger()->send(mTaskName, mMessage, mSenderID, mImage, mImageSize, mIsBG, mIsLed, mTag, mDelay);
     }
+
+#endif
 
     void termMail(const char* pTaskName) {
         ::getNWC24Messenger()->term(pTaskName);

@@ -269,7 +269,9 @@ void PowerStarList::drawForMessageBoardCapture() {
     MR::addPictureFontTagPlayerIcon(pictureFont);
     MR::setTextBoxMessageRecursive(this, "BlosBase", pictureFont);
 
+#if (VERSION != RMGJ01 && VERSION != RMGE01)
     setTotalPowerStarNumForMessageBoardCapture();
+#endif
 
     nw4r::lyt::DrawInfo drawInfo;
     MR::copyLayoutDrawInfoWithAspect(&drawInfo, this, false);
@@ -699,6 +701,7 @@ void PowerStarList::setSeparatorPaneSize() {
     }
 }
 
+#if (VERSION != RMGJ01 && VERSION != RMGE01)
 void PowerStarList::setTotalPowerStarNumForMessageBoardCapture() {
     wchar_t message[256];
     wchar_t* pMessage;
@@ -722,6 +725,7 @@ void PowerStarList::setTotalPowerStarNumForMessageBoardCapture() {
 
     MR::setTextBoxMessageRecursive(this, "TxtStarTotal", message);
 }
+#endif
 
 void PowerStarList::exeAppear() {
     ButtonPaneController* pController;
@@ -851,7 +855,7 @@ void PowerStarList::exeCaptureSend() {
         const wchar_t* pUserName = GameDataFunction::getUserName();
         const wchar_t* pMessage = MR::getGameMessageDirect(::cMailMessageID);
         ReplaceTagFunction::ReplaceArgs(mMailMessage, mMailMessageLength, pMessage, pUserName);
-
+#if (VERSION == RMGK01)
         MR::SendMailObj sendMailObj = MR::SendMailObj("スターリスト");
 
         sendMailObj.setMessageDirect(mMailMessage);
@@ -860,6 +864,9 @@ void PowerStarList::exeCaptureSend() {
         sendMailObj.setBGDisable();
         sendMailObj.setLedOff();
         sendMailObj.send();
+#else
+        MR::sendMail("スターリスト", mMailMessage, "WiiMessageTitle", MR::getOdhImage(), MR::getOdhImageSize(), false);
+#endif
     }
 
     if (MR::isMailSent("スターリスト")) {
