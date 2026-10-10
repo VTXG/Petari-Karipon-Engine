@@ -22,7 +22,6 @@
 #include <revolution/wpad.h>
 #include <wstring.h>
 
-
 extern "C" int vswprintf(wchar_t* s, size_t n, const wchar_t* format, va_list arg);
 
 namespace {
@@ -89,19 +88,22 @@ namespace {
         static void update(SystemDebugLayout::PrintContext& rContext) {
             GameOnlineManager* pOnlineManager = getOnlineManager();
 
-            if (pOnlineManager->isConnected()) {
+            if (!pOnlineManager->isConnected()) {
+                return;
+            }
+
+            if (pOnlineManager->isRoomStateConnected()) {
+                for (GameOnlineClient* pClient = pOnlineManager->mClients.begin(); pClient != pOnlineManager->mClients.end(); pClient++) {
+                    rContext.printTextF(false, L"[%d] ID: %d Stage: %s Scenario: %d\n", pClient - pOnlineManager->mClients.mArr, pClient->mGlobalID, pClient->mStageName, pClient->mScenarioNo);
+                }
+            }
+            else {
                 if (rContext.printText(true, L"[Create]\n")) {
                     pOnlineManager->requestRoomMake("Test");
                 }
 
                 if (rContext.printText(true, L"[Join]\n")) {
                     pOnlineManager->requestRoomJoin("Test");
-                }
-            }
-
-            if (pOnlineManager->isConnectedInRoom()) {
-                for (GameOnlineClient* pClient = pOnlineManager->mClients.begin(); pClient != pOnlineManager->mClients.end(); pClient++) {
-                    rContext.printTextF(false, L"[%d] ID: %d Stage: %s Scenario: %d\n", pClient - pOnlineManager->mClients.mArr, pClient->mGlobalID, pClient->mStageName, pClient->mScenarioNo);
                 }
             }
         }

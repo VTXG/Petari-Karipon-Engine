@@ -1,17 +1,19 @@
 #pragma once
 
-#include "Game/System/GameOnlineConst.hpp"
+#include "Game/System/GameOnlineFunction.hpp"
 #include "Game/System/NerveExecutor.hpp"
 #include "Game/System/NetworkSystemWrapper.hpp"
 #include "Game/Util/Array.hpp"
-#include "Game/Util/DataBuffer.hpp"
 
 class OnlinePlayer;
 
 class GameOnlineClient {
 public:
+    static const int INVALID_ID = 0xFF;
+
     GameOnlineClient();
 
+    void reset();
     void initActor();
     void destroyActor();
     bool isConnected() const;
@@ -22,7 +24,7 @@ public:
     }
 
     bool isValid() const {
-        return mGlobalID != GameOnlineConst::INVALID_PLAYER_ID;
+        return mGlobalID != INVALID_ID;
     }
 
     void exeDisconnected();
@@ -49,12 +51,16 @@ public:
     GameOnlineManager();
 
     void update();
+    bool requestRoomMake(const char* pCode);
+    bool requestRoomJoin(const char* pCode);
+
+    void initMemory();
     void initActors();
     void destroyActors();
 
-    bool receive(MR::DataBuffer& rBuffer, s32* pSize, SockAddress* pAddress);
-    void send(MR::DataStream& rStream, const SockAddress& rAddress);
-    void broadcast(MR::DataStream& rStream, bool isNeedEqualStage);
+    bool receive(SockAddress* pAddress);
+    void send(GameOnlinePacket* pPacket, const SockAddress& rAddress);
+    void broadcast(GameOnlinePacket* pPacket, bool isNeedEqualStage);
 
     GameOnlineClient* getClientByLocalID(u8 localID);
     GameOnlineClient* getClientByGlobalID(u8 globalID);
@@ -65,20 +71,19 @@ public:
     u8 getFreeClientGlobalID();
     u8 getConnectedClientNum();
     bool isAllClientConnected();
-
-    bool requestRoomMake(const char* pCode);
-    bool requestRoomJoin(const char* pCode);
     bool isConnected() const;
-    bool isConnectedInRoom() const;
+    bool isRoomStateConnected() const {
+        return mRoomState == ROOM_STATE_CONNECTED;
+    }
 
     void handlePing(const SockAddress& rAddress);
-    void handlePong(MR::DataStream& rStream);
+    void handlePong();
     // receiveRoomMakeRequest is handled by server code
-    void handleRoomMakeInfo(MR::DataStream& rStream);
-    void handleRoomJoinRequest(MR::DataStream& rStream);
-    void handleRoomJoinInfo(MR::DataStream& rStream);
-    void handlePlayerData(OSTime timestamp, MR::DataStream& rStream);
-    void handlePlayerStage(MR::DataStream& rStream);
+    void handleRoomMakeInfo();
+    void handleRoomJoinRequest();
+    void handleRoomJoinInfo();
+    void handlePlayerData();
+    void handlePlayerStage();
 
     void sendPing();
     void sendPong(const SockAddress& rAddress);
@@ -90,12 +95,16 @@ public:
     void exeDisconnected();
     void exeConnecting();
     void exeConnected();
-    void exeConnectedInRoom();
+    void exeOnEndConnected();
 
     IOSFd mSocket;
     SockAddress mServerAddress;
 
     RoomState mRoomState;
     MR::AssignableArray< GameOnlineClient > mClients;
-    MR::DataBuffer mTemporaryBuffer;
+    union {
+        GameOnlinePacket* mRecvPacket;
+        GameOnlinePacket* mSendPacket;
+    };
+    GameOnlinePacketQueue mSyncPacketQueue;
 };
