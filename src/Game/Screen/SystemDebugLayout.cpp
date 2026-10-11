@@ -1,7 +1,6 @@
 #include "Game/Screen/SystemDebugLayout.hpp"
 #include "Game/NameObj/NameObjHolder.hpp"
 #include "Game/System/FileLoader.hpp"
-#include "Game/System/GameOnlineFunction.hpp"
 #include "Game/System/GameOnlineManager.hpp"
 #include "Game/System/GameSystem.hpp"
 #include "Game/System/GameSystemObjHolder.hpp"
@@ -31,6 +30,10 @@ namespace {
         const char* mName;
         const PageUpdateFunc mFunc;
     };
+
+    static GameOnlineManager* getOnlineManager() {
+        return SingletonHolder< GameSystem >::get()->mObjHolder->mOnlineManager;
+    }
 
     namespace DiagnosticsPage {
         static OSTick sLastTick;
@@ -76,15 +79,11 @@ namespace {
             printHeapInfo(rContext, "WPadHeap", pWatcher->mWPadHeap);
             printHeapInfo(rContext, "HomeButtonLayoutHeap", pWatcher->mHomeButtonLayoutHeap);
             printHeapInfo(rContext, "AudSystemHeap", pWatcher->mAudSystemHeap);
-            printHeapInfo(rContext, "GameOnlineHeap", GameOnlineFunction::getGameOnlineHeap());
+            printHeapInfo(rContext, "GameOnlineHeap", getOnlineManager()->mOnlineHeap);
         }
     } // namespace DiagnosticsPage
 
     namespace OnlinePage {
-        static GameOnlineManager* getOnlineManager() {
-            return SingletonHolder< GameSystem >::get()->mObjHolder->mOnlineManager;
-        }
-
         static void update(SystemDebugLayout::PrintContext& rContext) {
             GameOnlineManager* pOnlineManager = getOnlineManager();
 

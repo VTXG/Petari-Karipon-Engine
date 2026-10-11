@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Game/System/GameOnlineConst.hpp"
 #include "Game/System/NetworkSystemWrapper.hpp"
+#include "Game/System/GameOnlineClient.hpp"
 #include <revolution/os/OSTime.h>
 #include <revolution/types.h>
 
@@ -18,6 +18,20 @@ struct GameOnlinePacketHeader {
 
 class GameOnlinePacket {
 public:
+    enum {
+        TYPE_PING = 0,
+        TYPE_PONG,
+        TYPE_REPLY,
+        TYPE_ROOM_MAKE_REQUEST,
+        TYPE_ROOM_MAKE_INFO,
+        TYPE_ROOM_JOIN_REQUEST,
+        TYPE_ROOM_JOIN_INFO,
+        TYPE_PLAYER_JOIN,
+        TYPE_PLAYER_LEAVE,
+        TYPE_PLAYER_DATA,
+        TYPE_PLAYER_STAGE,
+    };
+
     static const int INVALID_PACKET_ID = -1;
 
     static const int BUFFER_SIZE = 0x200;
@@ -69,7 +83,7 @@ public:
     SockAddress mAddress;
     bool mIsBroadcast;
     bool mIsNeedEqualStage;
-    bool mIsReply[GameOnlineConst::MAX_PLAYER_NUM - 1];
+    bool mIsReply[GameOnlineClient::MAX_PLAYER_NUM - 1];
 };
 
 class GameOnlinePacketQueue {
@@ -92,11 +106,3 @@ public:
     u32 mCapacity;
     u32 mID;
 };
-
-namespace GameOnlineFunction {
-    JKRHeap* createGameOnlineHeap();
-    JKRHeap* getGameOnlineHeap();
-
-    void readSockAddress(GameOnlinePacket* pPacket, SockAddress& rAddress);
-    void writeSockAddress(GameOnlinePacket* pPacket, const SockAddress& rAddress);
-} // namespace GameOnlineFunction

@@ -1,46 +1,10 @@
 #pragma once
 
-#include "Game/System/GameOnlineFunction.hpp"
+#include "Game/System/GameOnlinePacket.hpp"
 #include "Game/System/NerveExecutor.hpp"
-#include "Game/System/NetworkSystemWrapper.hpp"
 #include "Game/Util/Array.hpp"
 
-class OnlinePlayer;
-
-class GameOnlineClient {
-public:
-    static const int INVALID_ID = 0xFF;
-
-    GameOnlineClient();
-
-    void reset();
-    void initActor();
-    void destroyActor();
-    void updateCurrentStage();
-
-    bool isTimeout() const;
-    bool isEqualCurrentStage() const;
-
-    bool isHost() const {
-        return mGlobalID == 0;
-    }
-
-    bool isValid() const {
-        return mGlobalID != INVALID_ID;
-    }
-
-    void exeDisconnected();
-    void exeConnecting();
-    void exeConnected();
-
-    u8 mGlobalID;
-    SockAddress mAddress;
-    OnlinePlayer* mActor;
-    OSTime mLastPingTime;
-    OSTime mLastPlayerDataTime;
-    char mStageName[32];
-    s32 mScenarioNo;
-};
+class JKRUnitHeap;
 
 class GameOnlineManager : public NerveExecutor {
 public:
@@ -101,12 +65,18 @@ public:
     void exeConnected();
     void exeOnEndConnected();
 
-    IOSFd mSocket;
+    JKRUnitHeap* mOnlineHeap;
     SockAddress mServerAddress;
 
+    IOSFd mSocket;
     RoomState mRoomState;
     MR::AssignableArray< GameOnlineClient > mClients;
     GameOnlinePacket* mRecvPacket;
     GameOnlinePacket* mSendPacket;
     GameOnlinePacketQueue mSyncPacketQueue;
 };
+
+namespace GameOnlineFunction {
+    void readSockAddress(GameOnlinePacket* pPacket, SockAddress& rAddress);
+    void writeSockAddress(GameOnlinePacket* pPacket, const SockAddress& rAddress);
+} // namespace GameOnlineFunction

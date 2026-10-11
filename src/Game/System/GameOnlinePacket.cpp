@@ -1,7 +1,5 @@
-#include "Game/System/GameOnlineFunction.hpp"
-#include "Game/System/NetworkSystemWrapper.hpp"
+#include "Game/System/GameOnlinePacket.hpp"
 #include "Game/Util/MemoryUtil.hpp"
-#include <JSystem/JKernel/JKRUnitHeap.hpp>
 #include <cstring>
 
 GameOnlinePacket::GameOnlinePacket() {
@@ -138,34 +136,3 @@ void GameOnlinePacketQueue::pop() {
 
     mPackets[--mSize].reset();
 }
-
-namespace {
-    static JKRUnitHeap* sGameOnlineHeap;
-}
-
-namespace GameOnlineFunction {
-    JKRHeap* createGameOnlineHeap() {
-        return sGameOnlineHeap = JKRUnitHeap::create(sizeof(GameOnlinePacket), 0x1E000, 32, JKRHeap::sSystemHeap, true);
-    }
-
-    JKRHeap* getGameOnlineHeap() {
-        return sGameOnlineHeap;
-    }
-
-    void readSockAddress(GameOnlinePacket* pPacket, SockAddress& rAddress) {
-        rAddress = SockAddress();
-        pPacket->read(&rAddress.mIP.mOctets[0]);
-        pPacket->read(&rAddress.mIP.mOctets[1]);
-        pPacket->read(&rAddress.mIP.mOctets[2]);
-        pPacket->read(&rAddress.mIP.mOctets[3]);
-        pPacket->read(&rAddress.mPort);
-    }
-
-    void writeSockAddress(GameOnlinePacket* pPacket, const SockAddress& rAddress) {
-        pPacket->write(&rAddress.mIP.mOctets[0]);
-        pPacket->write(&rAddress.mIP.mOctets[1]);
-        pPacket->write(&rAddress.mIP.mOctets[2]);
-        pPacket->write(&rAddress.mIP.mOctets[3]);
-        pPacket->write(&rAddress.mPort);
-    }
-} // namespace GameOnlineFunction

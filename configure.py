@@ -2645,8 +2645,8 @@ config.libs = [
 
             # Karipon
             Object(MatchingFor(), "Game/System/GameEmbeddedTable.cpp"),
-            Object(MatchingFor(), "Game/System/GameOnlineFunction.cpp"),
             Object(MatchingFor(), "Game/System/GameOnlineManager.cpp"),
+            Object(MatchingFor(), "Game/System/GameOnlinePacket.cpp"),
             Object(MatchingFor(), "Game/System/NetworkSystemWrapper.cpp"),
 
             # Removed
