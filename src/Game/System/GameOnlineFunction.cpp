@@ -9,7 +9,14 @@ GameOnlinePacket::GameOnlinePacket() {
 }
 
 bool GameOnlinePacket::loadHeader(s32 size) {
-    reset();
+    mPosition = 0;
+    mSize = 0;
+    mIsBroadcast = false;
+    mIsNeedEqualStage = false;
+
+    for (u32 i = 0; i < ARRAY_SIZE(mIsReply); i++) {
+        mIsReply[i] = false;
+    }
 
     if (size < HEADER_SIZE) {
         return false;
@@ -33,12 +40,10 @@ bool GameOnlinePacket::loadHeader(s32 size) {
     return true;
 }
 
-void GameOnlinePacket::makeHeader(u32 type, u32 id) {
+void GameOnlinePacket::makeHeader(u32 type) {
     mHeader.mType = type;
     mHeader.mSize = mSize;
     mHeader.mChecksum = mSize > 0 ? MR::calcCheckSum(mData, mSize) : 0;
-    mHeader.mPacketID = id;
-    mHeader.mTimestamp = OSGetTime();
 }
 
 void GameOnlinePacket::read(void* pData, s32 size) {
@@ -67,7 +72,20 @@ void GameOnlinePacket::write(const void* pData, s32 size) {
     }
 }
 
-GameOnlinePacketQueue::GameOnlinePacketQueue() : mPackets(), mSize(), mCapacity() {}
+void GameOnlinePacket::reset() {
+    mHeader.mPacketID = INVALID_PACKET_ID;
+    mPosition = 0;
+    mSize = 0;
+    mAddress = SockAddress();
+    mIsBroadcast = false;
+    mIsNeedEqualStage = false;
+
+    for (u32 i = 0; i < ARRAY_SIZE(mIsReply); i++) {
+        mIsReply[i] = false;
+    }
+}
+
+GameOnlinePacketQueue::GameOnlinePacketQueue() : mPackets(), mSize(), mCapacity(), mID() {}
 
 GameOnlinePacketQueue::~GameOnlinePacketQueue() {
     if (mPackets != nullptr) {
@@ -89,7 +107,10 @@ GameOnlinePacket* GameOnlinePacketQueue::push() {
         return nullptr;
     }
 
-    return &mPackets[mSize++];
+    GameOnlinePacket* pPacket = &mPackets[mSize++];
+    pPacket->reset();
+    pPacket->mHeader.mPacketID = mID++;
+    return pPacket;
 }
 
 GameOnlinePacket* GameOnlinePacketQueue::get() {
@@ -98,6 +119,16 @@ GameOnlinePacket* GameOnlinePacketQueue::get() {
     }
 
     return &mPackets[mSize - 1];
+}
+
+GameOnlinePacket* GameOnlinePacketQueue::find(u32 packetID) {
+    for (u32 i = 0; i < mSize; i++) {
+        if (mPackets[i].mHeader.mPacketID == packetID) {
+            return &mPackets[i];
+        }
+    }
+
+    return nullptr;
 }
 
 void GameOnlinePacketQueue::pop() {
@@ -121,12 +152,8 @@ namespace GameOnlineFunction {
         return sGameOnlineHeap;
     }
 
-    void initSockAddress(SockAddress& rAddress) {
-        rAddress.mLength = sizeof(SockAddress);
-        rAddress.mFamily = SO_AF_INET;
-    }
-
     void readSockAddress(GameOnlinePacket* pPacket, SockAddress& rAddress) {
+        rAddress = SockAddress();
         pPacket->read(&rAddress.mIP.mOctets[0]);
         pPacket->read(&rAddress.mIP.mOctets[1]);
         pPacket->read(&rAddress.mIP.mOctets[2]);

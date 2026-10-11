@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Game/System/GameOnlineConst.hpp"
+#include "Game/System/NetworkSystemWrapper.hpp"
 #include <revolution/os/OSTime.h>
 #include <revolution/types.h>
 
@@ -16,17 +18,7 @@ struct GameOnlinePacketHeader {
 
 class GameOnlinePacket {
 public:
-    enum {
-        TYPE_PING = 0,
-        TYPE_PONG,
-        TYPE_ROOM_MAKE_REQUEST,
-        TYPE_ROOM_MAKE_INFO,
-        TYPE_ROOM_JOIN_REQUEST,
-        TYPE_ROOM_JOIN_INFO,
-        TYPE_PLAYER_DATA,
-        TYPE_PLAYER_STAGE,
-        TYPE_PLAYER_LEAVE,
-    };
+    static const int INVALID_PACKET_ID = -1;
 
     static const int BUFFER_SIZE = 0x200;
     static const int HEADER_SIZE = sizeof(GameOnlinePacketHeader);
@@ -35,10 +27,10 @@ public:
     GameOnlinePacket();
 
     bool loadHeader(s32 size);
-    void makeHeader(u32 type, u32 id = -1);
-
+    void makeHeader(u32 type);
     void read(void* pData, s32 size);
     void write(const void* pData, s32 size);
+    void reset();
 
     template < typename T >
     void read(T* pData) {
@@ -50,17 +42,20 @@ public:
         write(pData, sizeof(*pData));
     }
 
-    void reset() {
-        mPosition = 0;
-        mSize = 0;
+    void setTargetBroadcast(bool isNeedEqualStage) {
+        mIsBroadcast = true;
+        mIsNeedEqualStage = isNeedEqualStage;
+    }
+
+    void setTargetAddress(const SockAddress& rAddress) {
+        mIsBroadcast = false;
+        mAddress = rAddress;
     }
 
     u32 getTotalSize() const {
         return mSize + HEADER_SIZE;
     }
 
-    u32 mPosition;
-    u32 mSize;
     union {
         struct {
             GameOnlinePacketHeader mHeader;
@@ -68,6 +63,13 @@ public:
         };
         u8 mBuffer[BUFFER_SIZE];
     };
+
+    u32 mPosition;
+    u32 mSize;
+    SockAddress mAddress;
+    bool mIsBroadcast;
+    bool mIsNeedEqualStage;
+    bool mIsReply[GameOnlineConst::MAX_PLAYER_NUM - 1];
 };
 
 class GameOnlinePacketQueue {
@@ -79,18 +81,22 @@ public:
     void init(u32 capacity);
     GameOnlinePacket* push();
     GameOnlinePacket* get();
+    GameOnlinePacket* find(u32 packetID);
     void pop();
+    void reset() {
+        mSize = 0;
+    }
 
     GameOnlinePacket* mPackets;
     u32 mSize;
     u32 mCapacity;
+    u32 mID;
 };
 
 namespace GameOnlineFunction {
     JKRHeap* createGameOnlineHeap();
     JKRHeap* getGameOnlineHeap();
 
-    void initSockAddress(SockAddress& rAddress);
     void readSockAddress(GameOnlinePacket* pPacket, SockAddress& rAddress);
     void writeSockAddress(GameOnlinePacket* pPacket, const SockAddress& rAddress);
 } // namespace GameOnlineFunction

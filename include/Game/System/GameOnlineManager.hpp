@@ -16,7 +16,9 @@ public:
     void reset();
     void initActor();
     void destroyActor();
-    bool isConnected() const;
+    void updateCurrentStage();
+
+    bool isTimeout() const;
     bool isEqualCurrentStage() const;
 
     bool isHost() const {
@@ -58,9 +60,9 @@ public:
     void initActors();
     void destroyActors();
 
-    bool receive(SockAddress* pAddress);
-    void send(GameOnlinePacket* pPacket, const SockAddress& rAddress);
-    void broadcast(GameOnlinePacket* pPacket, bool isNeedEqualStage);
+    bool receive();
+    void send(GameOnlinePacket* pPacket);
+    void updateSyncPackets();
 
     GameOnlineClient* getClientByLocalID(u8 localID);
     GameOnlineClient* getClientByGlobalID(u8 globalID);
@@ -68,25 +70,27 @@ public:
     GameOnlineClient* getLocalClient() {
         return &mClients[0];
     }
+    u8 getLocalIDByGlobalID(u8 globalID);
     u8 getFreeClientGlobalID();
     u8 getConnectedClientNum();
     bool isAllClientConnected();
     bool isConnected() const;
-    bool isRoomStateConnected() const {
-        return mRoomState == ROOM_STATE_CONNECTED;
-    }
 
-    void handlePing(const SockAddress& rAddress);
+    void handlePing();
     void handlePong();
+    void handleReply();
     // receiveRoomMakeRequest is handled by server code
     void handleRoomMakeInfo();
     void handleRoomJoinRequest();
     void handleRoomJoinInfo();
+    void handlePlayerJoin();
+    void handlePlayerLeave();
     void handlePlayerData();
     void handlePlayerStage();
 
     void sendPing();
     void sendPong(const SockAddress& rAddress);
+    void sendReply(u32 packetID, const SockAddress& rAddress);
     // sendRoomMakeInfo is handled by server code
     void sendRoomJoinInfo(const SockAddress& rAddress);
     void sendPlayerData();
@@ -102,9 +106,7 @@ public:
 
     RoomState mRoomState;
     MR::AssignableArray< GameOnlineClient > mClients;
-    union {
-        GameOnlinePacket* mRecvPacket;
-        GameOnlinePacket* mSendPacket;
-    };
+    GameOnlinePacket* mRecvPacket;
+    GameOnlinePacket* mSendPacket;
     GameOnlinePacketQueue mSyncPacketQueue;
 };

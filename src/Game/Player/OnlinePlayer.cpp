@@ -4,7 +4,6 @@
 #include "Game/Animation/XanimeResource.hpp"
 #include "Game/LiveActor/LiveActor.hpp"
 #include "Game/LiveActor/ModelManager.hpp"
-#include "Game/Scene/SceneFunction.hpp"
 #include "Game/System/GameOnlineManager.hpp"
 #include "Game/Util/ActorSensorUtil.hpp"
 #include "Game/Util/ActorShadowUtil.hpp"
@@ -13,7 +12,6 @@
 #include "Game/Util/LiveActorUtil.hpp"
 #include "Game/Util/ModelUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
-#include "JSystem/JGeometry/TVec.hpp"
 
 extern XanimeGroupInfo marioAnimeTable[];
 extern XanimeAuxInfo marioAnimeAuxTable[];
@@ -24,7 +22,8 @@ extern XanimeBckTable3 tripleAnimeTable[];
 extern XanimeBckTable4 quadAnimeTable[];
 extern XanimeSwapTable luigiAnimeSwapTable[];
 
-OnlinePlayer::OnlinePlayer(const char* pName) : LiveActor(pName), mClient(), mXanimePlayer(), mXanimePlayerUpper(), mHasJetTurtle(), mIsHidden(true) {}
+OnlinePlayer::OnlinePlayer(const char* pName, GameOnlineClient* pClient)
+    : LiveActor(pName), mClient(pClient), mXanimePlayer(), mXanimePlayerUpper(), mHasJetTurtle(), mIsHidden(true) {}
 
 void OnlinePlayer::init(const JMapInfoIter& rIter) {
     mPosition.zero();
@@ -60,31 +59,11 @@ void OnlinePlayer::init(const JMapInfoIter& rIter) {
 
     MR::connectToSceneMapObj(this);
     makeActorAppeared();
-
-    // mIsHidden = true;
-    // MR::hideModel(this);
-    // MR::invalidateHitSensors(this);
-    // MR::invalidateShadowAll(this);
+    syncHideState();
 }
 
 void OnlinePlayer::movement() {
-    /*
-    if (mIsHidden) {
-        if (mClient->isEqualCurrentStage()) {
-            MR::showModel(this);
-            MR::validateHitSensors(this);
-            MR::validateShadowAll(this);
-            mIsHidden = false;
-        }
-    }
-    else if (!mClient->isEqualCurrentStage()) {
-        MR::hideModel(this);
-        MR::invalidateHitSensors(this);
-        MR::invalidateShadowAll(this);
-        mIsHidden = true;
-    }
-    */
-
+    syncHideState();
     LiveActor::movement();
 }
 
@@ -117,4 +96,26 @@ void OnlinePlayer::setAnimationFrame(f32 frame) {
     mXanimePlayer->_20->setFrame(frame);
     mXanimePlayer->_20->setRate(0.0f);
     mXanimePlayer->_20->setLoop(J3DFrameCtrl::EMode_RESET);
+}
+
+void OnlinePlayer::setAnimationWeight(u32 track, f32 weight) {
+    mXanimePlayer->changeTrackWeight(track, weight);
+}
+
+void OnlinePlayer::syncHideState() {
+    bool isEqualStage = mClient->isEqualCurrentStage();
+
+    if (mIsHidden) {
+        if (isEqualStage) {
+            MR::showModel(this);
+            MR::validateHitSensors(this);
+            MR::validateShadowAll(this);
+            mIsHidden = false;
+        }
+    } else if (!isEqualStage) {
+        MR::hideModel(this);
+        MR::invalidateHitSensors(this);
+        MR::invalidateShadowAll(this);
+        mIsHidden = true;
+    }
 }

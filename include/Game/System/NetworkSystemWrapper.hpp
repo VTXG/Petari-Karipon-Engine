@@ -3,24 +3,6 @@
 #include <private/iostypes.h>
 #include <revolution/types.h>
 
-struct MACAddress {
-    /* 0x00 */ u8 mOctets[6];
-};
-
-struct IPAddress {
-    union {
-        /* 0x00 */ u32 mAddress;
-        /* 0x00 */ u8 mOctets[4];
-    };
-};
-
-struct SockAddress {
-    /* 0x00 */ u8 mLength;
-    /* 0x01 */ u8 mFamily;
-    /* 0x02 */ u16 mPort;
-    /* 0x04 */ IPAddress mIP;
-};
-
 enum SOFamily {
     SO_AF_INET = 2,
 };
@@ -129,6 +111,28 @@ enum SOReturnCode {
     SO_ERR_TIMEDOUT = -76,
     SO_ERR_TXTBSY = -77,
     SO_ERR_XDEV = -78,
+};
+
+struct MACAddress {
+    /* 0x00 */ u8 mOctets[6];
+};
+
+struct IPAddress {
+    union {
+        /* 0x00 */ u32 mAddress;
+        /* 0x00 */ u8 mOctets[4];
+    };
+};
+
+struct SockAddress {
+    SockAddress() : mFamily(SO_AF_INET), mLength(sizeof(SockAddress)), mPort() {
+        mIP.mAddress = 0;
+    }
+
+    /* 0x00 */ u8 mLength;
+    /* 0x01 */ u8 mFamily;
+    /* 0x02 */ u16 mPort;
+    /* 0x04 */ IPAddress mIP;
 };
 
 class NetworkSystemWrapper {

@@ -92,12 +92,15 @@ namespace {
                 return;
             }
 
-            if (pOnlineManager->isRoomStateConnected()) {
+            rContext.printTextF(false, L"Room State : %d\n", pOnlineManager->mRoomState);
+
+            if (pOnlineManager->mRoomState == GameOnlineManager::ROOM_STATE_CONNECTED) {
+                rContext.printText(false, L"Players:\n");
                 for (GameOnlineClient* pClient = pOnlineManager->mClients.begin(); pClient != pOnlineManager->mClients.end(); pClient++) {
-                    rContext.printTextF(false, L"[%d] ID: %d Stage: %s Scenario: %d\n", pClient - pOnlineManager->mClients.mArr, pClient->mGlobalID, pClient->mStageName, pClient->mScenarioNo);
+                    rContext.printTextF(false, L" [%d] Port: %d Global ID: %d Stage: %s Scenario: %d\n", pClient - pOnlineManager->mClients.mArr,
+                                        pClient->mAddress.mPort, pClient->mGlobalID, pClient->mStageName, pClient->mScenarioNo);
                 }
-            }
-            else {
+            } else {
                 if (rContext.printText(true, L"[Create]\n")) {
                     pOnlineManager->requestRoomMake("Test");
                 }
@@ -105,6 +108,14 @@ namespace {
                 if (rContext.printText(true, L"[Join]\n")) {
                     pOnlineManager->requestRoomJoin("Test");
                 }
+            }
+
+            rContext.printTextF(false, L"Queued Packets (%d):\n", pOnlineManager->mSyncPacketQueue.mSize);
+
+            for (u32 i = 0; i < pOnlineManager->mSyncPacketQueue.mSize; i++) {
+                GameOnlinePacket* pPacket = &pOnlineManager->mSyncPacketQueue.mPackets[i];
+                rContext.printTextF(false, L" [%d] : ID %d, Type %d, Size %d, Reply %d, %d, %d\n", i, pPacket->mHeader.mPacketID,
+                                    pPacket->mHeader.mType, pPacket->mSize, pPacket->mIsReply[0], pPacket->mIsReply[1], pPacket->mIsReply[2]);
             }
         }
     } // namespace OnlinePage

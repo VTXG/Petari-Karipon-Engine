@@ -6,6 +6,7 @@
 #include "Game/Player/MarioActor.hpp"
 #include "Game/Player/MarioAnimator.hpp"
 #include "Game/Player/OnlinePlayer.hpp"
+#include "Game/System/GameOnlineConst.hpp"
 #include "Game/System/GameOnlineFunction.hpp"
 #include "Game/System/GameSystem.hpp"
 #include "Game/System/GameSystemObjHolder.hpp"
@@ -23,10 +24,8 @@
 /*
 
 TODO
-- add proper packet class with links
 - disconnects
 - ignore old and interpolate player data packets
-- make update run asynchronously (?)
 - fix BCK anims
 
 */
@@ -42,7 +41,6 @@ namespace {
         PLAYER_LEAVE_TIMEOUT,
     };
 
-    static const int MAX_PLAYER_NUM = 4;
     static const OSTime PING_RATE = 500 / (243000000u / 4 / 1000);
     static const OSTime PING_TIMEOUT = 3 * (243000000u / 4);
 
@@ -69,8 +67,7 @@ void GameOnlineClient::reset() {
 }
 
 void GameOnlineClient::initActor() {
-    mActor = new OnlinePlayer("OnlinePlayer");
-    mActor->mClient = this;
+    mActor = new OnlinePlayer("OnlinePlayer", this);
     mActor->initWithoutIter();
 }
 
@@ -81,8 +78,13 @@ void GameOnlineClient::destroyActor() {
     }
 }
 
-bool GameOnlineClient::isConnected() const {
-    return isValid() && (OSGetTime() - mLastPingTime) < ::PING_TIMEOUT;
+void GameOnlineClient::updateCurrentStage() {
+    snprintf(mStageName, sizeof(mStageName), "%s", MR::getCurrentStageName());
+    mScenarioNo = MR::getCurrentScenarioNo();
+}
+
+bool GameOnlineClient::isTimeout() const {
+    return (OSGetTime() - mLastPingTime) > PING_TIMEOUT;
 }
 
 bool GameOnlineClient::isEqualCurrentStage() const {
@@ -90,9 +92,8 @@ bool GameOnlineClient::isEqualCurrentStage() const {
 }
 
 GameOnlineManager::GameOnlineManager()
-    : NerveExecutor("GameOnlineManager"), mSocket(-1), mServerAddress(), mRoomState(ROOM_STATE_DISCONNECTED), mClients(::MAX_PLAYER_NUM),
-      mRecvPacket(), mSyncPacketQueue() {
-    GameOnlineFunction::initSockAddress(mServerAddress);
+    : NerveExecutor("GameOnlineManager"), mSocket(-1), mServerAddress(), mRoomState(ROOM_STATE_DISCONNECTED),
+      mClients(GameOnlineConst::MAX_PLAYER_NUM), mRecvPacket(), mSendPacket(), mSyncPacketQueue() {
     mServerAddress.mIP.mOctets[0] = 10;
     mServerAddress.mIP.mOctets[1] = 207;
     mServerAddress.mIP.mOctets[2] = 154;
@@ -112,25 +113,26 @@ void GameOnlineManager::initMemory() {
     MR::CurrentHeapRestorer heapRestorer = MR::CurrentHeapRestorer(pOnlineHeap);
 
     mRecvPacket = new GameOnlinePacket();
+    mSendPacket = new GameOnlinePacket();
     mSyncPacketQueue.init(0x20);
 }
 
 void GameOnlineManager::initActors() {
-    for (GameOnlineClient* pClient = mClients.begin(); pClient != mClients.end(); pClient++) {
+    for (GameOnlineClient* pClient = getClientByLocalID(1); pClient != mClients.end(); pClient++) {
         pClient->initActor();
     }
 }
 
 void GameOnlineManager::destroyActors() {
-    for (GameOnlineClient* pClient = mClients.begin(); pClient != mClients.end(); pClient++) {
+    for (GameOnlineClient* pClient = getClientByLocalID(1); pClient != mClients.end(); pClient++) {
         pClient->destroyActor();
     }
 }
 
-bool GameOnlineManager::receive(SockAddress* pAddress) {
+bool GameOnlineManager::receive() {
     mRecvPacket->reset();
 
-    IOSError ret = ::getNetworkSystem()->recv(mSocket, mRecvPacket->mBuffer, GameOnlinePacket::BUFFER_SIZE, SO_MSG_NONBLOCK, pAddress);
+    IOSError ret = ::getNetworkSystem()->recv(mSocket, mRecvPacket->mBuffer, GameOnlinePacket::BUFFER_SIZE, SO_MSG_NONBLOCK, &mRecvPacket->mAddress);
     if (ret < 0) {
         return false;
     }
@@ -138,21 +140,52 @@ bool GameOnlineManager::receive(SockAddress* pAddress) {
     return mRecvPacket->loadHeader(ret);
 }
 
-void GameOnlineManager::send(GameOnlinePacket* pPacket, const SockAddress& rAddress) {
-    ::getNetworkSystem()->send(mSocket, pPacket->mBuffer, pPacket->getTotalSize(), SO_MSG_NONBLOCK, rAddress);
-}
+void GameOnlineManager::send(GameOnlinePacket* pPacket) {
+    pPacket->mHeader.mTimestamp = OSGetTime();
 
-void GameOnlineManager::broadcast(GameOnlinePacket* pPacket, bool isNeedEqualStage) {
+    if (!pPacket->mIsBroadcast) {
+        ::getNetworkSystem()->send(mSocket, pPacket->mBuffer, pPacket->getTotalSize(), SO_MSG_NONBLOCK, pPacket->mAddress);
+        return;
+    }
+
     for (GameOnlineClient* pClient = getClientByLocalID(1); pClient != mClients.end(); pClient++) {
         if (!pClient->isValid()) {
             continue;
         }
 
-        if (isNeedEqualStage && !pClient->isEqualCurrentStage()) {
+        if (pPacket->mIsNeedEqualStage && !pClient->isEqualCurrentStage()) {
             continue;
         }
 
-        send(pPacket, pClient->mAddress);
+        ::getNetworkSystem()->send(mSocket, pPacket->mBuffer, pPacket->getTotalSize(), SO_MSG_NONBLOCK, pClient->mAddress);
+    }
+}
+
+void GameOnlineManager::updateSyncPackets() {
+    GameOnlinePacket* pPacket;
+
+    while ((pPacket = mSyncPacketQueue.get()) != nullptr) {
+        bool isPop = true;
+
+        for (u32 i = 0; i < ARRAY_SIZE(pPacket->mIsReply); i++) {
+            GameOnlineClient* pClient = getClientByLocalID(i + 1);
+
+            if (pClient->isValid() && !pPacket->mIsReply[i]) {
+                isPop = false;
+                break;
+            }
+        }
+
+        if (isPop) {
+            mSyncPacketQueue.pop();
+            continue;
+        }
+
+        if ((OSGetTime() - pPacket->mHeader.mTimestamp) > PING_RATE) {
+            send(pPacket);
+        }
+
+        break;
     }
 }
 
@@ -181,6 +214,7 @@ GameOnlineClient* GameOnlineManager::getClientByGlobalID(u8 globalID) {
 GameOnlineClient* GameOnlineManager::getFreeClient() {
     for (GameOnlineClient* pClient = mClients.begin(); pClient != mClients.end(); pClient++) {
         if (!pClient->isValid()) {
+            pClient->reset();
             return pClient;
         }
     }
@@ -188,8 +222,18 @@ GameOnlineClient* GameOnlineManager::getFreeClient() {
     return nullptr;
 }
 
+u8 GameOnlineManager::getLocalIDByGlobalID(u8 globalID) {
+    GameOnlineClient* pClient = getClientByGlobalID(globalID);
+
+    if (pClient != nullptr) {
+        return pClient - mClients.mArr;
+    }
+
+    return GameOnlineClient::INVALID_ID;
+}
+
 u8 GameOnlineManager::getFreeClientGlobalID() {
-    for (u8 globalID = 0; globalID < ::MAX_PLAYER_NUM; globalID++) {
+    for (u8 globalID = 0; globalID < GameOnlineConst::MAX_PLAYER_NUM; globalID++) {
         if (getClientByGlobalID(globalID) == nullptr) {
             return globalID;
         }
@@ -212,7 +256,7 @@ u8 GameOnlineManager::getConnectedClientNum() {
 
 bool GameOnlineManager::isAllClientConnected() {
     for (GameOnlineClient* pClient = getClientByLocalID(1); pClient != mClients.end(); pClient++) {
-        if (pClient->isValid() && !pClient->isConnected()) {
+        if (pClient->isValid() && pClient->isTimeout()) {
             return false;
         }
     }
@@ -225,31 +269,33 @@ bool GameOnlineManager::isConnected() const {
 }
 
 bool GameOnlineManager::requestRoomMake(const char* pCode) {
-    if (!isNerve(GET_NERVE_ANON(NrvGameOnlineManagerConnected))) {
+    if (!isConnected()) {
         return false;
     }
 
     mSendPacket->reset();
     mSendPacket->write(pCode, strlen(pCode) + 1);
-    mSendPacket->makeHeader(GameOnlinePacket::TYPE_ROOM_MAKE_REQUEST);
-    send(mSendPacket, mServerAddress);
+    mSendPacket->makeHeader(GameOnlineConst::TYPE_ROOM_MAKE_REQUEST);
+    mSendPacket->setTargetAddress(mServerAddress);
+    send(mSendPacket);
     return true;
 }
 
 bool GameOnlineManager::requestRoomJoin(const char* pCode) {
-    if (!isNerve(GET_NERVE_ANON(NrvGameOnlineManagerConnected))) {
+    if (!isConnected()) {
         return false;
     }
 
     mSendPacket->reset();
     mSendPacket->write(pCode, strlen(pCode) + 1);
-    mSendPacket->makeHeader(GameOnlinePacket::TYPE_ROOM_JOIN_REQUEST);
-    send(mSendPacket, mServerAddress);
+    mSendPacket->makeHeader(GameOnlineConst::TYPE_ROOM_JOIN_REQUEST);
+    mSendPacket->setTargetAddress(mServerAddress);
+    send(mSendPacket);
     return true;
 }
 
-void GameOnlineManager::handlePing(const SockAddress& rAddress) {
-    sendPong(rAddress);
+void GameOnlineManager::handlePing() {
+    sendPong(mRecvPacket->mAddress);
 }
 
 void GameOnlineManager::handlePong() {
@@ -267,64 +313,127 @@ void GameOnlineManager::handlePong() {
     }
 }
 
+void GameOnlineManager::handleReply() {
+    u8 globalID;
+    u32 packetID;
+    mRecvPacket->read(&globalID);
+    mRecvPacket->read(&packetID);
+
+    u8 localID = getLocalIDByGlobalID(globalID);
+    if (localID == GameOnlineClient::INVALID_ID) {
+        OSReport("handleReply failed id\n");
+        return;
+    }
+
+    GameOnlinePacket* pPacket = mSyncPacketQueue.find(packetID);
+    if (pPacket == nullptr) {
+        OSReport("handleReply failed no packet %d\n", packetID);
+        return;
+    }
+
+    pPacket->mIsReply[localID - 1] = true;
+}
+
 void GameOnlineManager::handleRoomMakeInfo() {
+    if (mRoomState != ROOM_STATE_DISCONNECTED) {
+        return;
+    }
+
     GameOnlineClient* pLocalClient = getLocalClient();
     pLocalClient->mGlobalID = 0;
-
-    GameOnlineFunction::initSockAddress(pLocalClient->mAddress);
     GameOnlineFunction::readSockAddress(mRecvPacket, pLocalClient->mAddress);
+    pLocalClient->updateCurrentStage();
+
+    OSTime time = OSGetTime();
+    pLocalClient->mLastPingTime = time;
+    pLocalClient->mLastPlayerDataTime = time;
 
     mRoomState = ROOM_STATE_CONNECTING;
 }
 
 void GameOnlineManager::handleRoomJoinRequest() {
+    if (mRoomState != ROOM_STATE_CONNECTED) {
+        return;
+    }
+
     if (!getLocalClient()->isHost()) {
         OSReport("[%s:%d] JOIN_REQUEST sent to non-host\n", __FILE__, __LINE__);
         return;
     }
 
     SockAddress address;
-    GameOnlineFunction::initSockAddress(address);
     GameOnlineFunction::readSockAddress(mRecvPacket, address);
     sendRoomJoinInfo(address);
 }
 
 void GameOnlineManager::handleRoomJoinInfo() {
-    u8 clientNum;
-    u8 globalID;
-
-    mRecvPacket->read(&globalID);
-    mRecvPacket->read(&clientNum);
-
-    if (mRoomState == ROOM_STATE_DISCONNECTED) {
-        GameOnlineClient* pClient = getLocalClient();
-        pClient->reset();
-        pClient->mGlobalID = globalID;
-
-        OSTime time = OSGetTime();
-        pClient->mLastPingTime = time;
-        pClient->mLastPlayerDataTime = time;
+    if (mRoomState != ROOM_STATE_DISCONNECTED) {
+        return;
     }
 
+    GameOnlineClient* pLocalClient = getLocalClient();
+    pLocalClient->reset();
+
+    mRecvPacket->read(&pLocalClient->mGlobalID);
+    GameOnlineFunction::readSockAddress(mRecvPacket, pLocalClient->mAddress);
+
+    OSTime time = OSGetTime();
+    pLocalClient->mLastPingTime = time;
+    pLocalClient->mLastPlayerDataTime = time;
+
+    u8 clientNum;
+    mRecvPacket->read(&clientNum);
+
     for (u8 i = 0; i < clientNum; i++) {
-        mRecvPacket->read(&globalID);
-
-        GameOnlineClient* pClient = getClientByGlobalID(globalID);
-        if (pClient == nullptr) {
-            pClient = getFreeClient();
-            pClient->reset();
-        }
-
-        pClient->mGlobalID = globalID;
-        GameOnlineFunction::initSockAddress(pClient->mAddress);
+        GameOnlineClient* pClient = getFreeClient();
+        mRecvPacket->read(&pClient->mGlobalID);
         GameOnlineFunction::readSockAddress(mRecvPacket, pClient->mAddress);
         mRecvPacket->read(pClient->mStageName, sizeof(pClient->mStageName));
         mRecvPacket->read(&pClient->mScenarioNo);
     }
 
-    if (mRoomState == ROOM_STATE_DISCONNECTED) {
-        mRoomState = ROOM_STATE_CONNECTING;
+    pLocalClient->updateCurrentStage();
+
+    GameOnlinePacket* pPacket = mSyncPacketQueue.push();
+    pPacket->write(&pLocalClient->mGlobalID);
+    GameOnlineFunction::writeSockAddress(pPacket, pLocalClient->mAddress);
+    OSReport("sendPlayerJoin at %d id %d %d\n", pPacket->mPosition, pLocalClient->mGlobalID, pLocalClient->mAddress.mPort);
+    pPacket->write(pLocalClient->mStageName, sizeof(pLocalClient->mStageName));
+    pPacket->write(&pLocalClient->mScenarioNo);
+    pPacket->makeHeader(GameOnlineConst::TYPE_PLAYER_JOIN);
+    pPacket->setTargetBroadcast(false);
+
+    mRoomState = ROOM_STATE_CONNECTING;
+}
+
+void GameOnlineManager::handlePlayerJoin() {
+    u8 globalID;
+    mRecvPacket->read(&globalID);
+
+    if (getClientByGlobalID(globalID) != nullptr) {
+        return;
     }
+
+    GameOnlineClient* pClient = getFreeClient();
+    pClient->mGlobalID = globalID;
+    GameOnlineFunction::readSockAddress(mRecvPacket, pClient->mAddress);
+    OSReport("handlePlayerJoin at %d id %d %d\n", mRecvPacket->mPosition, pClient->mGlobalID, pClient->mAddress.mPort);
+    mRecvPacket->read(pClient->mStageName, sizeof(pClient->mStageName));
+    mRecvPacket->read(&pClient->mScenarioNo);
+}
+
+void GameOnlineManager::handlePlayerLeave() {
+    u8 globalID;
+    u8 leaveReason;
+    mRecvPacket->read(&globalID);
+    mRecvPacket->read(&leaveReason);
+    GameOnlineClient* pClient = getClientByGlobalID(globalID);
+
+    if (pClient == nullptr) {
+        return;
+    }
+
+    pClient->reset();
 }
 
 void GameOnlineManager::handlePlayerData() {
@@ -334,7 +443,6 @@ void GameOnlineManager::handlePlayerData() {
 
     u8 globalID;
     mRecvPacket->read(&globalID);
-
     GameOnlineClient* pClient = getClientByGlobalID(globalID);
     if (pClient == nullptr || pClient->mActor == nullptr || pClient->mLastPlayerDataTime > mRecvPacket->mHeader.mTimestamp) {
         return;
@@ -365,7 +473,7 @@ void GameOnlineManager::handlePlayerData() {
     for (s32 i = 0; i < 4; i++) {
         f32 weights;
         mRecvPacket->read(&weights);
-        pActor->mXanimePlayer->changeTrackWeight(i, weights);
+        pActor->setAnimationWeight(i, weights);
     }
 }
 
@@ -386,15 +494,16 @@ void GameOnlineManager::sendPing() {
     GameOnlineClient* pLocalClient = getLocalClient();
     OSTime time = OSGetTime();
 
-    if ((time - pLocalClient->mLastPingTime) < ::PING_RATE) {
+    if ((time - pLocalClient->mLastPingTime) < PING_RATE) {
         return;
     }
 
     pLocalClient->mLastPingTime = time;
 
     mSendPacket->reset();
-    mSendPacket->makeHeader(GameOnlinePacket::TYPE_PING);
-    broadcast(mSendPacket, false);
+    mSendPacket->makeHeader(GameOnlineConst::TYPE_PING);
+    mSendPacket->setTargetBroadcast(false);
+    send(mSendPacket);
 }
 
 void GameOnlineManager::sendPong(const SockAddress& rAddress) {
@@ -402,8 +511,18 @@ void GameOnlineManager::sendPong(const SockAddress& rAddress) {
 
     mSendPacket->reset();
     mSendPacket->write(&pLocalClient->mGlobalID);
-    mSendPacket->makeHeader(GameOnlinePacket::TYPE_PONG);
-    send(mSendPacket, rAddress);
+    mSendPacket->makeHeader(GameOnlineConst::TYPE_PONG);
+    mSendPacket->setTargetAddress(rAddress);
+    send(mSendPacket);
+}
+
+void GameOnlineManager::sendReply(u32 packetID, const SockAddress& rAddress) {
+    mSendPacket->reset();
+    mSendPacket->write(&getLocalClient()->mGlobalID);
+    mSendPacket->write(&packetID);
+    mSendPacket->makeHeader(GameOnlineConst::TYPE_REPLY);
+    mSendPacket->setTargetAddress(rAddress);
+    send(mSendPacket);
 }
 
 void GameOnlineManager::sendRoomJoinInfo(const SockAddress& rAddress) {
@@ -412,29 +531,30 @@ void GameOnlineManager::sendRoomJoinInfo(const SockAddress& rAddress) {
         return;
     }
 
-    GameOnlineClient* pClient = getFreeClient();
-    pClient->reset();
-    pClient->mGlobalID = globalID;
-    pClient->mAddress = rAddress;
+    GameOnlinePacket* pPacket = mSyncPacketQueue.push();
+    pPacket->write(&globalID);
+    GameOnlineFunction::writeSockAddress(pPacket, rAddress);
 
     u8 clientNum = getConnectedClientNum();
-    mSendPacket->reset();
-    mSendPacket->write(&globalID);
-    mSendPacket->write(&clientNum);
+    pPacket->write(&clientNum);
 
     for (GameOnlineClient* pClient = mClients.begin(); pClient != mClients.end(); pClient++) {
         if (!pClient->isValid()) {
             continue;
         }
 
-        mSendPacket->write(&pClient->mGlobalID);
-        GameOnlineFunction::writeSockAddress(mSendPacket, pClient->mAddress);
-        mSendPacket->write(pClient->mStageName, sizeof(pClient->mStageName));
-        mSendPacket->write(&pClient->mScenarioNo);
+        pPacket->write(&pClient->mGlobalID);
+        GameOnlineFunction::writeSockAddress(pPacket, pClient->mAddress);
+        pPacket->write(pClient->mStageName, sizeof(pClient->mStageName));
+        pPacket->write(&pClient->mScenarioNo);
     }
 
-    mSendPacket->makeHeader(GameOnlinePacket::TYPE_ROOM_JOIN_INFO);
-    broadcast(mSendPacket, false);
+    pPacket->makeHeader(GameOnlineConst::TYPE_ROOM_JOIN_INFO);
+    pPacket->setTargetAddress(rAddress);
+
+    GameOnlineClient* pClient = getFreeClient();
+    pClient->mGlobalID = globalID;
+    pClient->mAddress = rAddress;
 }
 
 void GameOnlineManager::sendPlayerData() {
@@ -478,8 +598,9 @@ void GameOnlineManager::sendPlayerData() {
         mSendPacket->write(&pMarioActorAnim->getCore()->mTrackList[i].mWeight);
     }
 
-    mSendPacket->makeHeader(GameOnlinePacket::TYPE_PLAYER_DATA);
-    broadcast(mSendPacket, true);
+    mSendPacket->makeHeader(GameOnlineConst::TYPE_PLAYER_DATA);
+    mSendPacket->setTargetBroadcast(true);
+    send(mSendPacket);
 }
 
 void GameOnlineManager::sendPlayerStage() {
@@ -488,16 +609,14 @@ void GameOnlineManager::sendPlayerStage() {
         return;
     }
 
-    snprintf(pLocalClient->mStageName, sizeof(pLocalClient->mStageName), "%s", MR::getCurrentStageName());
-    pLocalClient->mScenarioNo = MR::getCurrentScenarioNo();
+    pLocalClient->updateCurrentStage();
 
-    mSendPacket->reset();
-    mSendPacket->write(&pLocalClient->mGlobalID);
-    mSendPacket->write(pLocalClient->mStageName, sizeof(pLocalClient->mStageName));
-    mSendPacket->write(&pLocalClient->mScenarioNo);
-
-    mSendPacket->makeHeader(GameOnlinePacket::TYPE_PLAYER_STAGE);
-    broadcast(mSendPacket, false);
+    GameOnlinePacket* pPacket = mSyncPacketQueue.push();
+    pPacket->write(&pLocalClient->mGlobalID);
+    pPacket->write(pLocalClient->mStageName, sizeof(pLocalClient->mStageName));
+    pPacket->write(&pLocalClient->mScenarioNo);
+    pPacket->makeHeader(GameOnlineConst::TYPE_PLAYER_STAGE);
+    pPacket->setTargetBroadcast(false);
 }
 
 void GameOnlineManager::exeDisconnected() {
@@ -533,39 +652,56 @@ void GameOnlineManager::exeConnected() {
     if (MR::isFirstStep(this)) {
         mSocket = ::getNetworkSystem()->socket(SO_AF_INET, SO_SOCK_DGRAM, 0);
         mRoomState = ROOM_STATE_DISCONNECTED;
+        mSyncPacketQueue.reset();
     }
 
     sendPing();
 
-    if (isRoomStateConnected()) {
+    if (mRoomState == ROOM_STATE_CONNECTED) {
         sendPlayerStage();
         sendPlayerData();
+        updateSyncPackets();
     }
 
-    SockAddress address;
-    while (receive(&address)) {
+    while (receive()) {
+        SockAddress address = mRecvPacket->mAddress;
+        u32 packetID = mRecvPacket->mHeader.mPacketID;
+
         switch (mRecvPacket->mHeader.mType) {
-        case GameOnlinePacket::TYPE_PING:
-            handlePing(address);
+        case GameOnlineConst::TYPE_PING:
+            handlePing();
             break;
-        case GameOnlinePacket::TYPE_PONG:
+        case GameOnlineConst::TYPE_PONG:
             handlePong();
             break;
-        case GameOnlinePacket::TYPE_ROOM_MAKE_INFO:
+        case GameOnlineConst::TYPE_REPLY:
+            handleReply();
+            break;
+        case GameOnlineConst::TYPE_ROOM_MAKE_INFO:
             handleRoomMakeInfo();
             break;
-        case GameOnlinePacket::TYPE_ROOM_JOIN_REQUEST:
+        case GameOnlineConst::TYPE_ROOM_JOIN_REQUEST:
             handleRoomJoinRequest();
             break;
-        case GameOnlinePacket::TYPE_ROOM_JOIN_INFO:
+        case GameOnlineConst::TYPE_ROOM_JOIN_INFO:
             handleRoomJoinInfo();
             break;
-        case GameOnlinePacket::TYPE_PLAYER_DATA:
+        case GameOnlineConst::TYPE_PLAYER_JOIN:
+            handlePlayerJoin();
+            break;
+        case GameOnlineConst::TYPE_PLAYER_LEAVE:
+            handlePlayerLeave();
+            break;
+        case GameOnlineConst::TYPE_PLAYER_DATA:
             handlePlayerData();
             break;
-        case GameOnlinePacket::TYPE_PLAYER_STAGE:
+        case GameOnlineConst::TYPE_PLAYER_STAGE:
             handlePlayerStage();
             break;
+        }
+
+        if (packetID != GameOnlinePacket::INVALID_PACKET_ID) {
+            sendReply(packetID, address);
         }
     }
 
@@ -583,4 +719,5 @@ void GameOnlineManager::exeOnEndConnected() {
 
     mSocket = -1;
     mRoomState = ROOM_STATE_DISCONNECTED;
+    mSyncPacketQueue.reset();
 }

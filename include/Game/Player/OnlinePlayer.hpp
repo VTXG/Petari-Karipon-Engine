@@ -7,7 +7,7 @@ class XanimePlayer;
 
 class OnlinePlayer : public LiveActor {
 public:
-    OnlinePlayer(const char* pName);
+    OnlinePlayer(const char* pName, GameOnlineClient* pClient);
 
     virtual void init(const JMapInfoIter& rIter);
     virtual void movement();
@@ -15,7 +15,8 @@ public:
     void playAnimation(u32 animHash);
     void playAnimationSimple(const char* pAnimName);
     void setAnimationFrame(f32 frame);
-    void setAnimationWeight(const f32* pWeights);
+    void setAnimationWeight(u32 track, f32 weight);
+    void syncHideState();
 
     /* 0x8C */ GameOnlineClient* mClient;
     /* 0x90 */ XanimePlayer* mXanimePlayer;
