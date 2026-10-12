@@ -4,7 +4,7 @@
 #include "Game/Animation/XanimeResource.hpp"
 #include "Game/LiveActor/LiveActor.hpp"
 #include "Game/LiveActor/ModelManager.hpp"
-#include "Game/System/GameOnlineManager.hpp"
+#include "Game/System/GameOnlineClient.hpp"
 #include "Game/Util/ActorSensorUtil.hpp"
 #include "Game/Util/ActorShadowUtil.hpp"
 #include "Game/Util/DemoUtil.hpp"
@@ -12,6 +12,7 @@
 #include "Game/Util/LiveActorUtil.hpp"
 #include "Game/Util/ModelUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
+#include "Game/Util/PlayerUtil.hpp"
 
 extern XanimeGroupInfo marioAnimeTable[];
 extern XanimeAuxInfo marioAnimeAuxTable[];
@@ -23,7 +24,7 @@ extern XanimeBckTable4 quadAnimeTable[];
 extern XanimeSwapTable luigiAnimeSwapTable[];
 
 OnlinePlayer::OnlinePlayer(const char* pName, GameOnlineClient* pClient)
-    : LiveActor(pName), mClient(pClient), mXanimePlayer(), mXanimePlayerUpper(), mHasJetTurtle(), mIsHidden(true) {}
+    : LiveActor(pName), mClient(pClient), mXanimePlayer(), mXanimePlayerUpper(), mHasJetTurtle(), mIsVisible() {}
 
 void OnlinePlayer::init(const JMapInfoIter& rIter) {
     mPosition.zero();
@@ -32,10 +33,7 @@ void OnlinePlayer::init(const JMapInfoIter& rIter) {
 
     initModelManagerWithAnm("GhostMario", nullptr, true);
 
-    XanimeResourceTable* pResourceTable =
-        new XanimeResourceTable(MR::getResourceHolder(this), marioAnimeTable, marioAnimeAuxTable, marioAnimeOfsTable,
-                                reinterpret_cast< XanimeBckTable* >(singleAnimeTable), doubleAnimeTable, tripleAnimeTable, quadAnimeTable, nullptr);
-
+    XanimeResourceTable* pResourceTable = MR::getPlayerXanimeResource();
     mXanimePlayer = new XanimePlayer(MR::getJ3DModel(this), pResourceTable);
     mXanimePlayer->duplicateSimpleGroup();
     mModelManager->mXanimePlayer = mXanimePlayer;
@@ -59,12 +57,19 @@ void OnlinePlayer::init(const JMapInfoIter& rIter) {
 
     MR::connectToSceneMapObj(this);
     makeActorAppeared();
-    syncHideState();
+
+    MR::startBtk(this, "GhostMario");
+    MR::startBrk(this, "GhostMario");
+
+    updateVisibility();
 }
 
 void OnlinePlayer::movement() {
-    syncHideState();
-    LiveActor::movement();
+    updateVisibility();
+
+    if (mIsVisible) {
+        LiveActor::movement();
+    }
 }
 
 void OnlinePlayer::playAnimation(u32 animHash) {
@@ -88,34 +93,34 @@ void OnlinePlayer::playAnimation(u32 animHash) {
 }
 
 void OnlinePlayer::playAnimationSimple(const char* pAnimName) {
-    // TODO figure this out
     MR::startBck(this, pAnimName);
 }
 
 void OnlinePlayer::setAnimationFrame(f32 frame) {
     mXanimePlayer->_20->setFrame(frame);
     mXanimePlayer->_20->setRate(0.0f);
-    mXanimePlayer->_20->setLoop(J3DFrameCtrl::EMode_RESET);
+    mXanimePlayer->_20->setLoop(J3DFrameCtrl::EMode_NONE);
+    mXanimePlayer->_20->mState = 0;
 }
 
 void OnlinePlayer::setAnimationWeight(u32 track, f32 weight) {
     mXanimePlayer->changeTrackWeight(track, weight);
 }
 
-void OnlinePlayer::syncHideState() {
+void OnlinePlayer::updateVisibility() {
     bool isEqualStage = mClient->isEqualCurrentStage();
 
-    if (mIsHidden) {
+    if (!mIsVisible) {
         if (isEqualStage) {
             MR::showModel(this);
             MR::validateHitSensors(this);
             MR::validateShadowAll(this);
-            mIsHidden = false;
+            mIsVisible = true;
         }
     } else if (!isEqualStage) {
         MR::hideModel(this);
         MR::invalidateHitSensors(this);
         MR::invalidateShadowAll(this);
-        mIsHidden = true;
+        mIsVisible = false;
     }
 }

@@ -138,8 +138,6 @@ void GameScene::init() {
             MR::createSceneObj(SceneObj_CometRetryButton);
         }
 
-        getGameOnlineManager()->initActors();
-
         LightFunction::initLightData();
         initSequences();
         SceneFunction::startActorPlacement();
@@ -150,6 +148,7 @@ void GameScene::init() {
         MR::initEventSystemAfterPlacement();
         MR::endInitLiveActorSystemInfo();
         MR::setInitializeStateAfterPlacement();
+        getGameOnlineManager()->initActors();
         MR::callMethodAllSceneNameObj(&NameObj::initAfterPlacement);
         SleepControlFunc::initSyncSleepController();
 

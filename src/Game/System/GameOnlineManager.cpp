@@ -25,7 +25,6 @@
 TODO
 - disconnects
 - ignore old and interpolate player data packets
-- fix BCK anims
 
 */
 

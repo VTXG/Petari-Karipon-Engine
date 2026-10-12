@@ -16,11 +16,11 @@ public:
     void playAnimationSimple(const char* pAnimName);
     void setAnimationFrame(f32 frame);
     void setAnimationWeight(u32 track, f32 weight);
-    void syncHideState();
+    void updateVisibility();
 
     /* 0x8C */ GameOnlineClient* mClient;
     /* 0x90 */ XanimePlayer* mXanimePlayer;
     /* 0x94 */ XanimePlayer* mXanimePlayerUpper;
     /* 0x98 */ bool mHasJetTurtle;
-    /* 0x99 */ bool mIsHidden;
+    /* 0x99 */ bool mIsVisible;
 };
