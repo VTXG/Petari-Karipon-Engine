@@ -113,8 +113,8 @@ namespace {
 
             for (u32 i = 0; i < pOnlineManager->mSyncPacketQueue.mSize; i++) {
                 GameOnlinePacket* pPacket = &pOnlineManager->mSyncPacketQueue.mPackets[i];
-                rContext.printTextF(false, L" [%d] : ID %d, Type %d, Size %d, Reply %d, %d, %d\n", i, pPacket->mHeader.mPacketID,
-                                    pPacket->mHeader.mType, pPacket->mSize, pPacket->mIsReply[0], pPacket->mIsReply[1], pPacket->mIsReply[2]);
+                rContext.printTextF(false, L" [%d] : ID %d, Type %d, Size %d, Reply %d, %d, %d, %d, %d\n", i, pPacket->mHeader.mPacketID,
+                                    pPacket->mHeader.mType, pPacket->mSize, pPacket->mIsReply[0], pPacket->mIsReply[1], pPacket->mIsReply[2], pPacket->mIsReply[3], pPacket->mIsReply[4]);
             }
         }
     } // namespace OnlinePage

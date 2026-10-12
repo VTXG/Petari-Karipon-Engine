@@ -8,7 +8,7 @@ class OnlinePlayer;
 
 class GameOnlineClient {
 public:
-    static const int MAX_PLAYER_NUM = 4;
+    static const int MAX_PLAYER_NUM = 6;
     static const int INVALID_ID = 0xFF;
 
     GameOnlineClient();

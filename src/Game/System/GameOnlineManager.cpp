@@ -39,8 +39,8 @@ namespace {
         PLAYER_LEAVE_TIMEOUT,
     };
 
-    static const OSTime PING_RATE = 500 / (243000000u / 4 / 1000);
-    static const OSTime PING_TIMEOUT = 3 * (243000000u / 4);
+    static const OSTime PING_RATE = 500 * (243000000u / 4 / 1000);
+    static const OSTime PING_TIMEOUT = 3000 * (243000000u / 4 / 1000);
 
     NetworkSystemWrapper* getNetworkSystem() {
         return SingletonHolder< GameSystem >::get()->mObjHolder->mNetworkSystem;
@@ -93,8 +93,8 @@ GameOnlineManager::GameOnlineManager()
     : NerveExecutor("GameOnlineManager"), mOnlineHeap(), mServerAddress(), mSocket(-1), mRoomState(ROOM_STATE_DISCONNECTED),
       mClients(GameOnlineClient::MAX_PLAYER_NUM), mRecvPacket(), mSendPacket(), mSyncPacketQueue() {
     mServerAddress.mIP.mOctets[0] = 10;
-    mServerAddress.mIP.mOctets[1] = 207;
-    mServerAddress.mIP.mOctets[2] = 154;
+    mServerAddress.mIP.mOctets[1] = 193;
+    mServerAddress.mIP.mOctets[2] = 56;
     mServerAddress.mIP.mOctets[3] = 239;
     mServerAddress.mPort = 8787;
 
@@ -195,20 +195,7 @@ void GameOnlineManager::updateSyncPackets() {
                 pNetworkSystem->send(mSocket, pPacket->mBuffer, pPacket->getTotalSize(), SO_MSG_NONBLOCK, pClient->mAddress);
             }
         } else {
-            u8 localID = GameOnlineClient::INVALID_ID;
-
-            for (u8 i = 1; i < GameOnlineClient::MAX_PLAYER_NUM; i++) {
-                GameOnlineClient* pClient = getClientByLocalID(i);
-
-                if (!pClient->isValid()) {
-                    continue;
-                }
-
-                if (pClient->mAddress == pPacket->mAddress) {
-                    localID = i;
-                    break;
-                }
-            }
+            u8 localID = getLocalIDByAddress(pPacket->mAddress);
 
             if (localID != GameOnlineClient::INVALID_ID && !pPacket->testReplyState(localID)) {
                 isPop = false;
@@ -262,6 +249,22 @@ u8 GameOnlineManager::getLocalIDByGlobalID(u8 globalID) {
 
     if (pClient != nullptr) {
         return pClient - mClients.mArr;
+    }
+
+    return GameOnlineClient::INVALID_ID;
+}
+
+u8 GameOnlineManager::getLocalIDByAddress(const SockAddress& rAddress) {
+    for (u8 localID = 0; localID < GameOnlineClient::MAX_PLAYER_NUM; localID++) {
+        GameOnlineClient* pClient = getClientByLocalID(localID);
+
+        if (!pClient->isValid()) {
+            continue;
+        }
+
+        if (pClient->mAddress == rAddress) {
+            return localID;
+        }
     }
 
     return GameOnlineClient::INVALID_ID;
@@ -557,6 +560,11 @@ void GameOnlineManager::sendReply(u32 packetID, const SockAddress& rAddress) {
 }
 
 void GameOnlineManager::sendRoomJoinInfo(const SockAddress& rAddress) {
+    if (getLocalIDByAddress(rAddress) != GameOnlineClient::INVALID_ID) {
+        OSReport("[%s:%d] Duplicate join request\n", __FILE__, __LINE__);
+        return;
+    }
+
     u8 globalID = getFreeClientGlobalID();
     if (globalID == GameOnlineClient::INVALID_ID) {
         return;

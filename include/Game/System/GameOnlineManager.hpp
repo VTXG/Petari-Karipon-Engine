@@ -35,6 +35,7 @@ public:
         return &mClients[0];
     }
     u8 getLocalIDByGlobalID(u8 globalID);
+    u8 getLocalIDByAddress(const SockAddress& rAddress);
     u8 getFreeClientGlobalID();
     u8 getConnectedClientNum();
     bool isAllClientConnected();
