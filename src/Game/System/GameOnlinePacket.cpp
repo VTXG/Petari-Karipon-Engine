@@ -71,7 +71,10 @@ void GameOnlinePacket::write(const void* pData, s32 size) {
 }
 
 void GameOnlinePacket::reset() {
+    mHeader.mSize = 0;
+    mHeader.mChecksum = 0;
     mHeader.mPacketID = INVALID_PACKET_ID;
+    mHeader.mTimestamp = 0;
     mPosition = 0;
     mSize = 0;
     mAddress = SockAddress();

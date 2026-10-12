@@ -129,6 +129,14 @@ struct SockAddress {
         mIP.mAddress = 0;
     }
 
+    bool operator==(const SockAddress& rOther) {
+        return mIP.mAddress == rOther.mIP.mAddress && mPort == rOther.mPort;
+    }
+
+    bool operator!=(const SockAddress& rOther) {
+        return !(*this == rOther);
+    }
+
     /* 0x00 */ u8 mLength;
     /* 0x01 */ u8 mFamily;
     /* 0x02 */ u16 mPort;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Game/System/NetworkSystemWrapper.hpp"
 #include "Game/System/GameOnlineClient.hpp"
+#include "Game/System/NetworkSystemWrapper.hpp"
 #include <revolution/os/OSTime.h>
 #include <revolution/types.h>
 
@@ -62,8 +62,17 @@ public:
     }
 
     void setTargetAddress(const SockAddress& rAddress) {
-        mIsBroadcast = false;
         mAddress = rAddress;
+        mIsBroadcast = false;
+        mIsNeedEqualStage = false;
+    }
+
+    void onReplyState(u8 localID) {
+        mIsReply[localID - 1] = true;
+    }
+
+    bool testReplyState(u8 localID) const {
+        return mIsReply[localID - 1];
     }
 
     u32 getTotalSize() const {
