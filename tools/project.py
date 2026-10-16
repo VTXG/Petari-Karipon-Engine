@@ -347,7 +347,7 @@ def check_path_case(path: Path):
             sys.exit(f"Cannot resolve: {path}")
 
     if path != curr:
-        print(f"⚠️  Case mismatch: expected={path} actual={curr}")
+        print(f"Case mismatch: expected={path} actual={curr}")
 
 
 def make_flags_str(flags: Optional[List[str]]) -> str:
@@ -1320,7 +1320,10 @@ def generate_build_ninja(
     # Default rule
     ###
     n.comment("Default rule")
-    n.default(link_outputs)
+    if build_config:
+        n.default(link_outputs)
+    else:
+        n.default(build_config_path)
 
     # Write build.ninja
     with open("build.ninja", "w", encoding="utf-8") as f:
