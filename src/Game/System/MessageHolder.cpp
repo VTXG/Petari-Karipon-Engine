@@ -4,12 +4,16 @@
 #include "Game/System/GameSystemObjHolder.hpp"
 #include "Game/Util/FileUtil.hpp"
 #include "Game/Util/SystemUtil.hpp"
+#include "revolution/types.h"
 #include <JSystem/JKernel/JKRArchive.hpp>
+#include <cstdlib>
 
 #define SYSTEMMESSAGE_ARC "/Memory/SystemMessage.arc"
 #define MESSAGE_ARC "/MessageData/Message.arc"
 
 namespace {
+    static wchar_t sErrorMessageBuffer[128];
+
     u8* getBlock(u32 magic, u8* pData) {
         u32 numBlocks = *reinterpret_cast< u32* >(pData + 0xc);
         pData += 0x20;
@@ -38,6 +42,13 @@ bool MessageData::getMessageDirect(TalkMessageInfo* pMessageInfo, const char* pM
         return true;
     }
 
+    s32 len = strlen(pMessage) + 1;
+    if (len > ARRAY_SIZE(sErrorMessageBuffer)) {
+        len = ARRAY_SIZE(sErrorMessageBuffer);
+    }
+
+    mbstowcs(sErrorMessageBuffer, pMessage, len);
+    pMessageInfo->_0 = reinterpret_cast< u8* >(sErrorMessageBuffer);
     return false;
 }
 
