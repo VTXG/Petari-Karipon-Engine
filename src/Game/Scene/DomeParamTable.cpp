@@ -10,8 +10,8 @@ namespace {
 
 namespace DomeParamTable {
     void init() {
-        void* pFileData = MR::receiveFile("/SystemData/DomeParamTable.byaml");
-        sDomeParamTable = ByamlUtil::createByamlRoot(static_cast< u8* >(pFileData));
+        void* fileData = MR::receiveFile("/SystemData/DomeParamTable.byaml");
+        sDomeParamTable = ByamlUtil::createByamlRoot(static_cast< u8* >(fileData));
     }
 
     s32 getDomeNum() {

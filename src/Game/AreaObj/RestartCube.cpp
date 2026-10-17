@@ -4,6 +4,7 @@
 #include "Game/AudioLib/AudWrap.hpp"
 #include "Game/GameAudio/AudStageBgmTable.hpp"
 #include "Game/System/GameDataTemporaryInGalaxy.hpp"
+#include "Game/System/GameSequenceFunction.hpp"
 #include "Game/Util/DemoUtil.hpp"
 #include "Game/Util/JMapIdInfo.hpp"
 #include "Game/Util/PlayerUtil.hpp"
@@ -25,6 +26,10 @@ void RestartCube::init(const JMapInfoIter& rIter) {
 
 void RestartCube::updatePlayerRestartIdInfo() {
     if (mObjArg3 == -1 || MR::isOnGroundPlayer()) {
+        if (*MR::getPlayerRestartIdInfo() != *mIdInfo) {
+            GameSequenceFunction::saveTemporaryTicoCoin();
+        }
+
         MR::setPlayerRestartIdInfo(*mIdInfo);
 
         if (!_48 && !MR::isCubeBgmChangeInvalid() && _40 >= 0) {

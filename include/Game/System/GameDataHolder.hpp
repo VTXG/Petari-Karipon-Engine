@@ -40,6 +40,7 @@ public:
     bool hasPowerStar(const char*, s32) const;
     bool hasGrandStar(int) const;
     void setPowerStar(const char*, s32, bool);
+    bool isTicoCoinCollected(const char* pGalaxyName, s32 id) const;
     s32 getPowerStarNumOwned(const char*) const;
     s32 calcCurrentPowerStarNum() const;
     GameDataSomeScenarioAccessor makeGalaxyScenarioAccessor(const char*, s32);

@@ -1993,6 +1993,9 @@ config.libs = [
             Object(MatchingFor(ALL), "Game/MapObj/MapPartsRotator.cpp"),
             Object(MatchingFor(), "Game/MapObj/MapPartsSeesaw1AxisRotator.cpp"),
             Object(MatchingFor(KOR), "Game/MapObj/MapPartsSeesaw2AxisRotator.cpp"),
+
+            # Karipon
+            Object(MatchingFor(), "Game/MapObj/TicoCoin.cpp"),
         ],
     ),
     GameLib(

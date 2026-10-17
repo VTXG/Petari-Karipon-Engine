@@ -54,6 +54,7 @@ namespace GameDataFunction {
     void addStarPiece(int);
     void setLast1upStarPieceNum(int);
     s32 getLast1upStarPieceNum();
+    bool isTicoCoinCollected(const char*, s32);
     const wchar_t* getUserName();
     u16 getUserFileIndex();
     void resetAllGameData();

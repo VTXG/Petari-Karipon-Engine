@@ -317,6 +317,7 @@ bool GameSequenceProgress::isCometStar(GalaxyMoveArgument moveArg) {
 void GameSequenceProgress::updateGameDataBeforeChangeScene() {
     if (GameSequenceFunction::hasStageResultSequence() && GameSequenceFunction::isPowerStarAtResultSequence("KoopaBattleVs3Galaxy", 1)) {
         GameSequenceFunction::reflectStageResultSequenceCoin();
+        GameSequenceFunction::reflectStageResultSequenceTicoCoin();
 
         GameDataFunction::addStockedStarPiece(GameSequenceFunction::getClearedStarPieceNum());
 

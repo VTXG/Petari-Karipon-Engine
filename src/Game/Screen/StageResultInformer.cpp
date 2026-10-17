@@ -27,6 +27,7 @@ namespace {
     const char cMessageIdGetPictureBook[] = "System_Result005";
     const char cMessageIdUpdateBestScore[] = "System_Result006";
     const char cMessageIdTicoGalaxyAppear[] = "System_Result007";
+    const char cMessageIdTicoCoin[] = "System_Result010";
     const char cNamePowerStarNum[] = "ShaStarNum";
     const char cNameGalaxyStarPieceNum[] = "ShaTPieceLNum";
     const char cNameTotalStarPieceNum[] = "ShaTPieceRNum";
@@ -51,6 +52,7 @@ namespace {
     NEW_NERVE(StageResultInformerDisplayGetStarPiece, StageResultInformer, DisplayGetStarPiece);
     NEW_NERVE(StageResultInformerWaitBeforeDisappearGetStarPiece, StageResultInformer, WaitBeforeDisappearGetStarPiece);
     NEW_NERVE(StageResultInformerDisappearGetStarPiece, StageResultInformer, DisappearGetStarPiece);
+    NEW_NERVE(StageResultInformerShowTicoCoin, StageResultInformer, ShowTicoCoin);
     NEW_NERVE(StageResultInformerShowNewGalaxyDiscover, StageResultInformer, ShowNewGalaxyDiscover);
     NEW_NERVE(StageResultInformerShowGalaxyMap, StageResultInformer, ShowGalaxyMap);
     NEW_NERVE(StageResultInformerShowGetPictureBook, StageResultInformer, ShowGetPictureBook);
@@ -330,6 +332,17 @@ void StageResultInformer::exeDisappearGetStarPiece() {
     }
 }
 
+void StageResultInformer::exeShowTicoCoin() {
+    // TODO add some fancy ass layout that displays the comet medals and stuff
+    GameSequenceFunction::reflectStageResultSequenceTicoCoin();
+    tryShowAndKeyWaitInformationWindow(::cMessageIdTicoCoin, nullptr);
+
+    // if (MR::isFirstStep(this)) {
+    //     mIconAButton->openWithoutMessage();
+    // }
+    // decideNextNerve();
+}
+
 void StageResultInformer::exeShowNewGalaxyDiscover() {
     tryShowAndKeyWaitInformationWindow(::cMessageIdNewGalaxyDiscover, GET_NERVE_ANON(StageResultInformerShowGalaxyMap));
 }
@@ -399,7 +412,8 @@ void StageResultInformer::decideNextNerve() {
     bool afterComplete = afterStar || isNerve(GET_NERVE_ANON(StageResultInformerShowGalaxyComplete));
     bool afterScore = afterComplete || isNerve(GET_NERVE_ANON(StageResultInformerDisappearUpdateBestScore));
     bool afterPiece = afterScore || isNerve(GET_NERVE_ANON(StageResultInformerDisappearGetStarPiece));
-    bool afterMap = afterPiece || isNerve(GET_NERVE_ANON(StageResultInformerShowGalaxyMap));
+    bool afterTicoCoin = afterScore || isNerve(GET_NERVE_ANON(StageResultInformerShowTicoCoin));
+    bool afterMap = afterTicoCoin || isNerve(GET_NERVE_ANON(StageResultInformerShowGalaxyMap));
     bool afterBook = afterMap || isNerve(GET_NERVE_ANON(StageResultInformerShowGetPictureBook));
 
     if (afterStar && mSequenceChecker->isJustCompleteGalaxy()) {
@@ -410,6 +424,8 @@ void StageResultInformer::decideNextNerve() {
         setNerve(GET_NERVE_ANON(StageResultInformerAppearGetStarPiece));
     } else if (afterPiece && mSequenceChecker->isJustOpenGalaxyWithoutChallengeGalaxy()) {
         setNerve(GET_NERVE_ANON(StageResultInformerShowNewGalaxyDiscover));
+    } else if (afterTicoCoin && GameSequenceFunction::isNeedToReflectStageResultSequenceTicoCoin()) {
+        setNerve(GET_NERVE_ANON(StageResultInformerShowTicoCoin));
     } else if (afterMap && mSequenceChecker->isAddPictureBook()) {
         setNerve(GET_NERVE_ANON(StageResultInformerShowGetPictureBook));
     } else if (afterBook && mSequenceChecker->isJustAppearTicoGalaxy()) {

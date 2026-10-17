@@ -28,6 +28,10 @@ public:
         return ret;
     }
 
+    inline bool operator!=(const JMapIdInfo& rOther) const {
+        return !(*this == rOther);
+    }
+
     s32 _0;
     s32 mZoneID;
 };

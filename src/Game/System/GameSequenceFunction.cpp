@@ -18,6 +18,10 @@
 #include "Game/Util/StringUtil.hpp"
 
 namespace {
+    GameDataHolder* getGameDataHolder() {
+        return SingletonHolder< GameSystem >::get()->mSequenceDirector->getGameDataHolder();
+    }
+
     GameSequenceProgress* getGameSequenceProgress() NO_INLINE {
         return SingletonHolder< GameSystem >::get()->mSequenceDirector->mGameSequenceProgress;
     }
@@ -124,8 +128,8 @@ namespace GameSequenceFunction {
         ::getGameSequenceProgress()->requestCancelScenarioSelect();
     }
 
-    void sendStageResultSequenceParam(const char* pStageName, s32 powerStarId, int starPieceNum, int coinNum) {
-        ::getGameDataTemporaryInGalaxy()->receiveStageResultParam(pStageName, powerStarId, starPieceNum, coinNum);
+    void sendStageResultSequenceParam(const char* pStageName, s32 powerStarId, int starPieceNum, int coinNum, u8 ticoCoinFlag) {
+        ::getGameDataTemporaryInGalaxy()->receiveStageResultParam(pStageName, powerStarId, starPieceNum, coinNum, ticoCoinFlag);
     }
 
     bool hasStageResultSequence() {
@@ -146,6 +150,22 @@ namespace GameSequenceFunction {
 
     int getClearedCoinNum() {
         return ::getGameDataTemporaryInGalaxy()->mCoinNum;
+    }
+
+    void onTicoCoinCollected(s32 id) {
+        ::getGameDataTemporaryInGalaxy()->onTicoCoinCollected(id);
+    }
+
+    bool isTicoCoinCollected(s32 id) {
+        return ::getGameDataTemporaryInGalaxy()->isTicoCoinCollected(id);
+    }
+
+    u8 getTicoCoinCollectedFlag() {
+        return ::getGameDataTemporaryInGalaxy()->getTicoCoinCollectedFlag();
+    }
+
+    void saveTemporaryTicoCoin() {
+        ::getGameDataTemporaryInGalaxy()->saveTemporaryTicoCoin();
     }
 
     bool hasPowerStarYetAtResultSequence() {
@@ -186,12 +206,25 @@ namespace GameSequenceFunction {
         return getClearedStarPieceNum() != 0;
     }
 
+    bool isNeedToReflectStageResultSequenceTicoCoin() {
+        u8 ticoCoinFlag = getTicoCoinCollectedFlag();
+
+        GameDataSomeScenarioAccessor accessor = ::getGameDataHolder()->makeGalaxyScenarioAccessor(getClearedStageName(), getClearedPowerStarId());
+        return (ticoCoinFlag & ~accessor.getTicoCoinFlag()) != 0;
+    }
+
     void reflectStageResultSequenceCoin() {
         u32 clearedCoinNum = getClearedCoinNum();
-        GameDataHolder* pGameDataHolder = SingletonHolder< GameSystem >::get()->mSequenceDirector->getGameDataHolder();
 
-        GameDataSomeScenarioAccessor accessor = pGameDataHolder->makeGalaxyScenarioAccessor(getClearedStageName(), getClearedPowerStarId());
+        GameDataSomeScenarioAccessor accessor = ::getGameDataHolder()->makeGalaxyScenarioAccessor(getClearedStageName(), getClearedPowerStarId());
         accessor.updateMaxCoinNum(clearedCoinNum);
+    }
+
+    void reflectStageResultSequenceTicoCoin() {
+        u8 ticoCoinFlag = getTicoCoinCollectedFlag();
+
+        GameDataSomeScenarioAccessor accessor = ::getGameDataHolder()->makeGalaxyScenarioAccessor(getClearedStageName(), getClearedPowerStarId());
+        accessor.updateTicoCoinFlag(ticoCoinFlag);
     }
 
     void resetStageResultSequenceParam() {

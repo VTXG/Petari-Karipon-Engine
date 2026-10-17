@@ -28,12 +28,16 @@ namespace GameSequenceFunction {
     void requestChangeScene(const char*);
     void requestGalaxyMove(const GalaxyMoveArgument&);
     void requestCancelScenarioSelect();
-    void sendStageResultSequenceParam(const char*, s32, int, int);
+    void sendStageResultSequenceParam(const char*, s32, int, int, u8);
     bool hasStageResultSequence() NO_INLINE;
     const char* getClearedStageName() NO_INLINE;
     s32 getClearedPowerStarId();
     int getClearedStarPieceNum();
     int getClearedCoinNum();
+    void onTicoCoinCollected(s32 id);
+    bool isTicoCoinCollected(s32 id);
+    u8 getTicoCoinCollectedFlag();
+    void saveTemporaryTicoCoin();
     bool hasPowerStarYetAtResultSequence();
     bool isPowerStarAtResultSequence(const char*, s32);
     bool isPowerStarGreenAtResultSequence();
@@ -41,7 +45,9 @@ namespace GameSequenceFunction {
     bool isGrandStarAtResultSequence();
     bool hasRetryGalaxySequence();
     bool isNeedToReflectStageResultSequenceStarPiece();
+    bool isNeedToReflectStageResultSequenceTicoCoin();
     void reflectStageResultSequenceCoin();
+    void reflectStageResultSequenceTicoCoin();
     void resetStageResultSequenceParam();
     void startPreLoadSaveDataSequence();
     void startTotalMailSizeSaveSequence();

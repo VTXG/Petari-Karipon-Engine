@@ -13,8 +13,8 @@
 AudSceneMgr::AudSceneMgr(JAUSectionHeap* pSectionHeap)
     : mSectionHeap(pSectionHeap), _4(), mStaticResource(), mStageResource(), mWaveSetStage(), mWaveSetScenario(), mPlayerMode(), mPrevPlayerMode(),
       mIsNewPlayerMode(), _1D() {
-    void* pFileData = MR::receiveFile("/SystemData/StageWaveTable.byaml");
-    ByamlIter root = ByamlUtil::createByamlRoot(static_cast< u8* >(pFileData));
+    void* fileData = MR::receiveFile("/SystemData/StageWaveTable.byaml");
+    ByamlIter root = ByamlUtil::createByamlRoot(static_cast< u8* >(fileData));
 
     mStaticResource = root["StaticResource"];
     mStageResource = root["StageResource"];
@@ -92,19 +92,19 @@ void AudSceneMgr::loadWaveSet(const ByamlIter& rWaveSet) {
     s32 size = rWaveSet.getSize();
 
     for (s32 i = 0; i < size; i++) {
-        const char* pName = nullptr;
-        rWaveSet.tryGetValueByIndex(i, &pName);
+        const char* name = nullptr;
+        rWaveSet.tryGetValueByIndex(i, &name);
 
-        if (MR::isNullOrEmptyString(pName)) {
+        if (MR::isNullOrEmptyString(name)) {
             continue;
         }
 
-        s32 bankNo = findWaveBankNo(pName);
+        s32 bankNo = findWaveBankNo(name);
         if (bankNo != -1) {
             mSectionHeap->loadWaveArc(bankNo);
-            OSReport("[%s] Loaded %s\n", __FILE__, pName);
+            OSReport("[%s] Loaded %s\n", __FILE__, name);
         } else {
-            OSReport("[%s] Failed loading %s\n", __FILE__, pName);
+            OSReport("[%s] Failed loading %s\n", __FILE__, name);
         }
     }
 }
@@ -117,19 +117,19 @@ void AudSceneMgr::eraseWaveSet(const ByamlIter& rWaveSet) {
     s32 size = rWaveSet.getSize();
 
     for (s32 i = size - 1; i >= 0; i--) {
-        const char* pName = nullptr;
-        rWaveSet.tryGetValueByIndex(i, &pName);
+        const char* name = nullptr;
+        rWaveSet.tryGetValueByIndex(i, &name);
 
-        if (MR::isNullOrEmptyString(pName)) {
+        if (MR::isNullOrEmptyString(name)) {
             continue;
         }
 
-        s32 bankNo = findWaveBankNo(pName);
+        s32 bankNo = findWaveBankNo(name);
         if (bankNo != -1) {
             mSectionHeap->eraseWaveArc(bankNo);
-            OSReport("[%s] Erased %s\n", __FILE__, pName);
+            OSReport("[%s] Erased %s\n", __FILE__, name);
         } else {
-            OSReport("[%s] Failed erasing %s\n", __FILE__, pName);
+            OSReport("[%s] Failed erasing %s\n", __FILE__, name);
         }
     }
 }
@@ -142,14 +142,14 @@ bool AudSceneMgr::isLoadDoneWaveSet(const ByamlIter& rWaveSet) const {
     s32 size = rWaveSet.getSize();
 
     for (s32 i = 0; i < size; i++) {
-        const char* pName = nullptr;
-        rWaveSet.tryGetValueByIndex(i, &pName);
+        const char* name = nullptr;
+        rWaveSet.tryGetValueByIndex(i, &name);
 
-        if (MR::isNullOrEmptyString(pName)) {
+        if (MR::isNullOrEmptyString(name)) {
             continue;
         }
 
-        s32 bankNo = findWaveBankNo(pName);
+        s32 bankNo = findWaveBankNo(name);
         if (bankNo != -1 && !mSectionHeap->isWaveLoaded(bankNo, 0)) {
             return false;
         }
@@ -215,15 +215,15 @@ s32 AudSceneMgr::findWaveBankNo(const char* pWaveArcName) const {
             continue;
         }
 
-        JASWaveBank* pWaveBank = mSectionHeap->getWaveBankTable().getWaveBank(bankNo);
-        if (pWaveBank == nullptr) {
+        JASWaveBank* waveBank = mSectionHeap->getWaveBankTable().getWaveBank(bankNo);
+        if (waveBank == nullptr) {
             continue;
         }
 
-        for (u32 i = 0; i < pWaveBank->getArcCount(); i++) {
-            JASWaveArc* pWaveArc = pWaveBank->getWaveArc(i);
+        for (u32 i = 0; i < waveBank->getArcCount(); i++) {
+            JASWaveArc* waveArc = waveBank->getWaveArc(i);
 
-            if (pWaveArc->mEntryNum == entryNum) {
+            if (waveArc->mEntryNum == entryNum) {
                 return bankNo;
             }
         }

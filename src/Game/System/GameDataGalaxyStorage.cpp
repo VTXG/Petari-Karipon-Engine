@@ -14,7 +14,7 @@ namespace {
         *static_cast< u16* >(pData) = value;
         return sizeof(value);
     }
-};  // namespace
+}; // namespace
 
 bool GameDataSomeScenarioAccessor::hasPowerStar() const {
     return mSomeGalaxyStorage->hasPowerStar(mScenarioNum - 1);
@@ -44,6 +44,14 @@ void GameDataSomeScenarioAccessor::updateMaxCoinNum(int coinNum) {
     }
 }
 
+u8 GameDataSomeScenarioAccessor::getTicoCoinFlag() const {
+    return mSomeGalaxyStorage->mTicoCoinFlag;
+}
+
+void GameDataSomeScenarioAccessor::updateTicoCoinFlag(u8 flag) {
+    mSomeGalaxyStorage->mTicoCoinFlag |= flag;
+}
+
 void GameDataSomeScenarioAccessor::setBitFlagAccordingToBool(u8* pFlags, bool val) {
     if (val) {
         *pFlags |= (1 << (mScenarioNum - 1));
@@ -61,7 +69,7 @@ GameDataSomeGalaxyStorage::GameDataSomeGalaxyStorage(const GalaxyStatusAccessor&
 void GameDataSomeGalaxyStorage::resetAllData() {
     mPowerStarOwnedFlags = 0b00000000;
     mAlreadyVisitedFlags = 0b00000000;
-    _A = 0;
+    mTicoCoinFlag = 0b00000000;
     _B = 0;
 
     for (s32 idx = 0; idx < 8; idx++) {
@@ -92,6 +100,13 @@ s32 GameDataSomeGalaxyStorage::deserialize(const BinaryDataContentAccessor& rAcc
         mAlreadyVisitedFlags = *firstPlayFlags;
     } else {
         mAlreadyVisitedFlags = 0b00000000;
+    }
+
+    u8* ticoCoinFlag = (u8*)rAccessor.getPointer("mTicoCoinFlag", (u8*)pData);
+    if (ticoCoinFlag != nullptr) {
+        mTicoCoinFlag = *ticoCoinFlag;
+    } else {
+        mTicoCoinFlag = 0b00000000;
     }
 
     u16* maxCoinNums = (u16*)rAccessor.getPointer("mMaxCoinNum", (u8*)pData);
@@ -162,6 +177,10 @@ GameDataSomeGalaxyStorage* GameDataAllGalaxyStorage::getGalaxyStorage(int index)
     return mSomeGalaxyStorages[index];
 }
 
+GameDataSomeGalaxyStorage* GameDataAllGalaxyStorage::getGalaxyStorage(const char* pGalaxyName) {
+    return mSomeGalaxyStorages[findIndex(pGalaxyName)];
+}
+
 u32 GameDataAllGalaxyStorage::makeHeaderHashCode() const {
     return 0xBF0640EE;
 }
@@ -215,6 +234,7 @@ void GameDataAllGalaxyStorage::initHeaderSerializer() {
     mHeaderSerializer->addAttribute("mGalaxyName", sizeof(u16));
     mHeaderSerializer->addAttribute("mPowerStarFlag", sizeof(u8));
     mHeaderSerializer->addAttribute("mFirstPlayFlag", sizeof(u8));
+    mHeaderSerializer->addAttribute("mTicoCoinFlag", sizeof(u8));
     mHeaderSerializer->addAttribute("mMaxCoinNum", sizeof(u16) * 8);
     mHeaderSerializer->flush();
 }
@@ -243,6 +263,9 @@ void GameDataSomeGalaxyStorage::serialize(const BinaryDataContentAccessor& rAcce
 
     u8* firstPlayFlags = (u8*)rAccessor.getPointer("mFirstPlayFlag", pData);
     *firstPlayFlags = mAlreadyVisitedFlags;
+
+    u8* ticoCoinFlag = (u8*)rAccessor.getPointer("mTicoCoinFlag", pData);
+    *ticoCoinFlag = mTicoCoinFlag;
 
     u16* maxCoinNums = (u16*)rAccessor.getPointer("mMaxCoinNum", pData);
     for (s32 idx = 0; idx < 8; idx++) {

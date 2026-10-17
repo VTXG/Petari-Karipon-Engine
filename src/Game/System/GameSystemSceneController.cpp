@@ -123,7 +123,7 @@ void GameSystemSceneController::initializeScene() {
         u32 fileCacheSize = 0x1040400;
 
         ByamlIter params;
-        if (StageParamTable::tryGetParams(&params, mNextSceneControlInfo.mStage, mNextSceneControlInfo.mScenarioNo)) {
+        if (StageParamTable::findParams(&params, mNextSceneControlInfo.mStage, mNextSceneControlInfo.mScenarioNo)) {
             params.tryGetValueByKey("FileCacheSize", &fileCacheSize);
         }
 

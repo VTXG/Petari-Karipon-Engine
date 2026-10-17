@@ -4,5 +4,6 @@
 
 namespace StageParamTable {
     void init();
-    bool tryGetParams(ByamlIter* pIter, const char* pStageName, s32 scenarioNo);
+    bool findParams(ByamlIter* pIter, const char* pStageName, s32 scenarioNo);
+    bool findParamsCommon(ByamlIter* pIter, const char* pStageName);
 }

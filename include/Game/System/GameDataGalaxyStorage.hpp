@@ -24,6 +24,11 @@ public:
         return (mAlreadyVisitedFlags & (1 << scenarioNo)) != 0;
     }
 
+    bool isTicoCoinCollected(s32 id) const {
+        u8 mask = (1 << id) & 0xFF;
+        return (mTicoCoinFlag & mask) != 0;
+    }
+
     u16 getMaxCoinNum(int scenarioNo) const {
         return mMaxCoinNum[scenarioNo];
     }
@@ -36,7 +41,7 @@ public:
     /* 0x04 */ s32 mPowerStarNum;
     /* 0x08 */ u8 mPowerStarOwnedFlags;
     /* 0x09 */ u8 mAlreadyVisitedFlags;
-    /* 0x0A */ u8 _A;
+    /* 0x0A */ u8 mTicoCoinFlag;
     /* 0x0B */ u8 _B;
     /* 0x0C */ u16 mMaxCoinNum[8];
 };
@@ -52,6 +57,8 @@ public:
     void setPowerStarFlag(bool);
     void setFlagAlreadyVisited(bool);
     void updateMaxCoinNum(int);
+    u8 getTicoCoinFlag() const;
+    void updateTicoCoinFlag(u8 flag);
 
     void setBitFlagAccordingToBool(u8*, bool);
 
@@ -83,6 +90,7 @@ public:
     s32 getPowerStarNumOwned(const char*) const;
     s32 getGalaxyNum() const;
     GameDataSomeGalaxyStorage* getGalaxyStorage(int);
+    GameDataSomeGalaxyStorage* getGalaxyStorage(const char*);
     void initHeaderSerializer();
     s32 findIndex(const char*) const;
     s32 findIndex(u16) const;

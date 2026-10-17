@@ -42,6 +42,7 @@ public:
     void exeDisplayGetStarPiece();
     void exeWaitBeforeDisappearGetStarPiece();
     void exeDisappearGetStarPiece();
+    void exeShowTicoCoin();
     void exeShowNewGalaxyDiscover();
     void exeShowGalaxyMap();
     void exeShowGetPictureBook();

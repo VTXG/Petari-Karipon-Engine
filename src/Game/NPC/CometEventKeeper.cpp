@@ -14,12 +14,12 @@ void CometEventKeeper::init() {
     initCometStatus();
 
     ByamlIter params;
-    bool isExistParams = StageParamTable::tryGetParams(&params, MR::getCurrentStageName(), MR::getCurrentScenarioNo());
+    bool isFindParams = StageParamTable::findParams(&params, MR::getCurrentStageName(), MR::getCurrentScenarioNo());
 
     if (isStartEvent("Red") || isStartEvent("Black")) {
         u32 timeLimit = 0;
 
-        if (isExistParams) {
+        if (isFindParams) {
             params.tryGetValueByKey("TimeLimit", &timeLimit);
         }
 
@@ -28,17 +28,17 @@ void CometEventKeeper::init() {
         mExecutorTimeLimit->kill();
     }
 
-    const char* pCometFilterName = mCometName;
+    const char* cometFilterName = mCometName;
 
-    if (isExistParams) {
-        params.tryGetValueByKey("CometFilter", &pCometFilterName);
+    if (isFindParams) {
+        params.tryGetValueByKey("CometFilter", &cometFilterName);
     }
 
-    if (pCometFilterName != nullptr) {
+    if (cometFilterName != nullptr) {
         mScreenFilter = new GalaxyCometScreenFilter();
         mScreenFilter->initWithoutIter();
         mScreenFilter->_20 = true;
-        mScreenFilter->setCometType(pCometFilterName);
+        mScreenFilter->setCometType(cometFilterName);
     }
 }
 

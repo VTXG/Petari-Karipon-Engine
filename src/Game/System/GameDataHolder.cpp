@@ -187,6 +187,10 @@ void GameDataHolder::setPowerStar(const char* pGalaxyName, s32 scenarioNum, bool
     makeGalaxyScenarioAccessor(pGalaxyName, scenarioNum).setPowerStarFlag(set);
 }
 
+bool GameDataHolder::isTicoCoinCollected(const char* pGalaxyName, s32 id) const {
+    return mAllGalaxyStorage->getGalaxyStorage(pGalaxyName)->isTicoCoinCollected(id);
+}
+
 s32 GameDataHolder::getPowerStarNumOwned(const char* pGalaxyName) const {
     return mAllGalaxyStorage->getPowerStarNumOwned(pGalaxyName);
 }

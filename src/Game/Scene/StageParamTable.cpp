@@ -10,17 +10,27 @@ namespace {
 
 namespace StageParamTable {
     void init() {
-        void* pFileData = MR::receiveFile("/SystemData/StageParamTable.byaml");
-        sStageParamTable = ByamlUtil::createByamlRoot(static_cast< u8* >(pFileData));
+        void* fileData = MR::receiveFile("/SystemData/StageParamTable.byaml");
+        sStageParamTable = ByamlUtil::createByamlRoot(static_cast< u8* >(fileData));
     }
 
-    bool tryGetParams(ByamlIter* pIter, const char* pStageName, s32 scenarioNo) {
+    bool findParams(ByamlIter* pIter, const char* pStageName, s32 scenarioNo) {
         ByamlIter stageEntry;
 
         if (sStageParamTable.tryGetIterByKey(pStageName, &stageEntry)) {
             char key[16];
             snprintf(key, sizeof(key), "Scenario%d", scenarioNo);
             return stageEntry.tryGetIterByKey(key, pIter) || stageEntry.tryGetIterByKey("Common", pIter);
+        }
+
+        return false;
+    }
+
+    bool findParamsCommon(ByamlIter* pIter, const char* pStageName) {
+        ByamlIter stageEntry;
+
+        if (sStageParamTable.tryGetIterByKey(pStageName, &stageEntry)) {
+            return stageEntry.tryGetIterByKey("Common", pIter);
         }
 
         return false;

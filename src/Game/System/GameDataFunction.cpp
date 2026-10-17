@@ -232,6 +232,10 @@ namespace GameDataFunction {
         return ::getGameDataTemporaryInGalaxy()->mLast1upStarPieceNum;
     }
 
+    bool isTicoCoinCollected(const char* pGalaxyName, s32 id) {
+        return getCurrentGameDataHolder()->isTicoCoinCollected(pGalaxyName, id);
+    }
+
     const wchar_t* getUserName() {
         return ::getSaveDataHandleSequence()->getCurrentUserFile()->mUserName;
     }
@@ -324,11 +328,13 @@ namespace GameDataFunction {
         ::getGameDataTemporaryInGalaxy()->clearAlreadyDoneFlag();
         ::getGameDataTemporaryInGalaxy()->resetStageResultStarPieceParam();
         ::getGameDataTemporaryInGalaxy()->resetStageResultCoinParam();
+        ::getGameDataTemporaryInGalaxy()->resetStageResultTicoCoinParam(true);
     }
 
     void resetGameDataGoToGalaxyRetry() {
         ::getGameDataTemporaryInGalaxy()->resetRaceBestTime();
         ::getGameDataTemporaryInGalaxy()->_4 = true;
+        ::getGameDataTemporaryInGalaxy()->resetStageResultTicoCoinParam(false);
     }
 
     void onCompleteEndingCurrentPlayer() {

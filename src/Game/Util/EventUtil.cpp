@@ -1,3 +1,4 @@
+#include "Game/Util/EventUtil.hpp"
 #include "Game/Map/RaceManager.hpp"
 #include "Game/NPC/EventDirector.hpp"
 #include "Game/Scene/DomeParamTable.hpp"
@@ -11,7 +12,6 @@
 #include "Game/System/GameEventFlag.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
 #include "Game/System/GameSequenceFunction.hpp"
-#include "Game/Util/EventUtil.hpp"
 #include "Game/Util/PlayerUtil.hpp"
 #include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
@@ -420,7 +420,8 @@ namespace MR {
     }
 
     void sendStageResultSequenceParam(s32 scenarioNo) {
-        GameSequenceFunction::sendStageResultSequenceParam(MR::getCurrentStageName(), scenarioNo, MR::getStarPieceNum(), MR::getCoinNum());
+        GameSequenceFunction::sendStageResultSequenceParam(MR::getCurrentStageName(), scenarioNo, MR::getStarPieceNum(), MR::getCoinNum(),
+                                                           GameSequenceFunction::getTicoCoinCollectedFlag());
     }
 
     bool isOnGameEventFlagPowerStarSuccess(const char* pGalaxyName, s32 starId) {

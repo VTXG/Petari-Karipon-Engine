@@ -8,6 +8,7 @@
 #include "Game/Map.hpp"
 #include "Game/Map/OceanBowl.hpp"
 #include "Game/MapObj.hpp"
+#include "Game/MapObj/TicoCoin.hpp"
 #include "Game/NPC.hpp"
 #include "Game/NameObj/NameObjArchiveListCollector.hpp"
 #include "Game/NameObj/NameObjFactoryStubs.hpp"
@@ -5959,8 +5960,17 @@ namespace {
             createNameObj< FileSelector >,
             nullptr,
         },
+        {
+            "TicoCoin",
+            createNameObj< TicoCoin >,
+            "TicoCoin",
+        }
     };
     const NameObjFactory::Name2Archive cName2ArchiveNamesTable[] = {
+        {
+            "TicoCoin",
+            "TicoCoin",
+        },
         {
             "AirBubbleGenerator",
             "AirBubble",
