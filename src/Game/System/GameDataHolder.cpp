@@ -1,7 +1,6 @@
 #include "Game/System/GameDataHolder.hpp"
 #include "Game/System/GameDataGalaxyStorage.hpp"
 #include "Game/System/GameDataPlayerStatus.hpp"
-#include "Game/System/GameEmbeddedTable.hpp"
 #include "Game/System/GameEventFlagChecker.hpp"
 #include "Game/System/GameEventFlagStorage.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
@@ -12,6 +11,10 @@
 #include "Game/System/UserFile.hpp"
 #include "Game/Util/MathUtil.hpp"
 #include <cstdio>
+
+#ifdef KRP_CORE
+#include <Karipon/System/GameEmbeddedTable.hpp>
+#endif
 
 namespace {
     const char cPictureBookChapterSuffix[] = "ABCDEFGHI";

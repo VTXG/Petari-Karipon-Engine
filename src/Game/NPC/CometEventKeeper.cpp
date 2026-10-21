@@ -1,11 +1,14 @@
 #include "Game/NPC/CometEventKeeper.hpp"
 #include "Game/NPC/CometEventExecutorTimeLimit.hpp"
-#include "Game/Scene/StageParamTable.hpp"
 #include "Game/Screen/GalaxyCometScreenFilter.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
 #include "Game/Util/EventUtil.hpp"
 #include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
+
+#ifdef KRP_CORE
+#include <Karipon/System/StageParamTable.hpp>
+#endif
 
 CometEventKeeper::CometEventKeeper() : mExecutorTimeLimit(nullptr), mScreenFilter(nullptr), mCometName(nullptr), mCometStateIndex(0) {
 }
@@ -13,7 +16,8 @@ CometEventKeeper::CometEventKeeper() : mExecutorTimeLimit(nullptr), mScreenFilte
 void CometEventKeeper::init() {
     initCometStatus();
 
-    ByamlIter params;
+#ifdef KRP_CORE
+    krp::ByamlIter params;
     bool isFindParams = StageParamTable::findParams(&params, MR::getCurrentStageName(), MR::getCurrentScenarioNo());
 
     if (isStartEvent("Red") || isStartEvent("Black")) {
@@ -40,6 +44,7 @@ void CometEventKeeper::init() {
         mScreenFilter->_20 = true;
         mScreenFilter->setCometType(cometFilterName);
     }
+#endif
 }
 
 bool CometEventKeeper::isStartEvent(const char* pParam1) const {

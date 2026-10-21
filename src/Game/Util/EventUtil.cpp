@@ -1,7 +1,6 @@
 #include "Game/Util/EventUtil.hpp"
 #include "Game/Map/RaceManager.hpp"
 #include "Game/NPC/EventDirector.hpp"
-#include "Game/Scene/DomeParamTable.hpp"
 #include "Game/Scene/SceneObjHolder.hpp"
 #include "Game/Scene/ScenePlayingResult.hpp"
 #include "Game/Screen/InformationObserver.hpp"
@@ -16,6 +15,10 @@
 #include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
 #include <cstdio>
+
+#ifdef KRP_CORE
+#include <Karipon/System/DomeParamTable.hpp>
+#endif
 
 void EventUtil_FORCE_MATCH_STRINGS() {
     MR::isEqualString("ハチマリオ初変身", "ハチマリオ初変身");

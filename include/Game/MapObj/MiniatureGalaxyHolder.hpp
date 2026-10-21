@@ -1,7 +1,10 @@
 #pragma once
 
 #include "Game/LiveActor/LiveActor.hpp"
-#include "Game/Util/ByamlIter.hpp"
+
+#ifdef KRP_CORE
+#include <Karipon/Util/ByamlIter.hpp>
+#endif
 
 class LiveActorGroup;
 class MiniatureGalaxy;
@@ -17,7 +20,9 @@ public:
     MiniatureGalaxy* findMiniatureGalaxy(const char*) const;
     void killAllMiniatureGalaxy();
     s32 calcIndex(const LiveActor*) const;
-    ByamlIter getOrbitParams(s32 idx);
+#ifdef KRP_CORE
+    krp::ByamlIter getOrbitParams(s32 idx);
+#endif
     void updateCometStatus();
 
     /* 0x8C */ LiveActorGroup* mMiniatureGalaxyGroup;
@@ -25,7 +30,9 @@ public:
     /* 0x94 */ MiniatureGalaxy* mCometGalaxy;
     /* 0x98 */ s32 mCometID;
     /* 0x9C */ s32 _9C;
-    /* 0x100 */ ByamlIter mParamTable;
+#ifdef KRP_CORE
+    /* 0x100 */ krp::ByamlIter mParamTable;
+#endif
 };
 
 class MiniatureGalaxyFunction {
@@ -34,7 +41,9 @@ public:
     static MiniatureGalaxyHolder* getHolder();
 
     static s32 calcMiniatureGalaxyIndex(const LiveActor* pActor);
-    static ByamlIter getMiniatureGalaxyOrbitParams(s32 idx);
+#ifdef KRP_CORE
+    static krp::ByamlIter getMiniatureGalaxyOrbitParams(s32 idx);
+#endif
 
     static s32 getMiniatureGalaxyNum();
     static void updateCometStatus();

@@ -2,12 +2,15 @@
 #include "Game/NWC24/NWC24Messenger.hpp"
 #include "Game/System/FindingLuigiEventScheduler.hpp"
 #include "Game/System/GameDataTemporaryInGalaxy.hpp"
-#include "Game/System/GameEmbeddedTable.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
 #include "Game/System/GameEventValueChecker.hpp"
 #include "Game/System/GameSequenceProgress.hpp"
 #include "Game/System/SaveDataHandleSequence.hpp"
 #include <JSystem/JKernel/JKRHeap.hpp>
+
+#ifdef KRP_CORE
+#include <Karipon/System/GameEmbeddedTable.hpp>
+#endif
 
 GameSequenceDirector::GameSequenceDirector()
     : mGameDataTemporaryInGalaxy(nullptr), mGameSequenceProgress(nullptr), mSaveDataHandleSequence(nullptr), mNWC24Messenger(nullptr) {
@@ -21,9 +24,11 @@ GameSequenceDirector::GameSequenceDirector()
 }
 
 void GameSequenceDirector::initAfterResourceLoaded() {
+#ifdef KRP_CORE
     GameEmbeddedTable::init();
     GameEventFlagTable::init();
     GameEventValueTable::init();
+#endif
 
     mSaveDataHandleSequence->initAfterResourceLoaded();
     mGameSequenceProgress->initAfterResourceLoaded();

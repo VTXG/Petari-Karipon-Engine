@@ -1,0 +1,17 @@
+#pragma once
+
+#ifdef KRP_CORE
+
+#include <revolution/types.h>
+
+class JMapInfo;
+class JMapInfoIter;
+
+namespace GameEmbeddedTable {
+    void init();
+    JMapInfo getGalaxyTable();
+    JMapInfoIter getGalaxyEntry(const char* pName);
+    u8 getStoryEventProgress(const char* pName);
+}; // namespace GameEmbeddedTable
+
+#endif

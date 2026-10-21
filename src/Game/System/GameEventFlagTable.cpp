@@ -1,5 +1,4 @@
 #include "Game/System/GameEventFlagTable.hpp"
-#include "Game/System/GameEmbeddedTable.hpp"
 #include "Game/Util/Array.hpp"
 #include "Game/Util/FileUtil.hpp"
 #include "Game/Util/HashUtil.hpp"
@@ -8,6 +7,10 @@
 #include "Game/Util/StringUtil.hpp"
 #include <algorithm>
 #include <cstdio>
+
+#ifdef KRP_CORE
+#include <Karipon/System/GameEmbeddedTable.hpp>
+#endif
 
 namespace {
     static MR::AssignableArray< GameEventFlag > sGameEventFlagTable;

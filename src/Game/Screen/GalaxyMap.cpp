@@ -12,7 +12,6 @@
 #include "Game/Screen/LayoutManager.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
 #include "Game/System/GameDataConst.hpp"
-#include "Game/System/GameEmbeddedTable.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
 #include "Game/Util/GamePadUtil.hpp"
 #include "Game/Util/LayoutUtil.hpp"
@@ -22,6 +21,10 @@
 #include "Game/Util/StringUtil.hpp"
 #include <algorithm>
 #include <cstdio>
+
+#ifdef KRP_CORE
+#include <Karipon/System/GameEmbeddedTable.hpp>
+#endif
 
 namespace {
     static const s32 sFocusKeepFrame = 30;
@@ -420,7 +423,9 @@ namespace {
 }  // namespace
 
 void GalaxyMap::initPaneCtrlPointing() {
+#ifdef KRP_CORE
     JMapInfo galaxyInfo = GameEmbeddedTable::getGalaxyTable();
+#endif
 
     ::initIconArray(mIcon, new GalaxyMapIcon*[galaxyInfo.getNumEntries()], galaxyInfo.getNumEntries());
     ::initIconArray(mCometIcon, new GalaxyMapCometIcon*[galaxyInfo.getNumEntries()], galaxyInfo.getNumEntries());

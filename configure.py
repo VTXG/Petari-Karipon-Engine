@@ -121,6 +121,20 @@ parser.add_argument(
     action="store_false",
     help="disable progress calculation",
 )
+parser.add_argument(
+    "--krp-feature-core",
+    dest="krp_feature_core",
+    action="store_true",
+    help="enable Karipon core",
+    default=True,
+)
+parser.add_argument(
+    "--krp-feature-online",
+    dest="krp_feature_online",
+    action="store_true",
+    help="enable Karipon online multiplayer",
+    default=True,
+)
 args = parser.parse_args()
 
 config = ProjectConfig()
@@ -143,6 +157,9 @@ if not is_windows():
 # Don't build asm unless we're --non-matching
 if not config.non_matching:
     config.asm_dir = None
+# Karipon multiplayer depends on core
+if args.krp_feature_online:
+    args.krp_feature_core = True
 
 # Tool versions
 config.binutils_tag = "2.42-2"
@@ -162,6 +179,12 @@ config.asflags = [
     f"-I build/{config.version}/include",
     f"--defsym version={version_num}",
 ]
+
+if args.krp_feature_core:
+    config.asflags.append(f"--defsym KRP_CORE=1")
+if args.krp_feature_online:
+    config.asflags.append(f"--defsym KRP_ONLINE=1")
+
 config.ldflags = [
     "-fp hardware",
     "-nodefaults",
@@ -188,7 +211,12 @@ config.context_defines = ["DECOMPCTX"]
 
 
 # This is a very hacky way to do this, this *needs* to be done properly.
-VERSION_DEF = [f"-d VERSION={version_num}"] + [f"-d {VERSIONS[v]}={v}" for v in range(len(VERSIONS))] 
+global_defs = [f"-d VERSION={version_num}"] + [f"-d {VERSIONS[v]}={v}" for v in range(len(VERSIONS))] 
+
+if args.krp_feature_core:
+    global_defs.append(f"-DKRP_CORE")
+if args.krp_feature_online:
+    global_defs.append(f"-DKRP_ONLINE")
 
 # Base flags, common to most GC/Wii games.
 # Generally leave untouched, with overrides added below.
@@ -211,7 +239,7 @@ cflags_base = [
     "-enc SJIS",
     "-i include",
     f"-i build/{config.version}/include",
-    *VERSION_DEF,
+    *global_defs,
 ]
 
 cflags_game = [
@@ -244,7 +272,7 @@ cflags_game = [
     "-i libs/Runtime/include",
     "-i libs/nw4r/include",
     f"-i build/{config.version}/include",
-    *VERSION_DEF,
+    *global_defs,
 ]
 
 # Game TUs whose original .sdata2 pool doesn't start with the shared constants in this order
@@ -277,7 +305,7 @@ cflags_jsys = [
     "-i libs/MSL_C/include",
     "-i libs/MSL_C++/include",
     f"-i build/{config.version}/include",
-    *VERSION_DEF,
+    *global_defs,
 ]
 
 cflags_jsys_pch = [
@@ -310,7 +338,7 @@ cflags_jsys_pch = [
     "-i libs/Runtime/include",
     "-i libs/nw4r/include",
     f"-i build/{config.version}/include",
-    *VERSION_DEF,
+    *global_defs,
 ]
 
 cflags_jsys_j3d = [*cflags_jsys, "-O4,p"]
@@ -347,7 +375,7 @@ cflags_trk = [
     "-i libs/MSL_C/include",
     "-DMETRO_TRK",
     f"-i build/{config.version}/include",
-    *VERSION_DEF,
+    *global_defs,
 ]
 
 cflags_nw = [
@@ -376,7 +404,7 @@ cflags_nw = [
     "-i libs/Runtime/include",
     "-i libs/nw4r/include",
     f"-i build/{config.version}/include",
-    *VERSION_DEF,
+    *global_defs,
 ]
 
 cflags_sdk = [
@@ -406,7 +434,7 @@ cflags_sdk = [
     "-i libs/Runtime/include",
     "-i src/RVL_SDK/bte",
     f"-i build/{config.version}/include",
-    *VERSION_DEF,
+    *global_defs,
     "-ir libs/RVL_SDK/include/revolution/bte",
     "-DREVOLUTION",
 ]
@@ -440,7 +468,7 @@ cflags_rfl = [
     "-i libs/Runtime/include",
     "-i libs/RVLFaceLib/include",
     f"-i build/{config.version}/include",
-    *VERSION_DEF,
+    *global_defs,
 ]
 
 cflags_msl = [
@@ -466,7 +494,7 @@ cflags_msl = [
     "-i libs/RVL_SDK/include",
     "-i libs/Runtime/include",
     f"-i build/{config.version}/include",
-    *VERSION_DEF,
+    *global_defs,
 ]
 
 # Debug flags
@@ -662,6 +690,14 @@ def JSys_JParticleLib(lib_name: str, objects: List[Object]) -> Dict[str, Any]:
         "objects": objects,
     }
 
+def KariponLib(lib_name: str, objects: List[Object]) -> Dict[str, Any]:
+    return {
+        "lib": lib_name,
+        "mw_version": "GC/3.0a3",
+        "cflags": cflags_game,
+        "progress_category": "game",
+        "objects": objects,
+    }
 
 Matching = True  # Object matches and should be linked
 NonMatching = False  # Object does not match and should not be linked
@@ -764,6 +800,55 @@ config.libs = [
             Object(MatchingFor(ALL), "nw4r/lyt/lyt_arcResourceAccessor.cpp"),
             Object(MatchingFor(ALL), "nw4r/lyt/lyt_common.cpp"),
         ],
+    ),
+    KariponLib(
+        "AudioLib",
+        [
+            Object(MatchingFor(), "Karipon/AudioLib/AudSceneMgr.cpp"),
+        ]
+    ),
+    KariponLib(
+        "MapObj",
+        [
+            Object(MatchingFor(), "Karipon/MapObj/TicoCoin.cpp"),
+        ]
+    ),
+    KariponLib(
+        "Online",
+        [
+            # Object(MatchingFor(), "Karipon/Online/GameOnlineManager.cpp"),
+        ]
+    ),
+    KariponLib(
+        "Player",
+        [
+            Object(MatchingFor(), "Karipon/Player/OnlinePlayer.cpp"),
+        ]
+    ),
+    KariponLib(
+        "Screen",
+        [
+            Object(MatchingFor(), "Karipon/Screen/SystemDebugLayout.cpp"),
+        ]
+    ),
+    KariponLib(
+        "System",
+        [
+            Object(MatchingFor(), "Karipon/System/DomeParamTable.cpp"),
+            Object(MatchingFor(), "Karipon/System/GameOnlineManager.cpp"),
+            Object(MatchingFor(), "Karipon/System/GameOnlinePacket.cpp"),
+            Object(MatchingFor(), "Karipon/System/NetworkSystemWrapper.cpp"),
+            Object(MatchingFor(), "Karipon/System/StageParamTable.cpp"),
+        ]
+    ),
+    KariponLib(
+        "Util",
+        [
+            Object(MatchingFor(), "Karipon/Util/ByamlData.cpp"),
+            Object(MatchingFor(), "Karipon/Util/ByamlHeader.cpp"),
+            Object(MatchingFor(), "Karipon/Util/ByamlIter.cpp"),
+            Object(MatchingFor(), "Karipon/Util/ByamlUtil.cpp"),
+        ]
     ),
     GameLib(
         "Animation",
@@ -1993,9 +2078,6 @@ config.libs = [
             Object(MatchingFor(ALL), "Game/MapObj/MapPartsRotator.cpp"),
             Object(MatchingFor(), "Game/MapObj/MapPartsSeesaw1AxisRotator.cpp"),
             Object(MatchingFor(KOR), "Game/MapObj/MapPartsSeesaw2AxisRotator.cpp"),
-
-            # Karipon
-            Object(MatchingFor(), "Game/MapObj/TicoCoin.cpp"),
         ],
     ),
     GameLib(
@@ -2253,9 +2335,6 @@ config.libs = [
             Object(MatchingFor(), "Game/Player/PlayerEventFireDown.cpp"),
             Object(MatchingFor(), "Game/Player/PlayerEventRaceDown.cpp"),
             Object(MatchingFor(), "Game/Player/PlayerEventGhostRaceDown.cpp"),
-
-            # Karipon
-            Object(MatchingFor(), "Game/Player/OnlinePlayer.cpp"),
         ],
     ),
     GameLib(
@@ -2344,11 +2423,7 @@ config.libs = [
             ),
             Object(MatchingFor(ALL), "Game/Scene/StageFileLoader.cpp"),
             Object(MatchingFor(ALL), "Game/Scene/StageResourceLoader.cpp"),
-            Object(MatchingFor(ALL), "Game/Scene/StopSceneController.cpp"),
-
-            # Karipon
-            Object(MatchingFor(), "Game/Scene/DomeParamTable.cpp"),
-            Object(MatchingFor(), "Game/Scene/StageParamTable.cpp"),
+            Object(MatchingFor(ALL), "Game/Scene/StopSceneController.cpp"),            
         ],
     ),
     GameLib(
@@ -2512,9 +2587,6 @@ config.libs = [
             Object(MatchingFor(ALL), "Game/Screen/WipeRing.cpp"),
             Object(MatchingFor(ALL), "Game/Screen/YesNoController.cpp"),
             Object(MatchingFor(ALL), "Game/Screen/YesNoLayout.cpp"),
-
-            # Karipon
-            Object(MatchingFor(), "Game/Screen/SystemDebugLayout.cpp"),
         ],
     ),
     GameLib(
@@ -2647,13 +2719,7 @@ config.libs = [
             Object(MatchingFor(KOR), "Game/System/ErrorArchive.cpp"),
 
             # Karipon
-            Object(MatchingFor(), "Game/System/GameEmbeddedTable.cpp"),
-            Object(MatchingFor(), "Game/System/GameOnlineManager.cpp"),
-            Object(MatchingFor(), "Game/System/GameOnlinePacket.cpp"),
-            Object(MatchingFor(), "Game/System/NetworkSystemWrapper.cpp"),
-
-            # Removed
-            # Object(MatchingFor(ALL), "Game/System/BCSVInclude.s"),
+            # Removed Object(MatchingFor(ALL), "Game/System/BCSVInclude.s"),
         ],
     ),
     GameLib(
@@ -2742,12 +2808,6 @@ config.libs = [
             Object(MatchingFor(KOR), "Game/Util/TriangleFilter.cpp"),
             Object(MatchingFor(ALL), "Game/Util/TriggerChecker.cpp"),
             Object(MatchingFor(KOR), "Game/Util/ValueControl.cpp"),
-
-            # Karipon
-            Object(MatchingFor(), "Game/Util/ByamlData.cpp"),
-            Object(MatchingFor(), "Game/Util/ByamlHeader.cpp"),
-            Object(MatchingFor(), "Game/Util/ByamlIter.cpp"),
-            Object(MatchingFor(), "Game/Util/ByamlUtil.cpp"),
         ],
     ),
     SDKLib("ai", [Object(MatchingFor(ALL), "RVL_SDK/ai/ai.c")]),

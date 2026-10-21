@@ -2,12 +2,15 @@
 #include "Game/LiveActor/LiveActorGroup.hpp"
 #include "Game/Map/SphereSelector.hpp"
 #include "Game/MapObj/MiniatureGalaxy.hpp"
-#include "Game/Scene/DomeParamTable.hpp"
 #include "Game/Scene/SceneObjHolder.hpp"
 #include "Game/Util/DemoUtil.hpp"
 #include "Game/Util/EventUtil.hpp"
 #include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
+
+#ifdef KRP_CORE
+#include <Karipon/System/DomeParamTable.hpp>
+#endif
 
 MiniatureGalaxyHolder::MiniatureGalaxyHolder()
     : LiveActor("ミニチュアギャラクシー保持"), mMiniatureGalaxyGroup(), _90(), mCometGalaxy(), mCometID(-1), _9C(), mParamTable() {
@@ -93,9 +96,11 @@ s32 MiniatureGalaxyHolder::calcIndex(const LiveActor* pActor) const {
     return index;
 }
 
-ByamlIter MiniatureGalaxyHolder::getOrbitParams(s32 idx) {
+#ifdef KRP_CORE
+krp::ByamlIter MiniatureGalaxyHolder::getOrbitParams(s32 idx) {
     return mParamTable["Orbits"][idx];
 }
+#endif
 
 #pragma ppc_iro_level 1
 
@@ -134,9 +139,11 @@ s32 MiniatureGalaxyFunction::calcMiniatureGalaxyIndex(const LiveActor* pActor) {
     return getHolder()->calcIndex(pActor);
 }
 
-ByamlIter MiniatureGalaxyFunction::getMiniatureGalaxyOrbitParams(s32 idx) {
+#ifdef KRP_CORE
+krp::ByamlIter MiniatureGalaxyFunction::getMiniatureGalaxyOrbitParams(s32 idx) {
     return getHolder()->getOrbitParams(idx);
 }
+#endif
 
 void MiniatureGalaxyFunction::updateCometStatus() {
     getHolder()->updateCometStatus();

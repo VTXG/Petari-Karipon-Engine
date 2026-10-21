@@ -8,7 +8,6 @@
 #include "Game/Map.hpp"
 #include "Game/Map/OceanBowl.hpp"
 #include "Game/MapObj.hpp"
-#include "Game/MapObj/TicoCoin.hpp"
 #include "Game/NPC.hpp"
 #include "Game/NameObj/NameObjArchiveListCollector.hpp"
 #include "Game/NameObj/NameObjFactoryStubs.hpp"
@@ -17,6 +16,10 @@
 #include "Game/Screen.hpp"
 #include "Game/Util/FileUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
+
+#ifdef KRP_CORE
+#include <Karipon/MapObj/TicoCoin.hpp>
+#endif
 
 namespace {
     template < typename T >
@@ -5960,17 +5963,15 @@ namespace {
             createNameObj< FileSelector >,
             nullptr,
         },
+#ifdef KRP_CORE
         {
             "TicoCoin",
-            createNameObj< TicoCoin >,
+            createNameObj< krp::TicoCoin >,
             "TicoCoin",
         }
+#endif
     };
     const NameObjFactory::Name2Archive cName2ArchiveNamesTable[] = {
-        {
-            "TicoCoin",
-            "TicoCoin",
-        },
         {
             "AirBubbleGenerator",
             "AirBubble",
@@ -7737,6 +7738,12 @@ namespace {
             "MovieStarter",
             "MoviePadRumbleEndingB",
         },
+#ifdef KRP_CORE
+        {
+            "TicoCoin",
+            "TicoCoin",
+        },
+#endif
     };
     const NameObjFactory::Name2MakeArchiveListFunc cName2MakeArchiveListFuncTable[] = {
         {

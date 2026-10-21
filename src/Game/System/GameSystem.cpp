@@ -64,6 +64,10 @@ void main(void) {
     SingletonHolder< GameSystem >::init();
     SingletonHolder< GameSystem >::get()->init();
 
+#ifdef KRP_FEATURE_ENGINE
+    *(u8*)0 = 0;
+#endif
+
     GameSystem* pGameSystem = SingletonHolder< GameSystem >::get();
 
     while (true) {

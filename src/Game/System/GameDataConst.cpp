@@ -1,10 +1,13 @@
 #include "Game/System/GameDataConst.hpp"
-#include "Game/System/GameEmbeddedTable.hpp"
 #include "Game/System/GameEventFlag.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
 #include "Game/Util/JMapInfo.hpp"
 #include "Game/Util/StringUtil.hpp"
 #include <cstdio>
+
+#ifdef KRP_CORE
+#include <Karipon/System/GameEmbeddedTable.hpp>
+#endif
 
 s32 GameDataConst::getPowerStarNumToOpenGalaxy(const char* pGalaxy) {
     JMapInfoIter element = GameEmbeddedTable::getGalaxyEntry(pGalaxy);

@@ -1,5 +1,4 @@
 #include "Game/System/GameDataFunction.hpp"
-#include "Game/Scene/DomeParamTable.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
 #include "Game/System/GameDataGalaxyStorage.hpp"
 #include "Game/System/GameDataHolder.hpp"
@@ -14,6 +13,10 @@
 #include "Game/System/UserFile.hpp"
 #include "Game/Util/SingletonHolder.hpp"
 #include <cstdio>
+
+#ifdef KRP_CORE
+#include <Karipon/System/DomeParamTable.hpp>
+#endif
 
 namespace {
     SaveDataHandleSequence* getSaveDataHandleSequence() NO_INLINE {

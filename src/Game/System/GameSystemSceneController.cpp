@@ -1,13 +1,11 @@
 #include "Game/System/GameSystemSceneController.hpp"
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/NameObj/NameObjHolder.hpp"
-#include "Game/Scene/DomeParamTable.hpp"
 #include "Game/Scene/IntermissionScene.hpp"
 #include "Game/Scene/PlayTimerScene.hpp"
 #include "Game/Scene/ScenarioSelectScene.hpp"
 #include "Game/Scene/SceneFactory.hpp"
 #include "Game/Scene/SceneFunction.hpp"
-#include "Game/Scene/StageParamTable.hpp"
 #include "Game/System/AudSystemWrapper.hpp"
 #include "Game/System/GameSystem.hpp"
 #include "Game/System/GameSystemFunction.hpp"
@@ -15,7 +13,6 @@
 #include "Game/System/HeapMemoryWatcher.hpp"
 #include "Game/System/ScenarioDataParser.hpp"
 #include "Game/System/WPadHolder.hpp"
-#include "Game/Util/ByamlIter.hpp"
 #include "Game/Util/EventUtil.hpp"
 #include "Game/Util/FileUtil.hpp"
 #include "Game/Util/JMapIdInfo.hpp"
@@ -30,6 +27,12 @@
 
 #if (VERSION == RMGJ01 || VERSION == RMGE01)
 #include "Game/System/DrawSyncManager.hpp"
+#endif
+
+#ifdef KRP_CORE
+#include <Karipon/System/DomeParamTable.hpp>
+#include <Karipon/System/StageParamTable.hpp>
+#include <Karipon/Util/ByamlIter.hpp>
 #endif
 
 namespace {
@@ -83,8 +86,10 @@ GameSystemSceneController::GameSystemSceneController()
 }
 
 void GameSystemSceneController::initAfterStationedResourceLoaded() {
+#ifdef KRP_CORE
     DomeParamTable::init();
     StageParamTable::init();
+#endif
 
     mScenarioParser = new ScenarioDataParser("シナリオデータ解析");
     mScenarioParser->initWithoutIter();
@@ -122,7 +127,7 @@ void GameSystemSceneController::initializeScene() {
     if (SingletonHolder< HeapMemoryWatcher >::get()->mFileCacheHeap == nullptr || !isSameAtNextSceneAndStage()) {
         u32 fileCacheSize = 0x1040400;
 
-        ByamlIter params;
+        krp::ByamlIter params;
         if (StageParamTable::findParams(&params, mNextSceneControlInfo.mStage, mNextSceneControlInfo.mScenarioNo)) {
             params.tryGetValueByKey("FileCacheSize", &fileCacheSize);
         }

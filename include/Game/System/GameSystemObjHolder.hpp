@@ -48,7 +48,9 @@ public:
     void initWPad();
     void initStarPointerDirector();
     void initDisplay();
+#ifdef KRP_CORE
     void initNetwork();
+#endif
 
     /* 0x00 */ NameObjHolder* mObjHolder;
     /* 0x04 */ ParticleResourceHolder* mParticleResHolder;
@@ -63,9 +65,11 @@ public:
     /* 0x28 */ FunctionAsyncExecutor* mFunctionAsyncExecutor;
     /* 0x2C */ MessageHolder* mMessageHolder;
     /* 0x30 */ StarPointerDirector* mStarPointerDirector;
-    /* 0x34 */ NetworkSystemWrapper* mNetworkSystem;
-    /* 0x38 */ GameOnlineManager* mOnlineManager;
-    /* 0x3C */ SystemDebugLayout* mDebugLayout;
-    /* 0x40 */ JMath::TRandom_fast_ mRandom;
-    /* 0x44 */ u32 mLanguage;
+    /* 0x34 */ JMath::TRandom_fast_ mRandom;
+    /* 0x38 */ u32 mLanguage;
+#ifdef KRP_CORE
+    /* 0x3C */ NetworkSystemWrapper* mNetworkSystem;
+    /* 0x40 */ GameOnlineManager* mOnlineManager;
+    /* 0x44 */ SystemDebugLayout* mDebugLayout;
+#endif
 };

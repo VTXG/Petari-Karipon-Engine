@@ -1,11 +1,14 @@
 #include "Game/Screen/GalaxyMapDomeIcon.hpp"
 #include "Game/Screen/GalaxyNamePlate.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
-#include "Game/System/GameEmbeddedTable.hpp"
 #include "Game/Util/EventUtil.hpp"
 #include "Game/Util/LayoutUtil.hpp"
 #include "Game/Util/MessageUtil.hpp"
 #include <cstdio>
+
+#ifdef KRP_CORE
+#include <Karipon/System/GameEmbeddedTable.hpp>
+#endif
 
 void GalaxyMapDomeIcon_FORCE_MATCH(LayoutActor* pLayout) {
     MR::startAnim(pLayout, "MapDomeIcon", 0);
@@ -124,7 +127,9 @@ s32 GalaxyMapDomeIcon::calcDomeStatus() const {
 }
 
 bool GalaxyMapDomeIcon::isComplete() const {
+#ifdef KRP_CORE
     JMapInfo mapInfo = GameEmbeddedTable::getGalaxyTable();
+#endif
 
     CheckerIsComplete checker = CheckerIsComplete(_20);
 
@@ -182,7 +187,9 @@ void GalaxyMapDomeIcon::syncStatus() {
 }
 
 bool GalaxyMapDomeIcon::hasNewGalaxy() const {
+#ifdef KRP_CORE
     JMapInfo mapInfo = GameEmbeddedTable::getGalaxyTable();
+#endif
 
     CheckerIsExistNewGalaxy checker = CheckerIsExistNewGalaxy(_20);
 

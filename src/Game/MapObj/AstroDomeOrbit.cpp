@@ -2,12 +2,15 @@
 #include "Game/Map/SphereSelector.hpp"
 #include "Game/MapObj/MiniatureGalaxyHolder.hpp"
 #include "Game/Scene/SceneFunction.hpp"
-#include "Game/Util/ByamlUtil.hpp"
 #include "Game/Util/CameraUtil.hpp"
 #include "Game/Util/Color.hpp"
 #include "Game/Util/LiveActorUtil.hpp"
 #include "Game/Util/MathUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
+
+#ifdef KRP_CORE
+#include <Karipon/Util/ByamlUtil.hpp>
+#endif
 
 namespace {
     const static s32 cDevideNum = 64;
@@ -67,12 +70,14 @@ void AstroDomeOrbit::drawBloom() const {
 void AstroDomeOrbit::setup(s32 radiusIdx) {
     mAngle = ::cGalaxyRotateCoordOffset * radiusIdx;
 
-    ByamlIter params = MiniatureGalaxyFunction::getMiniatureGalaxyOrbitParams(radiusIdx);
-    ByamlUtil::getValueColor8(params["Color"], &mColor);
-    ByamlUtil::getValueColor8(params["Bloom"], &mBloomColor);    
+#ifdef KRP_CORE
+    krp::ByamlIter params = MiniatureGalaxyFunction::getMiniatureGalaxyOrbitParams(radiusIdx);
+    krp::getByamlDataColor8(params["Color"], &mColor);
+    krp::getByamlDataColor8(params["Bloom"], &mBloomColor);    
     params.tryGetValueByKey("Radius", &mOrbitRadius);
     params.tryGetValueByKey("Speed", &mSpeed);
-    ByamlUtil::getValueTVec3f(params["Rotate"], &mRotation);
+    krp::getByamlDataTVec3f(params["Rotate"], &mRotation);
+#endif
 }
 
 void AstroDomeOrbit::moveCoord() {

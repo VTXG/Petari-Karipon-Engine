@@ -4,18 +4,15 @@
 #include "Game/Screen/CaptureScreenDirector.hpp"
 #include "Game/Screen/ScreenPreserver.hpp"
 #include "Game/Screen/StarPointerDirector.hpp"
-#include "Game/Screen/SystemDebugLayout.hpp"
 #include "Game/System/AudSystemWrapper.hpp"
 #include "Game/System/ErrorArchive.hpp"
 #include "Game/System/FileLoader.hpp"
 #include "Game/System/FunctionAsyncExecutor.hpp"
-#include "Game/System/GameOnlineManager.hpp"
 #include "Game/System/HeapMemoryWatcher.hpp"
 #include "Game/System/Language.hpp"
 #include "Game/System/MainLoopFramework.hpp"
 #include "Game/System/MessageHolder.hpp"
 #include "Game/System/NANDManager.hpp"
-#include "Game/System/NetworkSystemWrapper.hpp"
 #include "Game/System/RenderMode.hpp"
 #include "Game/System/ResourceHolderManager.hpp"
 #include "Game/System/WPadHolder.hpp"
@@ -28,10 +25,21 @@
 #include <JSystem/JUtility/JUTVideo.hpp>
 #include <revolution/vi.h>
 
+#ifdef KRP_CORE
+#include <Karipon/Screen/SystemDebugLayout.hpp>
+#include <Karipon/System/GameOnlineManager.hpp>
+#include <Karipon/System/NetworkSystemWrapper.hpp>
+#endif
+
 GameSystemObjHolder::GameSystemObjHolder()
     : mObjHolder(), mParticleResHolder(), mRenderModeObj(), mCaptureScreenDirector(), mScreenPreserver(), mAudioSystem(), mWPadHolder(),
-      mFunctionAsyncExecutor(), mMessageHolder(), mStarPointerDirector(), mNetworkSystem(), mOnlineManager(), mRandom(0),
-      mLanguage(MR::getDecidedLanguageFromIPL()) {
+      mFunctionAsyncExecutor(), mMessageHolder(), mStarPointerDirector(), mRandom(0), mLanguage(MR::getDecidedLanguageFromIPL()) {
+#ifdef KRP_CORE
+    mNetworkSystem = nullptr;
+    mOnlineManager = nullptr;
+    mDebugLayout = nullptr;
+#endif
+
     initDvd();
     initNAND();
     initNameObj();
@@ -186,13 +194,17 @@ void GameSystemObjHolder::initDisplay() {
 
     mCaptureScreenDirector = new CaptureScreenDirector();
     mScreenPreserver = new ScreenPreserver();
+#ifdef KRP_CORE
     mDebugLayout = new SystemDebugLayout();
+#endif
 
     VISetTrapFilter(VI_TRUE);
     VISetTrapFilter(VI_FALSE);
 }
 
+#ifdef KRP_CORE
 void GameSystemObjHolder::initNetwork() {
     mNetworkSystem = new NetworkSystemWrapper();
     mOnlineManager = new GameOnlineManager();
 }
+#endif
