@@ -13,6 +13,11 @@
 #endif
 
 namespace {
+#ifndef KRP_CORE
+    const static Vec cRotateOutermost = {20.0f, 45.0f, 0.0f};
+    const static f32 cRadius[] = {4000.0f, 6200.0f, 8100.0f, 10300.0f, 12000.0f};
+    const static f32 cRadiusLastDome[] = {4000.0f, 6700.0f, 9100.0f, 11800.0f};
+#endif
     const static s32 cDevideNum = 64;
     const static f32 cWidth = 100.0f;
     const static f32 cHeight = 50.0f;
@@ -23,10 +28,14 @@ namespace {
 
     const static Color8 cColor(0x13, 0xB1, 0xFF, 0xFF);
     const static Color8 cBloomColor(0x00, 0xB4, 0x64, 0xFF);
-};  // namespace
+}; // namespace
 
-AstroDomeOrbit::AstroDomeOrbit()
-    : LiveActor("天文ドームの軌道"), mOrbitRadius(5000.0f), mAngle(), mSpeed(cGalaxyRotateSpeed), mColor(cColor), mBloomColor(cBloomColor) {
+AstroDomeOrbit::AstroDomeOrbit() : LiveActor("天文ドームの軌道"), mOrbitRadius(5000.0f), mAngle() {
+#ifdef KRP_CORE
+    mSpeed = cGalaxyRotateSpeed;
+    mColor = cColor;
+    mBloomColor = cBloomColor;
+#endif
 }
 
 void AstroDomeOrbit::init(const JMapInfoIter& rIter) {
@@ -44,7 +53,11 @@ void AstroDomeOrbit::draw() const {
         return;
     }
 
+#ifdef KRP_CORE
     initDraw(mColor);
+#else
+    initDraw(::cColor);
+#endif
 
     drawCelling(::cWidth, true, ::cHeight);
     drawCelling(::cWidth, false, ::cHeight);
@@ -58,7 +71,11 @@ void AstroDomeOrbit::drawBloom() const {
         return;
     }
 
+#ifdef KRP_CORE
     initDraw(mBloomColor);
+#else
+    initDraw(::cBloomColor);
+#endif
 
     drawCelling(::cBloomWidth, true, ::cBloomHeight);
     drawCelling(::cBloomWidth, false, ::cBloomHeight);
@@ -68,20 +85,37 @@ void AstroDomeOrbit::drawBloom() const {
 }
 
 void AstroDomeOrbit::setup(s32 radiusIdx) {
-    mAngle = ::cGalaxyRotateCoordOffset * radiusIdx;
-
 #ifdef KRP_CORE
+    mAngle = ::cGalaxyRotateCoordOffset * radiusIdx;
     krp::ByamlIter params = MiniatureGalaxyFunction::getMiniatureGalaxyOrbitParams(radiusIdx);
     krp::getByamlDataColor8(params["Color"], &mColor);
-    krp::getByamlDataColor8(params["Bloom"], &mBloomColor);    
+    krp::getByamlDataColor8(params["Bloom"], &mBloomColor);
     params.tryGetValueByKey("Radius", &mOrbitRadius);
     params.tryGetValueByKey("Speed", &mSpeed);
     krp::getByamlDataTVec3f(params["Rotate"], &mRotation);
+#else
+    s32 miniNum = MiniatureGalaxyFunction::getMiniatureGalaxyNum();
+    const f32* radii = ::cRadiusLastDome;
+
+    if (miniNum == 5) {
+        radii = ::cRadius;
+    }
+
+    mOrbitRadius = radii[radiusIdx];
+    mAngle = ::cGalaxyRotateCoordOffset * radiusIdx;
+
+    if (radiusIdx >= 4) {
+        mRotation.set(::cRotateOutermost);
+    }
 #endif
 }
 
 void AstroDomeOrbit::moveCoord() {
+#ifdef KRP_CORE
     mAngle = calcRepeatedRotateCoord(mSpeed + mAngle);
+#else
+    mAngle = calcRepeatedRotateCoord(::cGalaxyRotateSpeed + mAngle);
+#endif
 }
 
 void AstroDomeOrbit::calcGalaxyPos(TVec3f* pPos) const {
@@ -201,5 +235,4 @@ f32 AstroDomeOrbit::calcRepeatedRotateCoord(f32 coord) const {
     return MR::repeatDegree(coord);
 }
 
-AstroDomeOrbit::~AstroDomeOrbit() {
-}
+AstroDomeOrbit::~AstroDomeOrbit() {}

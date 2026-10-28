@@ -32,10 +32,12 @@ public:
         return ret;
     }
 
+#ifdef KRP_CORE
     template < typename T >
     inline void read(T* pVal) {
         read(pVal, sizeof(*pVal));
     }
+#endif
 
     // TODO: probably a lot of other helpers for different types
 };

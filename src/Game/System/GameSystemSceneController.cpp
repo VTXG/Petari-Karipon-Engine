@@ -30,9 +30,7 @@
 #endif
 
 #ifdef KRP_CORE
-#include <Karipon/System/DomeParamTable.hpp>
-#include <Karipon/System/StageParamTable.hpp>
-#include <Karipon/Util/ByamlIter.hpp>
+#include <Karipon/System/SystemDataHolder.hpp>
 #endif
 
 namespace {
@@ -86,11 +84,6 @@ GameSystemSceneController::GameSystemSceneController()
 }
 
 void GameSystemSceneController::initAfterStationedResourceLoaded() {
-#ifdef KRP_CORE
-    DomeParamTable::init();
-    StageParamTable::init();
-#endif
-
     mScenarioParser = new ScenarioDataParser("シナリオデータ解析");
     mScenarioParser->initWithoutIter();
 
@@ -127,8 +120,8 @@ void GameSystemSceneController::initializeScene() {
     if (SingletonHolder< HeapMemoryWatcher >::get()->mFileCacheHeap == nullptr || !isSameAtNextSceneAndStage()) {
         u32 fileCacheSize = 0x1040400;
 
-        krp::ByamlIter params;
-        if (StageParamTable::findParams(&params, mNextSceneControlInfo.mStage, mNextSceneControlInfo.mScenarioNo)) {
+        krp::ByamlIter params = krp::SystemDataHolder::get()->getStageParams(mNextSceneControlInfo.mStage, mNextSceneControlInfo.mScenarioNo);
+        if (params.isValid()) {
             params.tryGetValueByKey("FileCacheSize", &fileCacheSize);
         }
 

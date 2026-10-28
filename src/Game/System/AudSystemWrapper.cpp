@@ -7,12 +7,15 @@
 #include "Game/AudioLib/AudSystem.hpp"
 #include "Game/AudioLib/CSSoundNameConverter.hpp"
 #include "Game/Util/FileUtil.hpp"
-#include "Game/Util/MemoryUtil.hpp"
 #include "Game/Util/SingletonHolder.hpp"
 #include <JSystem/JKernel/JKRDvdRipper.hpp>
 #include <JSystem/JKernel/JKRExpHeap.hpp>
 #include <JSystem/JKernel/JKRMemArchive.hpp>
 #include <JSystem/JKernel/JKRSolidHeap.hpp>
+
+#ifdef KRP_CORE
+#include "Game/Util/MemoryUtil.hpp"
+#endif
 
 namespace AudRhythmWrap {
     void rhythmProc();
@@ -43,8 +46,9 @@ void AudSystemWrapper::requestResourceForInitialize() {
     MR::mountAsyncArchive(sJaiMeArc, mSolidHeap);
     MR::mountAsyncArchive(AudSpeakerWrap::getResName(), mSpkHeap);
     MR::mountAsyncArchive(sJaiRemixArc, mSolidHeap);
-
+#ifdef KRP_CORE
     MR::loadAsyncToMainRAM("/SystemData/StageWaveTable.byaml", nullptr, MR::getStationedHeapGDDR3(), JKRDvdRipper::ALLOC_DIRECTION_FORWARD);
+#endif
 }
 
 void AudSystemWrapper::createAudioSystem() {

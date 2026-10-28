@@ -18,7 +18,9 @@ public:
     void resetStageResultPowerStarParam();
     void resetStageResultStarPieceParam();
     void resetStageResultCoinParam();
+#ifdef KRP_CORE
     void resetStageResultTicoCoinParam(bool resetSaved);
+#endif
     void addStarPiece(int);
     void setLast1upStarPieceNum(int);
     s32 getStarPieceNum() const;
@@ -26,11 +28,15 @@ public:
     void clearAlreadyDoneFlag();
     s32 setupAlreadyDoneFlag(const char*, const JMapInfoIter&, u32*);
     void updateAlreadyDoneFlag(int, u32);
+#ifdef KRP_CORE
     void onTicoCoinCollected(s32 id);
     bool isTicoCoinCollected(s32 id);
     void saveTemporaryTicoCoin();
     u8 getTicoCoinCollectedFlag();
     void receiveStageResultParam(const char*, s32, int, int, u8);
+#else
+    void receiveStageResultParam(const char*, s32, int, int);
+#endif
 
     /* 0x00 */ JMapIdInfo* mPlayerRestartIdInfo;
     /* 0x04 */ bool _4;
@@ -43,6 +49,8 @@ public:
     /* 0x4C */ u32 _4C;
     /* 0x50 */ u32 _50;
     /* 0x54 */ AlreadyDoneFlagInGalaxy* mAlreadyDoneFlag;
+#ifdef KRP_CORE
     /* 0x58 */ u8 mTicoCoinTemporaryFlag;
     /* 0x59 */ u8 mTicoCoinSavedFlag;
+#endif
 };

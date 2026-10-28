@@ -16,6 +16,9 @@ public:
     bool isStartTimeLimitEvent() const;
     void startCometEventIfExist();
     void endCometEvent();
+#ifndef KRP_CORE
+    static u32 getTimeLimitFromTable(const GalaxyTimeLimitInfo*, int);
+#endif
     void initCometStatus();
 
 private:

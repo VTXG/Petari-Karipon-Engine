@@ -135,6 +135,13 @@ parser.add_argument(
     help="enable Karipon online multiplayer",
     default=True,
 )
+parser.add_argument(
+    "--krp-feature-optimize",
+    dest="krp_feature_optimize",
+    action="store_true",
+    help="enable Karipon optimizations",
+    default=True,
+)
 args = parser.parse_args()
 
 config = ProjectConfig()
@@ -157,9 +164,6 @@ if not is_windows():
 # Don't build asm unless we're --non-matching
 if not config.non_matching:
     config.asm_dir = None
-# Karipon multiplayer depends on core
-if args.krp_feature_online:
-    args.krp_feature_core = True
 
 # Tool versions
 config.binutils_tag = "2.42-2"
@@ -184,6 +188,8 @@ if args.krp_feature_core:
     config.asflags.append(f"--defsym KRP_CORE=1")
 if args.krp_feature_online:
     config.asflags.append(f"--defsym KRP_ONLINE=1")
+if args.krp_feature_optimize:
+    config.asflags.append(f"--defsym KRP_OPTIMIZE=1")
 
 config.ldflags = [
     "-fp hardware",
@@ -217,6 +223,8 @@ if args.krp_feature_core:
     global_defs.append(f"-DKRP_CORE")
 if args.krp_feature_online:
     global_defs.append(f"-DKRP_ONLINE")
+if args.krp_feature_optimize:
+    global_defs.append(f"-DKRP_OPTIMIZE")
 
 # Base flags, common to most GC/Wii games.
 # Generally leave untouched, with overrides added below.
@@ -834,11 +842,10 @@ config.libs = [
     KariponLib(
         "System",
         [
-            Object(MatchingFor(), "Karipon/System/DomeParamTable.cpp"),
             Object(MatchingFor(), "Karipon/System/GameOnlineManager.cpp"),
             Object(MatchingFor(), "Karipon/System/GameOnlinePacket.cpp"),
             Object(MatchingFor(), "Karipon/System/NetworkSystemWrapper.cpp"),
-            Object(MatchingFor(), "Karipon/System/StageParamTable.cpp"),
+            Object(MatchingFor(), "Karipon/System/SystemDataHolder.cpp"),
         ]
     ),
     KariponLib(

@@ -54,7 +54,9 @@ namespace GameDataFunction {
     void addStarPiece(int);
     void setLast1upStarPieceNum(int);
     s32 getLast1upStarPieceNum();
+#ifdef KRP_CORE
     bool isTicoCoinCollected(const char*, s32);
+#endif
     const wchar_t* getUserName();
     u16 getUserFileIndex();
     void resetAllGameData();
@@ -66,7 +68,9 @@ namespace GameDataFunction {
     GameDataHolder* getSceneStartGameDataHolder();
     s32 calcTicoGalaxyNum(const GameDataHolder*);
     s32 calcGrandStarNum(const GameDataHolder*);
+#ifdef KRP_CORE
     s32 calcOpenedAstroDomeNum(const GameDataHolder*);
+#endif
     void resetGameDataGoToGalaxyFirst();
     void resetGameDataGoToGalaxyRetry();
     void onCompleteEndingCurrentPlayer();

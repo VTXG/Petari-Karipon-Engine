@@ -90,7 +90,9 @@ namespace MR {
     bool isOnGameEventFlagPowerStarSuccess(const char*, s32);
     bool hasGrandStar(int);
     s32 calcOpenedAstroDomeNum();
+#ifdef KRP_CORE
     bool isOpenAstroDome(s32 domeID);
+#endif
     s32 calcCurrentGreenStarNum();
     s32 getPowerStarNumToOpenGalaxy(const char*);
     s32 getPowerStarNumSucceed(const char*);

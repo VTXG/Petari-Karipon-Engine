@@ -9,11 +9,16 @@
 #include "Game/System/SpinDriverPathStorage.hpp"
 #include "Game/System/StarPieceAlmsStorage.hpp"
 #include "Game/System/UserFile.hpp"
+#include "Game/Util/JMapInfo.hpp"
 #include "Game/Util/MathUtil.hpp"
 #include <cstdio>
 
 #ifdef KRP_CORE
-#include <Karipon/System/GameEmbeddedTable.hpp>
+#include <Karipon/System/SystemDataHolder.hpp>
+#endif
+
+#ifndef KRP_CORE
+extern const u8 StoryEventBCSV[];
 #endif
 
 namespace {
@@ -22,7 +27,7 @@ namespace {
 
 GameDataHolder::GameDataHolder(const UserFile* pUserFile)
     : mUserFile(pUserFile), mEventFlagChecker(), mEventValueChecker(), mPlayerStatus(), mAllGalaxyStorage(), mSpinDriverPathStorage(),
-      mStarPieceAlmsStorage(), mScenarioProgressTestRun(), mChunkHolder() {
+      mStarPieceAlmsStorage(), mMapInfo(), mScenarioProgressTestRun(), mChunkHolder() {
     mScenarioProgressTestRun = new ScenarioProgressTestRun(this);
     mAllGalaxyStorage = new GameDataAllGalaxyStorage();
     mEventFlagChecker = new GameEventFlagChecker(this);
@@ -30,6 +35,11 @@ GameDataHolder::GameDataHolder(const UserFile* pUserFile)
     mPlayerStatus = new GameDataPlayerStatus();
     mSpinDriverPathStorage = new SpinDriverPathStorage();
     mStarPieceAlmsStorage = new StarPieceAlmsStorage();
+
+#ifndef KRP_CORE
+    mMapInfo = new JMapInfo();
+    mMapInfo->attach(StoryEventBCSV);
+#endif
 
     mChunkHolder = new BinaryDataChunkHolder(4096, 6);
     mChunkHolder->addChunk(mPlayerStatus);
@@ -190,9 +200,11 @@ void GameDataHolder::setPowerStar(const char* pGalaxyName, s32 scenarioNum, bool
     makeGalaxyScenarioAccessor(pGalaxyName, scenarioNum).setPowerStarFlag(set);
 }
 
+#ifdef KRP_CORE
 bool GameDataHolder::isTicoCoinCollected(const char* pGalaxyName, s32 id) const {
     return mAllGalaxyStorage->getGalaxyStorage(pGalaxyName)->isTicoCoinCollected(id);
 }
+#endif
 
 s32 GameDataHolder::getPowerStarNumOwned(const char* pGalaxyName) const {
     return mAllGalaxyStorage->getPowerStarNumOwned(pGalaxyName);
@@ -286,11 +298,27 @@ bool GameDataHolder::isCompleteMarioAndLuigi() const {
 }
 
 bool GameDataHolder::isPassedStoryEvent(const char* pEventName) const {
-    return GameEmbeddedTable::getStoryEventProgress(pEventName) <= mPlayerStatus->mStoryProgress;
+#ifdef KRP_CORE
+    return krp::SystemDataHolder::get()->getStoryEventProgress(pEventName) <= mPlayerStatus->mStoryProgress;
+#else
+    JMapInfoIter iter = mMapInfo->findElement("name", pEventName, 0);
+
+    u32 progress = 0;
+    iter.getValue("progress", &progress);
+    return progress <= mPlayerStatus->mStoryProgress;
+#endif
 }
 
 void GameDataHolder::followStoryEventByName(const char* pEventName) {
-    mPlayerStatus->mStoryProgress = GameEmbeddedTable::getStoryEventProgress(pEventName);
+#ifdef KRP_CORE
+    mPlayerStatus->mStoryProgress = krp::SystemDataHolder::get()->getStoryEventProgress(pEventName);
+#else
+    JMapInfoIter iter = mMapInfo->findElement("name", pEventName, 0);
+
+    u32 progress = 0;
+    iter.getValue("progress", &progress);
+    mPlayerStatus->mStoryProgress = progress;
+#endif
 }
 
 void GameDataHolder::resetAllData() {

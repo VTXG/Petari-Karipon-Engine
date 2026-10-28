@@ -7,7 +7,9 @@
 #include <cstdio>
 
 #ifdef KRP_CORE
-#include <Karipon/System/GameEmbeddedTable.hpp>
+#include <Karipon/System/SystemDataHolder.hpp>
+#else
+#include "Game/System/GameDataConst.hpp"
 #endif
 
 void GalaxyMapDomeIcon_FORCE_MATCH(LayoutActor* pLayout) {
@@ -128,7 +130,10 @@ s32 GalaxyMapDomeIcon::calcDomeStatus() const {
 
 bool GalaxyMapDomeIcon::isComplete() const {
 #ifdef KRP_CORE
-    JMapInfo mapInfo = GameEmbeddedTable::getGalaxyTable();
+    JMapInfo& mapInfo = krp::SystemDataHolder::get()->mGalaxyInfoTable;
+#else
+    JMapInfo mapInfo = JMapInfo();
+    mapInfo.attach(&GalaxyIDBCSV);
 #endif
 
     CheckerIsComplete checker = CheckerIsComplete(_20);
@@ -188,7 +193,10 @@ void GalaxyMapDomeIcon::syncStatus() {
 
 bool GalaxyMapDomeIcon::hasNewGalaxy() const {
 #ifdef KRP_CORE
-    JMapInfo mapInfo = GameEmbeddedTable::getGalaxyTable();
+    JMapInfo mapInfo = krp::SystemDataHolder::get()->mGalaxyInfoTable;
+#else
+    JMapInfo mapInfo = JMapInfo();
+    mapInfo.attach(&GalaxyIDBCSV);
 #endif
 
     CheckerIsExistNewGalaxy checker = CheckerIsExistNewGalaxy(_20);
@@ -213,7 +221,11 @@ namespace {
         const char* pName = nullptr;
 
         rIter.getValue("MapPaneName", &pMapPaneName);
+#ifdef KRP_CORE
         rIter.getValue("Name", &pName);
+#else
+        rIter.getValue("name", &pName);
+#endif
 
         if (pMapPaneName != nullptr && pName != nullptr && strstr(pMapPaneName, _4) != nullptr) {
             execute(pName);

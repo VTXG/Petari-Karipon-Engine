@@ -23,7 +23,6 @@
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StarPointerUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
-#include "revolution/types.h"
 
 namespace {
     const Vec cNamePlateOffset = {0.0f, 1500.0f, 0.0f};
@@ -78,7 +77,9 @@ MiniatureGalaxy::MiniatureGalaxy(const char* pName)
     : LiveActor(pName), mType(-1), mState(MiniatureGalaxyState_Open), mUnknownModel(), mShadowModel(), mSelectModel(), mStarPlateModel(),
       mProjmapEffectMtxSetter(), mInitPos(gZeroVec), mObjectName(), mGalaxyName(), mCanZoomIn(1), mZoomLevel(::cZoomFrame), mOnesTexMtx(),
       mTensTexMtx(), mOrbit(), mNamePlate() {
+#ifdef KRP_CORE
     MiniatureGalaxyFunction::createHolder();
+#endif
     mShadowBaseMtx.identity();
     mPosMtx.identity();
 }
@@ -118,7 +119,11 @@ void MiniatureGalaxy::init(const JMapInfoIter& rIter) {
     }
 
     SphereSelectorFunction::registerTarget(this);
+#ifdef KRP_CORE
     MiniatureGalaxyFunction::getHolder()->registerActor(this, rIter);
+#else
+    MiniatureGalaxyFunction::registerMiniatureGalaxyToHolder(this, rIter);
+#endif
 
     mOrbit = new AstroDomeOrbit();
     mOrbit->initWithoutIter();
@@ -137,7 +142,12 @@ void MiniatureGalaxy::initAfterPlacement() {
 
 void MiniatureGalaxy::appear() {
     const f32 rotations[] = {0.0f, 210.0f, 80.0f, 330.0f, 130.0f};
+
+#ifdef KRP_CORE
     ::setInitialRotation(mRotation, rotations[MiniatureGalaxyFunction::calcMiniatureGalaxyIndex(this) % ARRAY_SIZE(rotations)]);
+#else
+    ::setInitialRotation(mRotation, rotations[MiniatureGalaxyFunction::calcMiniatureGalaxyIndex(this)]);
+#endif
 
     mCanZoomIn = 1;
     mZoomLevel = ::cZoomFrame;

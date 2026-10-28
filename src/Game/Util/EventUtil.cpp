@@ -17,7 +17,8 @@
 #include <cstdio>
 
 #ifdef KRP_CORE
-#include <Karipon/System/DomeParamTable.hpp>
+#include "Game/System/GameDataHolder.hpp"
+#include <Karipon/System/SystemDataHolder.hpp>
 #endif
 
 void EventUtil_FORCE_MATCH_STRINGS() {
@@ -443,13 +444,30 @@ namespace MR {
         return GameDataFunction::calcOpenedAstroDomeNum(GameDataFunction::getCurrentGameDataHolder());
     }
 
+#ifdef KRP_CORE
     bool isOpenAstroDome(s32 domeID) {
+        const GameDataHolder* gameDataHolder;
+
         if (GameSequenceFunction::hasStageResultSequence()) {
-            return DomeParamTable::isOpenDome(GameDataFunction::getSceneStartGameDataHolder(), domeID);
+            gameDataHolder = GameDataFunction::getSceneStartGameDataHolder();
+        }
+        else {
+            gameDataHolder = GameDataFunction::getCurrentGameDataHolder();
         }
 
-        return DomeParamTable::isOpenDome(GameDataFunction::getCurrentGameDataHolder(), domeID);
+        krp::SystemDataHolder* systemDataHolder = krp::SystemDataHolder::get();
+        krp::ByamlIter iter = systemDataHolder->getDomeParams(domeID);
+        const char* unlockFlag = nullptr;
+
+        iter.tryGetValueByKey("UnlockFlag", &unlockFlag);
+
+        if (unlockFlag == nullptr || gameDataHolder->isOnGameEventFlag(unlockFlag)) {
+            return true;
+        }
+
+        return false;
     }
+#endif
 
     s32 calcCurrentGreenStarNum() {
         return GameDataFunction::calcGreenStarNum(GameDataFunction::getCurrentGameDataHolder());

@@ -10,15 +10,18 @@ namespace JMath {
 class AudSystemWrapper;
 class CaptureScreenDirector;
 class FunctionAsyncExecutor;
-class GameOnlineManager;
 class MessageHolder;
 class NameObjHolder;
-class NetworkSystemWrapper;
 class ParticleResourceHolder;
 class ScreenPreserver;
 class StarPointerDirector;
-class SystemDebugLayout;
 class WPadHolder;
+
+#ifdef KRP_CORE
+class GameOnlineManager;
+class NetworkSystemWrapper;
+class SystemDebugLayout;
+#endif
 
 class GameSystemObjHolder {
 public:
@@ -34,7 +37,9 @@ public:
     void clearRequestFileInfo(bool);
     void drawStarPointer();
     void drawBeforeEndRender();
+#ifdef KRP_CORE
     void drawAfterHomeMenu();
+#endif
     void captureIfAllowForScreenPreserver();
     GXRenderModeObj* getRenderModeObj() const;
     void initDvd();

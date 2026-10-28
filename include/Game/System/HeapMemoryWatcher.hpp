@@ -6,7 +6,6 @@
 class JKRExpHeap;
 class JKRHeap;
 class JKRSolidHeap;
-class JKRUnitHeap;
 
 class HeapMemoryWatcher {
 public:

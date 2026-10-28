@@ -1,6 +1,13 @@
 #pragma once
 
+#ifdef KRP_CORE
 #include <revolution/types.h>
+#else
+#include "Game/Util/JMapInfo.hpp"
+#include <revolution.h>
+
+extern const JMapData GalaxyIDBCSV;
+#endif
 
 namespace GameDataConst {
     s32 getPowerStarNumToOpenGalaxy(const char*);

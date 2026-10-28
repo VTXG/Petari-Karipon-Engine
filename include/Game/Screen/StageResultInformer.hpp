@@ -42,7 +42,9 @@ public:
     void exeDisplayGetStarPiece();
     void exeWaitBeforeDisappearGetStarPiece();
     void exeDisappearGetStarPiece();
+#ifdef KRP_CORE
     void exeShowTicoCoin();
+#endif
     void exeShowNewGalaxyDiscover();
     void exeShowGalaxyMap();
     void exeShowGetPictureBook();

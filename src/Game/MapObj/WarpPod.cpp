@@ -216,9 +216,15 @@ void WarpPod::init(const JMapInfoIter& rIter) {
 
     bool isNonActive = false;
 
+#ifdef KRP_CORE
     if (!MR::isOpenAstroDome(mGrandstarReq)) {
         isNonActive = true;
     }
+#else
+    if (MR::calcOpenedAstroDomeNum() < mGrandstarReq) {
+        isNonActive = true;
+    }
+#endif
 
     if (mArg3 == 0) {
         s32 index = MR::getWarpPodManager()->_14++;

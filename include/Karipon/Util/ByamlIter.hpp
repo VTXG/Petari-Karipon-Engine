@@ -24,9 +24,12 @@ namespace krp {
     class ByamlIter {
     public:
         ByamlIter() : mData(nullptr), mRootNode(nullptr) {}
-        ByamlIter(const u8* pData);
-        ByamlIter(const u8* pData, const u8* pRoot) : mData(pData), mRootNode(pRoot) {}
+        ByamlIter(const void* pData) : mData(nullptr), mRootNode(nullptr) {
+            attach(pData);
+        }
+        ByamlIter(const void* pData, const void* pRoot) : mData(static_cast< const u8* >(pData)), mRootNode(static_cast< const u8* >(pRoot)) {}
 
+        bool attach(const void* pData);
         bool isValid() const {
             return mData != nullptr;
         }

@@ -12,7 +12,10 @@
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/SystemUtil.hpp"
 
-RestartCube::RestartCube(int formType, const char* pName) : AreaObj(formType, pName), mIdInfo(), _40(-1), _44(-1), _48(), mIsUsed() {
+RestartCube::RestartCube(int formType, const char* pName) : AreaObj(formType, pName), mIdInfo(), _40(-1), _44(-1), _48() {
+#ifdef KRP_CORE
+    mIsUsed = false;
+#endif
 }
 
 void RestartCube::init(const JMapInfoIter& rIter) {
@@ -27,10 +30,12 @@ void RestartCube::init(const JMapInfoIter& rIter) {
 
 void RestartCube::updatePlayerRestartIdInfo() {
     if (mObjArg3 == -1 || MR::isOnGroundPlayer()) {
+#ifdef KRP_CORE
         if (!mIsUsed) {
             mIsUsed = true;
             GameSequenceFunction::saveTemporaryTicoCoin();
         }
+#endif
 
         MR::setPlayerRestartIdInfo(*mIdInfo);
 

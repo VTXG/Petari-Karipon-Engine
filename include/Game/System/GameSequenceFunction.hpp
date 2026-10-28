@@ -28,16 +28,22 @@ namespace GameSequenceFunction {
     void requestChangeScene(const char*);
     void requestGalaxyMove(const GalaxyMoveArgument&);
     void requestCancelScenarioSelect();
+#ifdef KRP_CORE
     void sendStageResultSequenceParam(const char*, s32, int, int, u8);
+#else
+    void sendStageResultSequenceParam(const char*, s32, int, int);
+#endif
     bool hasStageResultSequence() NO_INLINE;
     const char* getClearedStageName() NO_INLINE;
     s32 getClearedPowerStarId();
     int getClearedStarPieceNum();
     int getClearedCoinNum();
+#ifdef KRP_CORE
     void onTicoCoinCollected(s32 id);
     bool isTicoCoinCollected(s32 id);
     u8 getTicoCoinCollectedFlag();
     void saveTemporaryTicoCoin();
+#endif
     bool hasPowerStarYetAtResultSequence();
     bool isPowerStarAtResultSequence(const char*, s32);
     bool isPowerStarGreenAtResultSequence();
@@ -45,9 +51,13 @@ namespace GameSequenceFunction {
     bool isGrandStarAtResultSequence();
     bool hasRetryGalaxySequence();
     bool isNeedToReflectStageResultSequenceStarPiece();
+#ifdef KRP_CORE
     bool isNeedToReflectStageResultSequenceTicoCoin();
+#endif
     void reflectStageResultSequenceCoin();
+#ifdef KRP_CORE
     void reflectStageResultSequenceTicoCoin();
+#endif
     void resetStageResultSequenceParam();
     void startPreLoadSaveDataSequence();
     void startTotalMailSizeSaveSequence();

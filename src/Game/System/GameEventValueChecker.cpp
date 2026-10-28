@@ -1,75 +1,66 @@
 #include "Game/System/GameEventValueChecker.hpp"
-#include "Game/Util/Array.hpp"
-#include "Game/Util/FileUtil.hpp"
+#include "Game/System/FindingLuigiEventScheduler.hpp"
 #include "Game/Util/HashUtil.hpp"
-#include "Game/Util/JMapInfo.hpp"
 #include "Game/Util/StringUtil.hpp"
 #include <JSystem/JSupport/JSUMemoryInputStream.hpp>
 #include <JSystem/JSupport/JSUMemoryOutputStream.hpp>
 
+#ifdef KRP_CORE
+#include <Karipon/System/SystemDataHolder.hpp>
+#endif
+
 namespace {
-    static MR::AssignableArray< GameEventValue > sGameEventValueTable;
-
-    static void initGameEventValue(GameEventValue& rValue, JMapInfo& rInfo, s32 idx) {
-        u32 defaultValue;
-        rInfo.getValue(idx, "Name", &rValue.mName);
-        rInfo.getValue(idx, "DefaultValue", &defaultValue);
-        rValue.mDefaultValue = defaultValue;
-    }
-}  // namespace
-
-namespace GameEventValueTable {
-    void init() {
-        void* pFileData = MR::receiveFile("/SystemData/GameEventValueTable.bcsv");
-
-        JMapInfo info;
-        info.attach(pFileData);
-
-        s32 numEntries = info.getNumEntries();
-        sGameEventValueTable.init(numEntries);
-
-        for (s32 i = 0; i < numEntries; i++) {
-            initGameEventValue(sGameEventValueTable[i], info, i);
-        }
-    }
-
-    s32 getTableSize() {
-        return sGameEventValueTable.mMaxSize;
-    }
-
-    s32 findIndex(const char* pName) {
-        for (s32 idx = 0; idx < sGameEventValueTable.mMaxSize; idx++) {
-            if (MR::isEqualString(pName, ::sGameEventValueTable[idx].mName)) {
-                return idx;
-            }
-        }
-
-        return -1;
-    }
-
-    s32 findIndexFromHashCode(u16 hash) {
-        for (s32 idx = 0; idx < sGameEventValueTable.mMaxSize; idx++) {
-            if (hash == static_cast< u16 >(MR::getHashCode(::sGameEventValueTable[idx].mName))) {
-                return idx;
-            }
-        }
-
-        return -1;
-    }
-}
+#ifndef KRP_CORE
+    const GameEventValue cGameEventValueTable[] = {
+        {"ペンギンレース[オーシャンリング]/hi", 0},
+        {"ペンギンレース[オーシャンリング]/lo", 90 * 60},
+        {"テレサレース[ファントム]/hi", 0},
+        {"テレサレース[ファントム]/lo", 90 * 60},
+        {"テレサレース[デスプロムナード]/hi", 0},
+        {"テレサレース[デスプロムナード]/lo", 90 * 60},
+        {"サーフィン[トライアル]/hi", 0},
+        {"サーフィン[トライアル]/lo", 90 * 60},
+        {"サーフィン[チャレンジ]/hi", 0},
+        {"サーフィン[チャレンジ]/lo", 90 * 60},
+        {"LibraryOpenNewStarCount", 1},
+        {"絵本既読章", 0},
+#if (VERSION == RMGK01)
+        {"MsgLedPattern", 1},
+#endif
+        {"LuigiEventState", FindingLuigiEventScheduler::STATE_NULL},
+        {"WarpPodSaveBits", 0},
+        {"TicoGalaxyAlreadyTalk", 0},
+        {"MessageAlreadyRead", 0},
+        {"MissPointForLetter", 0},
+        {"MissNum", 0},
+        {"Comet1Status", 0},
+        {"Comet2Status", 0},
+        {"Comet3Status", 0},
+        {"Comet4Status", 0},
+        {"Comet5Status", 0},
+        {"Comet6Status", 0},
+    };
+#endif
+}; // namespace
 
 GameEventValueChecker::GameEventValueChecker() : mValues(), mNumValues() {
-    mNumValues = GameEventValueTable::getTableSize();
+#ifdef KRP_CORE
+    krp::SystemDataHolder* systemDataHolder = krp::SystemDataHolder::get();
+    mNumValues = systemDataHolder->mEventValueTable.size();
     mValues = new u16[mNumValues];
+#else
+    mValues = new u16[ARRAY_SIZE(::cGameEventValueTable)];
+    mNumValues = ARRAY_SIZE(::cGameEventValueTable);
+#endif
     initializeData();
 }
 
 u32 GameEventValueChecker::getValue(const char* pName) const {
-    return mValues[GameEventValueTable::findIndex(pName)];
+    return mValues[findIndex(pName)];
 }
 
 void GameEventValueChecker::setValue(const char* pName, u16 value) {
-    mValues[GameEventValueTable::findIndex(pName)] = value;
+    mValues[findIndex(pName)] = value;
 }
 
 u32 GameEventValueChecker::makeHeaderHashCode() const {
@@ -81,12 +72,20 @@ u32 GameEventValueChecker::getSignature() const {
 }
 
 s32 GameEventValueChecker::serialize(u8* pData, u32 maxBufferSize) const {
+#ifdef KRP_CORE
+    krp::SystemDataHolder* systemDataHolder = krp::SystemDataHolder::get();
+#endif
+
     JSUMemoryOutputStream stream(pData, maxBufferSize);
 
     s32 hash;
 
     for (s32 idx = 0; idx < mNumValues; idx++) {
-        hash = MR::getHashCode(::sGameEventValueTable[idx].mName);
+#ifdef KRP_CORE
+        hash = MR::getHashCode(systemDataHolder->mEventValueTable[idx].mName);
+#else
+        hash = MR::getHashCode(::cGameEventValueTable[idx].mName);
+#endif
         const u16 value = mValues[idx];
 
         stream.writeU16(hash);
@@ -106,7 +105,8 @@ s32 GameEventValueChecker::deserialize(const u8* pData, u32 maxBufferSize) {
     for (s32 idx = 0; idx < numEntries; idx++) {
         u16 hash = stream.readU16();
         u16 value = stream.readU16();
-        s32 valueIndex = GameEventValueTable::findIndexFromHashCode(hash);
+
+        s32 valueIndex = findIndexFromHashCode(hash);
 
         if (valueIndex >= 0) {
             mValues[valueIndex] = value;
@@ -123,7 +123,55 @@ s32 GameEventValueChecker::deserialize(const u8* pData, u32 maxBufferSize) {
 }
 
 void GameEventValueChecker::initializeData() {
+#ifdef KRP_CORE
+    krp::SystemDataHolder* systemDataHolder = krp::SystemDataHolder::get();
+#endif
+
     for (s32 idx = 0; idx < mNumValues; idx++) {
-        mValues[idx] = ::sGameEventValueTable[idx].mDefaultValue;
+#ifdef KRP_CORE
+        mValues[idx] = systemDataHolder->mEventValueTable[idx].mDefaultValue;
+#else
+        mValues[idx] = ::cGameEventValueTable[idx].mDefaultValue;
+#endif
     }
+}
+
+s32 GameEventValueChecker::findIndex(const char* pName) const {
+#ifdef KRP_CORE
+    krp::SystemDataHolder* systemDataHolder = krp::SystemDataHolder::get();
+#endif
+
+    for (s32 idx = 0; idx < mNumValues; idx++) {
+#ifdef KRP_CORE
+        if (MR::isEqualString(pName, systemDataHolder->mEventValueTable[idx].mName)) {
+            return idx;
+        }
+#else
+        if (MR::isEqualString(pName, ::cGameEventValueTable[idx].mName)) {
+            return idx;
+        }
+#endif
+    }
+
+    return -1;
+}
+
+s32 GameEventValueChecker::findIndexFromHashCode(u16 hash) const {
+#ifdef KRP_CORE
+    krp::SystemDataHolder* systemDataHolder = krp::SystemDataHolder::get();
+#endif
+
+    for (s32 idx = 0; idx < mNumValues; idx++) {
+#ifdef KRP_CORE
+        if (hash == static_cast< u16 >(MR::getHashCode(systemDataHolder->mEventValueTable[idx].mName))) {
+            return idx;
+        }
+#else
+        if (hash == static_cast< u16 >(MR::getHashCode(::cGameEventValueTable[idx].mName))) {
+            return idx;
+        }
+#endif
+    }
+
+    return -1;
 }

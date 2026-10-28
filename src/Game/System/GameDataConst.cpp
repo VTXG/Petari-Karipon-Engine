@@ -6,11 +6,17 @@
 #include <cstdio>
 
 #ifdef KRP_CORE
-#include <Karipon/System/GameEmbeddedTable.hpp>
+#include <Karipon/System/SystemDataHolder.hpp>
 #endif
 
 s32 GameDataConst::getPowerStarNumToOpenGalaxy(const char* pGalaxy) {
-    JMapInfoIter element = GameEmbeddedTable::getGalaxyEntry(pGalaxy);
+#ifdef KRP_CORE
+    JMapInfoIter element = krp::SystemDataHolder::get()->getGalaxyInfo(pGalaxy);
+#else
+    JMapInfo info;
+    info.attach(&GalaxyIDBCSV);
+    JMapInfoIter element = info.findElement< const char* >("name", pGalaxy, 0);
+#endif
 
     u32 powerStarNum = 0;
     element.getValue< u32 >("PowerStarNum", &powerStarNum);
@@ -68,7 +74,13 @@ bool GameDataConst::isGalaxyAppearGreenDriver(const char* pGalaxyName) {
 }
 
 u32 GameDataConst::getIncludedGrandGalaxyId(const char* pGalaxy) {
-    JMapInfoIter element = GameEmbeddedTable::getGalaxyEntry(pGalaxy);
+#ifdef KRP_CORE
+    JMapInfoIter element = krp::SystemDataHolder::get()->getGalaxyInfo(pGalaxy);
+#else
+    JMapInfo info;
+    info.attach(&GalaxyIDBCSV);
+    JMapInfoIter element = info.findElement< const char* >("name", pGalaxy, 0);
+#endif
 
     u32 grandGalaxyNo = 0;
     element.getValue< u32 >("GrandGalaxyNo", &grandGalaxyNo);

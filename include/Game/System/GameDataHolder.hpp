@@ -40,7 +40,9 @@ public:
     bool hasPowerStar(const char*, s32) const;
     bool hasGrandStar(int) const;
     void setPowerStar(const char*, s32, bool);
+#ifdef KRP_CORE
     bool isTicoCoinCollected(const char* pGalaxyName, s32 id) const;
+#endif
     s32 getPowerStarNumOwned(const char*) const;
     s32 calcCurrentPowerStarNum() const;
     GameDataSomeScenarioAccessor makeGalaxyScenarioAccessor(const char*, s32);
@@ -72,8 +74,9 @@ public:
     /* 0x0C */ GameDataAllGalaxyStorage* mAllGalaxyStorage;
     /* 0x10 */ SpinDriverPathStorage* mSpinDriverPathStorage;
     /* 0x14 */ StarPieceAlmsStorage* mStarPieceAlmsStorage;
-    /* 0x18 */ ScenarioProgressTestRun* mScenarioProgressTestRun;
-    /* 0x1C */ BinaryDataChunkHolder* mChunkHolder;
-    /* 0x20 */ char mName[16];
-    /* 0x30 */ const UserFile* mUserFile;
+    /* 0x18 */ JMapInfo* mMapInfo;
+    /* 0x1C */ ScenarioProgressTestRun* mScenarioProgressTestRun;
+    /* 0x20 */ BinaryDataChunkHolder* mChunkHolder;
+    /* 0x24 */ char mName[16];
+    /* 0x34 */ const UserFile* mUserFile;
 };

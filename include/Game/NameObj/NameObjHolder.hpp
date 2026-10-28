@@ -20,6 +20,7 @@ public:
     void clearArray();
     NameObj* find(const char* pName);
 
+#ifdef KRP_CORE
     int getObjArraySize() const {
         return mObjArray1.size();
     }
@@ -27,6 +28,7 @@ public:
     int getObjArrayCapacity() const {
         return mObjArray1.capacity();
     }
+#endif
 
 private:
     /* 0x00 */ MR::Vector< MR::AssignableArray< NameObj* > > mObjArray1;

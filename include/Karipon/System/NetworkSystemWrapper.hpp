@@ -1,6 +1,6 @@
-#pragma once
-
 #ifdef KRP_ONLINE
+
+#pragma once
 
 #include <private/iostypes.h>
 #include <revolution/types.h>

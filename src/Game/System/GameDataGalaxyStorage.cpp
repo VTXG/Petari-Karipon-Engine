@@ -44,6 +44,7 @@ void GameDataSomeScenarioAccessor::updateMaxCoinNum(int coinNum) {
     }
 }
 
+#ifdef KRP_CORE
 u8 GameDataSomeScenarioAccessor::getTicoCoinFlag() const {
     return mSomeGalaxyStorage->mTicoCoinFlag;
 }
@@ -51,6 +52,7 @@ u8 GameDataSomeScenarioAccessor::getTicoCoinFlag() const {
 void GameDataSomeScenarioAccessor::updateTicoCoinFlag(u8 flag) {
     mSomeGalaxyStorage->mTicoCoinFlag |= flag;
 }
+#endif
 
 void GameDataSomeScenarioAccessor::setBitFlagAccordingToBool(u8* pFlags, bool val) {
     if (val) {
@@ -69,7 +71,11 @@ GameDataSomeGalaxyStorage::GameDataSomeGalaxyStorage(const GalaxyStatusAccessor&
 void GameDataSomeGalaxyStorage::resetAllData() {
     mPowerStarOwnedFlags = 0b00000000;
     mAlreadyVisitedFlags = 0b00000000;
+#ifdef KRP_CORE
     mTicoCoinFlag = 0b00000000;
+#else
+    _A = 0;
+#endif
     _B = 0;
 
     for (s32 idx = 0; idx < 8; idx++) {
@@ -102,12 +108,14 @@ s32 GameDataSomeGalaxyStorage::deserialize(const BinaryDataContentAccessor& rAcc
         mAlreadyVisitedFlags = 0b00000000;
     }
 
+#ifdef KRP_CORE
     u8* ticoCoinFlag = (u8*)rAccessor.getPointer("mTicoCoinFlag", (u8*)pData);
     if (ticoCoinFlag != nullptr) {
         mTicoCoinFlag = *ticoCoinFlag;
     } else {
         mTicoCoinFlag = 0b00000000;
     }
+#endif
 
     u16* maxCoinNums = (u16*)rAccessor.getPointer("mMaxCoinNum", (u8*)pData);
     for (s32 idx = 0; idx < 8; idx++) {
@@ -177,9 +185,11 @@ GameDataSomeGalaxyStorage* GameDataAllGalaxyStorage::getGalaxyStorage(int index)
     return mSomeGalaxyStorages[index];
 }
 
+#ifdef KRP_CORE
 GameDataSomeGalaxyStorage* GameDataAllGalaxyStorage::getGalaxyStorage(const char* pGalaxyName) {
     return mSomeGalaxyStorages[findIndex(pGalaxyName)];
 }
+#endif
 
 u32 GameDataAllGalaxyStorage::makeHeaderHashCode() const {
     return 0xBF0640EE;
@@ -234,7 +244,9 @@ void GameDataAllGalaxyStorage::initHeaderSerializer() {
     mHeaderSerializer->addAttribute("mGalaxyName", sizeof(u16));
     mHeaderSerializer->addAttribute("mPowerStarFlag", sizeof(u8));
     mHeaderSerializer->addAttribute("mFirstPlayFlag", sizeof(u8));
+#ifdef KRP_CORE
     mHeaderSerializer->addAttribute("mTicoCoinFlag", sizeof(u8));
+#endif
     mHeaderSerializer->addAttribute("mMaxCoinNum", sizeof(u16) * 8);
     mHeaderSerializer->flush();
 }
@@ -264,8 +276,10 @@ void GameDataSomeGalaxyStorage::serialize(const BinaryDataContentAccessor& rAcce
     u8* firstPlayFlags = (u8*)rAccessor.getPointer("mFirstPlayFlag", pData);
     *firstPlayFlags = mAlreadyVisitedFlags;
 
+#ifdef KRP_CORE
     u8* ticoCoinFlag = (u8*)rAccessor.getPointer("mTicoCoinFlag", pData);
     *ticoCoinFlag = mTicoCoinFlag;
+#endif
 
     u16* maxCoinNums = (u16*)rAccessor.getPointer("mMaxCoinNum", pData);
     for (s32 idx = 0; idx < 8; idx++) {

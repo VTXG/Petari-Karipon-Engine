@@ -4,13 +4,16 @@
 #include <cstring>
 
 namespace krp {
-    ByamlIter::ByamlIter(const u8* pData) : mData(pData), mRootNode(nullptr) {
+    bool ByamlIter::attach(const void* pData) {
+        mData = static_cast< const u8* >(pData);
+
         u32 dataOffset = mHeader->getDataOffset();
         if (dataOffset == 0) {
-            return;
+            return false;
         }
 
         mRootNode = &mData[dataOffset];
+        return true;
     }
 
     bool ByamlIter::isExistKey(const char* pKey) const {

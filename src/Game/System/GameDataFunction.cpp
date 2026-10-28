@@ -15,7 +15,8 @@
 #include <cstdio>
 
 #ifdef KRP_CORE
-#include <Karipon/System/DomeParamTable.hpp>
+#include "Game/Util/EventUtil.hpp"
+#include <Karipon/System/SystemDataHolder.hpp>
 #endif
 
 namespace {
@@ -235,9 +236,11 @@ namespace GameDataFunction {
         return ::getGameDataTemporaryInGalaxy()->mLast1upStarPieceNum;
     }
 
+#ifdef KRP_CORE
     bool isTicoCoinCollected(const char* pGalaxyName, s32 id) {
         return getCurrentGameDataHolder()->isTicoCoinCollected(pGalaxyName, id);
     }
+#endif
 
     const wchar_t* getUserName() {
         return ::getSaveDataHandleSequence()->getCurrentUserFile()->mUserName;
@@ -311,18 +314,20 @@ namespace GameDataFunction {
         return grandStarNum;
     }
 
+#ifdef KRP_CORE
     s32 calcOpenedAstroDomeNum(const GameDataHolder* pGameDataHolder) {
         s32 astroDomeNum = 0;
-        s32 entryNum = DomeParamTable::getDomeNum();
+        s32 entryNum = krp::SystemDataHolder::get()->mDomeParamTable.getSize();
 
         for (int i = 1; i <= entryNum; i++) {
-            if (DomeParamTable::isOpenDome(pGameDataHolder, i)) {
+            if (MR::isOpenAstroDome(i)) {
                 astroDomeNum++;
             }
         }
 
         return astroDomeNum;
     }
+#endif
 
     void resetGameDataGoToGalaxyFirst() {
         ::getGameDataTemporaryInGalaxy()->resetRaceBestTime();
@@ -331,13 +336,17 @@ namespace GameDataFunction {
         ::getGameDataTemporaryInGalaxy()->clearAlreadyDoneFlag();
         ::getGameDataTemporaryInGalaxy()->resetStageResultStarPieceParam();
         ::getGameDataTemporaryInGalaxy()->resetStageResultCoinParam();
+#ifdef KRP_CORE
         ::getGameDataTemporaryInGalaxy()->resetStageResultTicoCoinParam(true);
+#endif
     }
 
     void resetGameDataGoToGalaxyRetry() {
         ::getGameDataTemporaryInGalaxy()->resetRaceBestTime();
         ::getGameDataTemporaryInGalaxy()->_4 = true;
+#ifdef KRP_CORE
         ::getGameDataTemporaryInGalaxy()->resetStageResultTicoCoinParam(false);
+#endif
     }
 
     void onCompleteEndingCurrentPlayer() {

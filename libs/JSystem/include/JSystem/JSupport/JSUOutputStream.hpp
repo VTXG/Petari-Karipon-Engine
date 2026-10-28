@@ -25,10 +25,12 @@ public:
         write(&val, sizeof(u32));
     }
 
+#ifdef KRP_CORE
     template < typename T >
     inline void write(T val) {
         write(&val, sizeof(val));
     }
+#endif
 
     // TODO: probably a lot of other helpers for different types
 };

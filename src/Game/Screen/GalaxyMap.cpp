@@ -11,7 +11,6 @@
 #include "Game/Screen/IconAButton.hpp"
 #include "Game/Screen/LayoutManager.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
-#include "Game/System/GameDataConst.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
 #include "Game/Util/GamePadUtil.hpp"
 #include "Game/Util/LayoutUtil.hpp"
@@ -23,7 +22,9 @@
 #include <cstdio>
 
 #ifdef KRP_CORE
-#include <Karipon/System/GameEmbeddedTable.hpp>
+#include <Karipon/System/SystemDataHolder.hpp>
+#else
+#include "Game/System/GameDataConst.hpp"
 #endif
 
 namespace {
@@ -424,7 +425,10 @@ namespace {
 
 void GalaxyMap::initPaneCtrlPointing() {
 #ifdef KRP_CORE
-    JMapInfo galaxyInfo = GameEmbeddedTable::getGalaxyTable();
+    JMapInfo& galaxyInfo = krp::SystemDataHolder::get()->mGalaxyInfoTable;
+#else
+    JMapInfo galaxyInfo;
+    galaxyInfo.attach(&GalaxyIDBCSV);
 #endif
 
     ::initIconArray(mIcon, new GalaxyMapIcon*[galaxyInfo.getNumEntries()], galaxyInfo.getNumEntries());
@@ -443,7 +447,11 @@ void GalaxyMap::initPaneCtrlPointing() {
         }
 
         const char* pGalaxyName = nullptr;
+#ifdef KRP_CORE
         galaxyInfo.getValue(i, "Name", &pGalaxyName);
+#else
+        galaxyInfo.getValue(i, "name", &pGalaxyName);
+#endif
         GalaxyStatusAccessor accessor = MR::makeGalaxyStatusAccessor(pGalaxyName);
         MR::createAndAddPaneCtrl(this, pPaneName, 1);
         MR::addStarPointerTargetCircle(this, pPaneName, ::sPointingRange, TVec2f(0.0f, 0.0f), nullptr);

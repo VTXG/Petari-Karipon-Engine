@@ -1,5 +1,5 @@
 #include "Karipon/MapObj/TicoCoin.hpp"
-#include "Karipon/System/StageParamTable.hpp"
+#include "Karipon/System/SystemDataHolder.hpp"
 #include "Karipon/Util/ByamlIter.hpp"
 #include <Game/LiveActor/LiveActor.hpp>
 #include <Game/LiveActor/Nerve.hpp>
@@ -163,11 +163,11 @@ namespace krp {
             return false;
         }
 
-        ByamlIter iter;
+        ByamlIter params = krp::SystemDataHolder::get()->getStageParams(MR::getCurrentStageName());
 
-        if (StageParamTable::findParamsCommon(&iter, MR::getCurrentStageName())) {
+        if (params.isValid()) {
             u32 ticoCoinNum = 0;
-            iter.tryGetValueByKey("TicoCoinNum", &ticoCoinNum);
+            params.tryGetValueByKey("TicoCoinNum", &ticoCoinNum);
             return mID < ticoCoinNum;
         }
 

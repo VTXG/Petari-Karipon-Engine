@@ -8,10 +8,6 @@
 #include "Game/System/SaveDataHandleSequence.hpp"
 #include <JSystem/JKernel/JKRHeap.hpp>
 
-#ifdef KRP_CORE
-#include <Karipon/System/GameEmbeddedTable.hpp>
-#endif
-
 GameSequenceDirector::GameSequenceDirector()
     : mGameDataTemporaryInGalaxy(nullptr), mGameSequenceProgress(nullptr), mSaveDataHandleSequence(nullptr), mNWC24Messenger(nullptr) {
     mSaveDataHandleSequence = new SaveDataHandleSequence();
@@ -24,12 +20,6 @@ GameSequenceDirector::GameSequenceDirector()
 }
 
 void GameSequenceDirector::initAfterResourceLoaded() {
-#ifdef KRP_CORE
-    GameEmbeddedTable::init();
-    GameEventFlagTable::init();
-    GameEventValueTable::init();
-#endif
-
     mSaveDataHandleSequence->initAfterResourceLoaded();
     mGameSequenceProgress->initAfterResourceLoaded();
     mNWC24Messenger->initAfterResourceLoaded();

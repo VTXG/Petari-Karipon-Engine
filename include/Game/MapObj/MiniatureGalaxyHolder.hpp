@@ -35,17 +35,19 @@ public:
 #endif
 };
 
+// TODO: cleanup
+
 class MiniatureGalaxyFunction {
 public:
+#ifdef KRP_CORE
     static void createHolder();
     static MiniatureGalaxyHolder* getHolder();
-
-    static s32 calcMiniatureGalaxyIndex(const LiveActor* pActor);
-#ifdef KRP_CORE
     static krp::ByamlIter getMiniatureGalaxyOrbitParams(s32 idx);
+#else
+    static void registerMiniatureGalaxyToHolder(LiveActor*, const JMapInfoIter&);
 #endif
-
     static s32 getMiniatureGalaxyNum();
+    static s32 calcMiniatureGalaxyIndex(const LiveActor* pActor);
     static void updateCometStatus();
     static MiniatureGalaxy* getCometLandMiniatureGalaxy();
     static s32 getCometNameId();

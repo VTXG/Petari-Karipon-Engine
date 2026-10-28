@@ -34,9 +34,13 @@
 #include <nw4r/lyt/init.h>
 #include <revolution.h>
 
+#ifdef KRP_CORE
+#include <Karipon/System/SystemDataHolder.hpp>
+#endif
+
 #define GX_FIFO_SIZE 0x80000
 
-#define INIT_AUDIO_KEY "オーディオ初期化"  // "Audio Initialization"
+#define INIT_AUDIO_KEY "オーディオ初期化" // "Audio Initialization"
 
 namespace NrvGameSystem {
     NEW_NERVE(GameSystemInitializeAudio, GameSystem, InitializeAudio);
@@ -44,7 +48,7 @@ namespace NrvGameSystem {
     NEW_NERVE(GameSystemLoadStationedArchive, GameSystem, LoadStationedArchive);
     NEW_NERVE(GameSystemWaitForReboot, GameSystem, WaitForReboot);
     NEW_NERVE(GameSystemNormal, GameSystem, Normal);
-};  // namespace NrvGameSystem
+}; // namespace NrvGameSystem
 
 void main(void) {
     OSInitFastCast();
@@ -64,10 +68,6 @@ void main(void) {
     SingletonHolder< GameSystem >::init();
     SingletonHolder< GameSystem >::get()->init();
 
-#ifdef KRP_FEATURE_ENGINE
-    *(u8*)0 = 0;
-#endif
-
     GameSystem* pGameSystem = SingletonHolder< GameSystem >::get();
 
     while (true) {
@@ -79,6 +79,9 @@ GameSystem::GameSystem()
     : NerveExecutor("GameSystem"), mFifoBase(nullptr), mSequenceDirector(nullptr), mErrorWatcher(nullptr), mFontHolder(nullptr),
       mFrameControl(nullptr), mObjHolder(nullptr), mSceneController(nullptr), mStationedArchiveLoader(nullptr), mHomeButtonLayout(nullptr),
       mSystemWipeHolder(nullptr), mHomeButtonStateNotifier(nullptr), mIsExecuteLoadSystemArchive(false) {
+#ifdef KRP_CORE
+    mSystemDataHolder = nullptr;
+#endif
 }
 
 void GameSystem::init() {
@@ -100,6 +103,11 @@ void GameSystem::init() {
     mHomeButtonLayout = new HomeButtonLayout();
     mHomeButtonStateNotifier = new HomeButtonStateNotifier();
     mDimmingWatcher = new GameSystemDimmingWatcher();
+
+#ifdef KRP_CORE
+    mSystemDataHolder = new krp::SystemDataHolder();
+#endif
+
     setNerve(GET_NERVE(GameSystem, GameSystemInitializeAudio));
 }
 
@@ -153,8 +161,7 @@ void GameSystem::exeLoadStationedArchive() {
     }
 }
 
-void GameSystem::exeWaitForReboot() {
-}
+void GameSystem::exeWaitForReboot() {}
 
 void GameSystem::exeNormal() {
     updateSceneController();
@@ -170,6 +177,9 @@ void GameSystem::initGX() {
 }
 
 void GameSystem::initAfterStationedResourceLoaded() {
+#ifdef KRP_CORE
+    mSystemDataHolder->init();
+#endif
     mFontHolder->createFontFromFile();
     mObjHolder->initAfterStationedResourceLoaded();
     mHomeButtonLayout->initWithoutIter();

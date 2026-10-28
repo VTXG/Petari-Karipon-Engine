@@ -9,11 +9,22 @@
 #include "Game/Util/StringUtil.hpp"
 
 #ifdef KRP_CORE
-#include <Karipon/System/DomeParamTable.hpp>
+#include <Karipon/System/SystemDataHolder.hpp>
+#endif
+
+#ifndef KRP_CORE
+namespace {
+    MiniatureGalaxyHolder* getHolder() {
+        return MR::getSceneObj< MiniatureGalaxyHolder >(SceneObj_MiniatureGalaxyHolder);
+    }
+}; // namespace
 #endif
 
 MiniatureGalaxyHolder::MiniatureGalaxyHolder()
-    : LiveActor("ミニチュアギャラクシー保持"), mMiniatureGalaxyGroup(), _90(), mCometGalaxy(), mCometID(-1), _9C(), mParamTable() {
+    : LiveActor("ミニチュアギャラクシー保持"), mMiniatureGalaxyGroup(), _90(), mCometGalaxy(), mCometID(-1), _9C() {
+#ifdef KRP_CORE
+    mParamTable = krp::SystemDataHolder::get()->getDomeParams(MR::getCurrentScenarioNo());
+#endif
     mMiniatureGalaxyGroup = new LiveActorGroup("ミニチュアギャラクシーグループ", 16);
 }
 
@@ -31,7 +42,6 @@ void MiniatureGalaxyHolder::registerActor(LiveActor* pActor, const JMapInfoIter&
 }
 
 void MiniatureGalaxyHolder::init(const JMapInfoIter& rIter) {
-    mParamTable = DomeParamTable::getParam(MR::getCurrentScenarioNo());
     makeActorAppeared();
 }
 
@@ -123,6 +133,7 @@ void MiniatureGalaxyHolder::updateCometStatus() {
     }
 }
 
+#ifdef KRP_CORE
 void MiniatureGalaxyFunction::createHolder() {
     MR::createSceneObj(SceneObj_MiniatureGalaxyHolder);
 }
@@ -131,6 +142,16 @@ MiniatureGalaxyHolder* MiniatureGalaxyFunction::getHolder() {
     return MR::getSceneObj< MiniatureGalaxyHolder >(SceneObj_MiniatureGalaxyHolder);
 }
 
+krp::ByamlIter MiniatureGalaxyFunction::getMiniatureGalaxyOrbitParams(s32 idx) {
+    return getHolder()->getOrbitParams(idx);
+}
+#else
+void MiniatureGalaxyFunction::registerMiniatureGalaxyToHolder(LiveActor* pActor, const JMapInfoIter& rIter) {
+    MR::createSceneObj(SceneObj_MiniatureGalaxyHolder);
+    ::getHolder()->registerActor(pActor, rIter);
+}
+#endif
+
 s32 MiniatureGalaxyFunction::getMiniatureGalaxyNum() {
     return getHolder()->mMiniatureGalaxyGroup->getObjNum();
 }
@@ -138,12 +159,6 @@ s32 MiniatureGalaxyFunction::getMiniatureGalaxyNum() {
 s32 MiniatureGalaxyFunction::calcMiniatureGalaxyIndex(const LiveActor* pActor) {
     return getHolder()->calcIndex(pActor);
 }
-
-#ifdef KRP_CORE
-krp::ByamlIter MiniatureGalaxyFunction::getMiniatureGalaxyOrbitParams(s32 idx) {
-    return getHolder()->getOrbitParams(idx);
-}
-#endif
 
 void MiniatureGalaxyFunction::updateCometStatus() {
     getHolder()->updateCometStatus();

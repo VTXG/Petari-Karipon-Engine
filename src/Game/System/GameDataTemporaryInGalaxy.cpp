@@ -46,6 +46,7 @@ void GameDataTemporaryInGalaxy::resetStageResultCoinParam() {
     mCoinNum = 0;
 }
 
+#ifdef KRP_CORE
 void GameDataTemporaryInGalaxy::resetStageResultTicoCoinParam(bool resetSaved) {
     mTicoCoinTemporaryFlag = 0;
 
@@ -53,6 +54,7 @@ void GameDataTemporaryInGalaxy::resetStageResultTicoCoinParam(bool resetSaved) {
         mTicoCoinSavedFlag = 0;
     }
 }
+#endif
 
 void GameDataTemporaryInGalaxy::addStarPiece(int num) {
     s32 starPiece = mStarPieceNum + num;
@@ -87,6 +89,7 @@ void GameDataTemporaryInGalaxy::updateAlreadyDoneFlag(int index, u32 param2) {
     mAlreadyDoneFlag->updateValue(index, param2);
 }
 
+#ifdef KRP_CORE
 void GameDataTemporaryInGalaxy::onTicoCoinCollected(s32 id) {
     u8 flag = (1 << id) & 0xFF;
     mTicoCoinTemporaryFlag |= flag;
@@ -104,16 +107,23 @@ void GameDataTemporaryInGalaxy::saveTemporaryTicoCoin() {
 u8 GameDataTemporaryInGalaxy::getTicoCoinCollectedFlag() {
     return mTicoCoinTemporaryFlag | mTicoCoinSavedFlag;
 }
+#endif
 
+#ifdef KRP_CORE
 void GameDataTemporaryInGalaxy::receiveStageResultParam(const char* pStageName, s32 powerStarId, int starPieceNum, int coinNum, u8 ticoCoinFlag) {
+#else
+void GameDataTemporaryInGalaxy::receiveStageResultParam(const char* pStageName, s32 powerStarId, int starPieceNum, int coinNum) {
+#endif
     resetStageResultParam();
 
     mPowerStarId = powerStarId;
     _8 = 1;
     mStarPieceNum = starPieceNum;
     mCoinNum = coinNum;
+#ifdef KRP_CORE
     mTicoCoinTemporaryFlag = ticoCoinFlag;
     mTicoCoinSavedFlag = ticoCoinFlag;
+#endif
 
     snprintf(mStageName, sizeof(mStageName), "%s", pStageName);
 }

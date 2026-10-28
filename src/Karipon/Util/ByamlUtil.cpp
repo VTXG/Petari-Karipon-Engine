@@ -3,11 +3,11 @@
 #include "Karipon/Util/ByamlIter.hpp"
 
 namespace krp {
-    ByamlIter createByamlRoot(const u8* pData) {
+    ByamlIter createByamlRoot(const void* pData) {
         const ByamlHeader* header = reinterpret_cast< const ByamlHeader* >(pData);
 
         if (header->getTag() == 'BY' && (static_cast< s32 >(header->getVersion()) - 1) < 3) {
-            return ByamlIter(pData);
+            return ByamlIter(static_cast< const u8* >(pData));
         }
 
         return ByamlIter();
@@ -47,7 +47,7 @@ namespace krp {
         pValue->a = a;
     }
 
-    void getValueTVec3f(const ByamlIter& rIter, TVec3f* pValue) {
+    void getByamlDataTVec3f(const ByamlIter& rIter, TVec3f* pValue) {
         f32 x = 0.0f, y = 0.0f, z = 0.0f;
         rIter.tryGetValueByKey("X", &x);
         rIter.tryGetValueByKey("Y", &y);
