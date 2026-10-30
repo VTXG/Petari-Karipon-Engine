@@ -33,11 +33,15 @@ JKRArchive::~JKRArchive() {
 }
 
 bool JKRArchive::isSameName(CArcName& rName, u32 nameOffset, u16 hash) const {
+#ifdef KRP_CORE
+    return strcasecmp(mStringTable + nameOffset, rName.mName) == 0;
+#else
     if (rName.mHash != hash) {
         return false;
     }
 
     return strcmp(mStringTable + nameOffset, rName.mName) == 0;
+#endif
 }
 
 JKRArchive::SDIDirEntry* JKRArchive::findResType(u32 a1) const {

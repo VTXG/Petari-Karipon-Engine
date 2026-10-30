@@ -47,7 +47,7 @@ public:
     static void registerMiniatureGalaxyToHolder(LiveActor*, const JMapInfoIter&);
 #endif
     static s32 getMiniatureGalaxyNum();
-    static s32 calcMiniatureGalaxyIndex(const LiveActor* pActor);
+    static s32 calcMiniatureGalaxyIndex(const LiveActor*);
     static void updateCometStatus();
     static MiniatureGalaxy* getCometLandMiniatureGalaxy();
     static s32 getCometNameId();

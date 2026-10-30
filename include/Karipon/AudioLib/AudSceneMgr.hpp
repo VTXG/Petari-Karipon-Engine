@@ -1,9 +1,6 @@
 #pragma once
 
-#ifdef KRP_CORE
-
 #include "Karipon/Util/ByamlIter.hpp"
-#include <revolution/types.h>
 
 class JAUSectionHeap;
 
@@ -60,5 +57,3 @@ namespace krp {
         /* 0x31 */ bool _1D;
     };
 }; // namespace krp
-
-#endif

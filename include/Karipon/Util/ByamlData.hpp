@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef KRP_CORE
-
 #include <revolution/types.h>
 
 namespace krp {
@@ -107,5 +105,3 @@ namespace krp {
         const u8* mData;
     };
 }; // namespace krp
-
-#endif

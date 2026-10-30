@@ -1,5 +1,3 @@
-#ifdef KRP_CORE
-
 #pragma once
 
 #include "Karipon/Util/ByamlIter.hpp"
@@ -45,5 +43,3 @@ namespace krp {
         krp::ByamlIter mDomeParamTable;
     };
 }; // namespace krp
-
-#endif

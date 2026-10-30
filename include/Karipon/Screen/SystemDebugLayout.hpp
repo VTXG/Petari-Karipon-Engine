@@ -2,8 +2,6 @@
 
 // TODO: Modernize
 
-#ifdef KRP_CORE
-
 #include <JSystem/JGeometry/TVec.hpp>
 #include <nw4r/ut/WideTextWriter.h>
 
@@ -31,5 +29,3 @@ public:
     /* 0x08 */ u32 mSelectCurrentIndex;
     /* 0x0C */ bool mIsVisible;
 };
-
-#endif

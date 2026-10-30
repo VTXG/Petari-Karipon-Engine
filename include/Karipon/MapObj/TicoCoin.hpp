@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef KRP_CORE
-
 #include <Game/LiveActor/LiveActor.hpp>
 
 class ActorCameraInfo;
@@ -34,5 +32,3 @@ namespace krp {
         s32 mID;
     };
 }; // namespace krp
-
-#endif

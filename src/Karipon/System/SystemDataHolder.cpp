@@ -43,7 +43,7 @@ namespace {
     }
 
     static void attachResource(JKRMemArchive* pArchive, krp::ByamlIter& rIter, const char* pResourcePath) {
-        rIter.attach(pArchive->getResource(pResourcePath));
+        rIter = krp::createByamlRoot(pArchive->getResource(pResourcePath));
     }
 } // namespace
 
@@ -53,7 +53,7 @@ namespace krp {
           mDomeParamTable() {}
 
     void SystemDataHolder::init() {
-        mArchive = MR::receiveArchive("SystemData/SystemDataTable.bcsv");
+        mArchive = MR::receiveArchive("/SystemData/SystemDataTable.arc");
 
         ::attachResource(mArchive, mGalaxyInfoTable, "GalaxyInfoTable.bcsv");
         initCometTable();

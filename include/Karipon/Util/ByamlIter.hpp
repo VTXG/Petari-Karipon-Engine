@@ -1,9 +1,6 @@
 #pragma once
 
-#ifdef KRP_CORE
-
 #include "Karipon/Util/ByamlData.hpp"
-#include <revolution/types.h>
 
 namespace krp {
     class ByamlData;
@@ -24,12 +21,9 @@ namespace krp {
     class ByamlIter {
     public:
         ByamlIter() : mData(nullptr), mRootNode(nullptr) {}
-        ByamlIter(const void* pData) : mData(nullptr), mRootNode(nullptr) {
-            attach(pData);
-        }
+        ByamlIter(const void* pData);
         ByamlIter(const void* pData, const void* pRoot) : mData(static_cast< const u8* >(pData)), mRootNode(static_cast< const u8* >(pRoot)) {}
 
-        bool attach(const void* pData);
         bool isValid() const {
             return mData != nullptr;
         }
@@ -103,5 +97,3 @@ namespace krp {
         };
     };
 }; // namespace krp
-
-#endif

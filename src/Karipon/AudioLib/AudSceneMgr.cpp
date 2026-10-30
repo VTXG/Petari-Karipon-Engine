@@ -1,5 +1,3 @@
-#ifdef KRP_CORE
-
 #include "Karipon/AudioLib/AudSceneMgr.hpp"
 #include "Karipon/Util/ByamlUtil.hpp"
 #include <Game/AudioLib/AudEffector.hpp>
@@ -234,5 +232,3 @@ namespace krp {
         return -1;
     }
 }; // namespace krp
-
-#endif

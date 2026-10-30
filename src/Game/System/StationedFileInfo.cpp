@@ -952,36 +952,13 @@ namespace MR {
             StationedFileInfo::LOAD_TYPE_MOUNT_RESOURCE_LAYOUT,
             "/LayoutData/GameOver.arc",
         },
-        {            
-            StationedFileInfo::HEAP_TYPE_GDDR,
-            StationedFileInfo::LOAD_TYPE_FILE,
-            "/SystemData/DomeParamTable.byaml",
-        },
-        {            
-            StationedFileInfo::HEAP_TYPE_GDDR,
-            StationedFileInfo::LOAD_TYPE_FILE,
-            "/SystemData/GameEventFlagTable.bcsv",
-        },
+#ifdef KRP_CORE
         {
             StationedFileInfo::HEAP_TYPE_GDDR,
-            StationedFileInfo::LOAD_TYPE_FILE,
-            "/SystemData/GameEventValueTable.bcsv",
+            StationedFileInfo::LOAD_TYPE_MOUNT,
+            "/SystemData/SystemDataTable.arc",
         },
-        {
-            StationedFileInfo::HEAP_TYPE_GDDR,
-            StationedFileInfo::LOAD_TYPE_FILE,
-            "/SystemData/GameGalaxyTable.bcsv",
-        },
-        {
-            StationedFileInfo::HEAP_TYPE_GDDR,
-            StationedFileInfo::LOAD_TYPE_FILE,
-            "/SystemData/GameStoryEventTable.bcsv",
-        },
-        {
-            StationedFileInfo::HEAP_TYPE_GDDR,
-            StationedFileInfo::LOAD_TYPE_FILE,
-            "/SystemData/StageParamTable.byaml",
-        },
+#endif
         {
             StationedFileInfo::HEAP_TYPE_NAPA,
             StationedFileInfo::LOAD_TYPE_FILE,
@@ -992,4 +969,4 @@ namespace MR {
     const StationedFileInfo* getStationedFileInfoTable() {
         return cStationedFileInfo;
     }
-};  // namespace MR
+}; // namespace MR
