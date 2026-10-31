@@ -119,6 +119,10 @@
 #include "Game/Util/ShareUtil.hpp"
 #include "Game/Util/SingletonHolder.hpp"
 
+#ifdef KRP_CORE
+#include <Karipon/Map/ProductMapCreator.hpp>
+#endif
+
 SceneObjHolder::SceneObjHolder() {
     for (int i = 0; i < SceneObj_NumMax; i++) {
         mObj[i] = nullptr;
@@ -386,6 +390,10 @@ NameObj* SceneObjHolder::newEachObj(int id) {
         return new PrologueHolder("プロローグ保持");
     case SceneObj_StaffRoll:
         return new StaffRoll("スタッフロール");
+#ifdef KRP_CORE
+    case SceneObj_ProductMapCreator:
+        return new krp::ProductMapCreator();
+#endif
     default:
         return nullptr;
     }

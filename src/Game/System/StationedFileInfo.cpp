@@ -956,6 +956,11 @@ namespace MR {
         {
             StationedFileInfo::HEAP_TYPE_GDDR,
             StationedFileInfo::LOAD_TYPE_MOUNT,
+            "/ObjectData/ProductMapObjDataTable.arc",
+        },
+        {
+            StationedFileInfo::HEAP_TYPE_GDDR,
+            StationedFileInfo::LOAD_TYPE_MOUNT,
             "/SystemData/SystemDataTable.arc",
         },
 #endif

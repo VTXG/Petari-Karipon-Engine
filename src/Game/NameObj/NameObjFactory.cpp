@@ -18,6 +18,7 @@
 #include "Game/Util/StringUtil.hpp"
 
 #ifdef KRP_CORE
+#include <Karipon/Map/ProductMapCreator.hpp>
 #include <Karipon/MapObj/TicoCoin.hpp>
 #endif
 
@@ -8123,6 +8124,12 @@ namespace NameObjFactory {
         if (PlanetMapCreatorFunction::isRegisteredObj(pName)) {
             return PlanetMapCreatorFunction::getPlanetMapCreator(pName);
         }
+
+#ifdef KRP_CORE
+        if (krp::ProductMapCreatorFunction::isRegisteredObj(pName)) {
+            return krp::ProductMapCreatorFunction::getProductMapCreator(pName);
+        }
+#endif
 
         const Name2CreateFunc* pName2CreateFunc = getName2CreateFunc(pName, nullptr);
 

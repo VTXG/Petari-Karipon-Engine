@@ -7,10 +7,11 @@ namespace krp {
     ByamlIter::ByamlIter(const void* pData) : mData(static_cast< const u8* >(pData)), mRootNode(nullptr) {
         u32 dataOffset = mHeader->getDataOffset();
         if (dataOffset == 0) {
-            return;
+            mData = nullptr;
         }
-
-        mRootNode = &mData[dataOffset];
+        else {
+            mRootNode = &mData[dataOffset];
+        }        
     }
 
     bool ByamlIter::isExistKey(const char* pKey) const {

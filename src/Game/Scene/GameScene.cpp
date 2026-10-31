@@ -113,6 +113,10 @@ void GameScene::init() {
     MR::createSceneObj(SceneObj_CinemaFrame);
     MR::createSceneObj(SceneObj_PlanetMapCreator);
 
+#ifdef KRP_CORE
+    MR::createSceneObj(SceneObj_ProductMapCreator);
+#endif
+
     if (MR::isStageEpilogueDemo()) {
         MR::createSceneObj(SceneObj_StaffRoll);
     }

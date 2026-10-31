@@ -816,6 +816,12 @@ config.libs = [
         ]
     ),
     KariponLib(
+        "Map",
+        [
+            Object(MatchingFor(), "Karipon/Map/ProductMapCreator.cpp"),
+        ]
+    ),
+    KariponLib(
         "MapObj",
         [
             Object(MatchingFor(), "Karipon/MapObj/TicoCoin.cpp"),
@@ -836,6 +842,7 @@ config.libs = [
     KariponLib(
         "Screen",
         [
+            Object(MatchingFor(), "Karipon/Screen/PostFog.cpp"),
             Object(MatchingFor(), "Karipon/Screen/SystemDebugLayout.cpp"),
         ]
     ),

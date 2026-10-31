@@ -129,6 +129,10 @@ enum SceneObj {
     SceneObj_PrologueHolder = 0x79,
     SceneObj_StaffRoll = 0x7A,
 
+#ifdef KRP_CORE
+    SceneObj_ProductMapCreator = 0x7B,
+#endif
+
     SceneObj_NumMax,
 };
 
