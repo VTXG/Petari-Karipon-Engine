@@ -69,11 +69,18 @@ JKRHeap* HeapMemoryWatcher::getHeapGDDR3(const JKRHeap* pHeap) {
 
 void HeapMemoryWatcher::createFileCacheHeapOnGameHeap(u32 size) {
     mFileCacheHeap = ::createSolidHeap(size, mGameHeapGDDR);
+#ifdef KRP_CORE
+    mFileCacheHeap->setName("FileCacheHeap");
+#endif
 }
 
 void HeapMemoryWatcher::createSceneHeapOnGameHeap() {
     mSceneHeapNapa = ::createSolidHeap(-1, mGameHeapNapa);
     mSceneHeapGDDR = ::createSolidHeap(-1, mGameHeapGDDR);
+#ifdef KRP_CORE
+    mSceneHeapNapa->setName("SceneHeapNapa");
+    mSceneHeapGDDR->setName("SceneHeapGDDR");
+#endif
 }
 
 void HeapMemoryWatcher::adjustStationedHeaps() {
@@ -122,6 +129,10 @@ void HeapMemoryWatcher::createRootHeap() {
     u32 arenaHi, arenaLo;
 
     JKRExpHeap::createRoot(1, true);
+#ifdef KRP_CORE
+    JKRHeap::sRootHeap->setName("RootHeapGDDR3");
+#endif
+
     arenaLo = reinterpret_cast< u32 >(OSGetMEM2ArenaLo());
     arenaHi = reinterpret_cast< u32 >(OSGetMEM2ArenaHi());
     newHi = reinterpret_cast< void* >(arenaLo + 0xE00000);
@@ -134,6 +145,9 @@ void HeapMemoryWatcher::createRootHeap() {
     }
 
     HeapMemoryWatcher::sRootHeapGDDR3 = pHeap;
+#ifdef KRP_CORE
+    HeapMemoryWatcher::sRootHeapGDDR3->setName("RootHeapGDDR3");
+#endif
 }
 
 void HeapMemoryWatcher::createHeaps() {
@@ -146,12 +160,28 @@ void HeapMemoryWatcher::createHeaps() {
     mWPadHeap = ::createExpHeap(wpadHeapSize, pRootHeapGDDR, false);
     mHomeButtonLayoutHeap = ::createExpHeap(0x80000, HeapMemoryWatcher::sRootHeapGDDR3, false);
     mStationedHeapGDDR = ::createExpHeap(0x1400000, HeapMemoryWatcher::sRootHeapGDDR3, false);
+
+#ifdef KRP_CORE
+    JKRHeap::sSystemHeap->setName("SystemHeap");
+    mAudSystemHeap->setName("AudSystemHeap");
+    mStationedHeapNapa->setName("StationedHeapNapa");
+    mWPadHeap->setName("WPadHeap");
+
+    mHomeButtonLayoutHeap->setName("HomeButtonLayoutHeap");
+    mStationedHeapGDDR->setName("StationedHeapGDDR");
+#endif
+
     createGameHeap();
 }
 
 void HeapMemoryWatcher::createGameHeap() {
     mGameHeapNapa = ::createExpHeap(-1, JKRHeap::sRootHeap, false);
     mGameHeapGDDR = ::createExpHeap(-1, HeapMemoryWatcher::sRootHeapGDDR3, false);
+
+#ifdef KRP_CORE
+    mGameHeapNapa->setName("GameHeapNapa");
+    mGameHeapGDDR->setName("GameHeapGDDR");
+#endif
 }
 
 HeapMemoryWatcher::HeapMemoryWatcher()
@@ -162,7 +192,21 @@ HeapMemoryWatcher::HeapMemoryWatcher()
 }
 
 void HeapMemoryWatcher::memoryErrorCallback(void* pHeap, u32 size, int alignment) {
-    OSPanic(__FILE__, __LINE__, "Failed to allocate 0x%X bytes with %d-byte alignment", size, alignment);
+#ifdef KRP_CORE
+    const JKRHeap* jkrHeap = static_cast< const JKRHeap* >(pHeap);
+    const char* heapName;
+
+    if (jkrHeap != nullptr && jkrHeap->mName != nullptr) {
+        heapName = jkrHeap->mName;
+    }
+    else {
+        heapName = "unknown";
+    }
+
+    OSPanic(__FILE__, __LINE__, "Failed to allocate memory in heap '%s' (size=%d, align=%d)", heapName, size, alignment);
+#else
+    OSPanic(__FILE__, 537, "");
+#endif
 }
 
 void HeapMemoryWatcher::checkRestMemory() {

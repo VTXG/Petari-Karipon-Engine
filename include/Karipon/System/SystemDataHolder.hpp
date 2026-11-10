@@ -25,13 +25,6 @@ namespace krp {
         krp::ByamlIter getDomeParams(s32 scenarioNo);
 
         static SystemDataHolder* get();
-        // static JMapInfo getGalaxyTable();
-        // static JMapInfoIter getGalaxyTableIter(const char* pName);
-        // static MR::AssignableArray< GalaxyCometTimePaper* >& getCometTable();
-        // static MR::AssignableArray< GameEventFlag >& getEventFlagTable();
-        // static MR::AssignableArray< GameEventValue >& getEventValueTable();
-        // static u8 getStoryEventProgress(const char* pName);
-        // static krp::ByamlIter getStageParamsIter(const char* pName, s32 scenarioNo = 0);
 
         JKRMemArchive* mArchive;
         JMapInfo mGalaxyInfoTable;

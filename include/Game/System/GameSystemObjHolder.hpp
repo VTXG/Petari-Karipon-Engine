@@ -20,7 +20,10 @@ class WPadHolder;
 #ifdef KRP_CORE
 class GameOnlineManager;
 class NetworkSystemWrapper;
-class SystemDebugLayout;
+
+namespace krp {
+    class SystemDebugLayout;
+};
 #endif
 
 class GameSystemObjHolder {
@@ -75,6 +78,6 @@ public:
 #ifdef KRP_CORE
     /* 0x3C */ NetworkSystemWrapper* mNetworkSystem;
     /* 0x40 */ GameOnlineManager* mOnlineManager;
-    /* 0x44 */ SystemDebugLayout* mDebugLayout;
+    /* 0x44 */ krp::SystemDebugLayout* mDebugLayout;
 #endif
 };

@@ -41,7 +41,11 @@ void* FileRipper::loadToMainRAM(const char* fpath, u8* dest, bool decompress, JK
     u32 decompressedSize;
 
     if (!MR::isFileExist(fpath, false)) {
+#ifdef KRP_CORE
+        OSPanic(__FILE__, __LINE__, "File '%s' isn't exist.", fpath);
+#else
         OSPanic(__FILE__, 0x70, "File isn't exist.");
+#endif
     }
 
     u32 fsize = (MR::getFileSize(fpath, false) + 0x1f) / 0x20 * 0x20;

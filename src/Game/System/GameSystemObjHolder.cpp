@@ -195,7 +195,7 @@ void GameSystemObjHolder::initDisplay() {
     mCaptureScreenDirector = new CaptureScreenDirector();
     mScreenPreserver = new ScreenPreserver();
 #ifdef KRP_CORE
-    mDebugLayout = new SystemDebugLayout();
+    mDebugLayout = new krp::SystemDebugLayout();
 #endif
 
     VISetTrapFilter(VI_TRUE);

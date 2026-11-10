@@ -213,6 +213,12 @@ public:
         return (void*)mEnd;
     }
 
+#ifdef KRP_CORE
+    inline void setName(const char* pName) {
+        mName = pName;
+    }
+#endif
+
     /* 0x18 */ mutable OSMutex mMutex;
     /* 0x30 */ u8* mStart;
     /* 0x34 */ u8* mEnd;
@@ -225,6 +231,9 @@ public:
     /* 0x5C */ JSUList< JKRDisposer > mDisposerList;
     /* 0x68 */ bool mErrorFlag;
     /* 0x69 */ u8 _69;
+#ifdef KRP_CORE
+    /* 0x6C */ const char* mName;
+#endif
 };
 
 #ifdef __MWERKS__

@@ -6,20 +6,20 @@ namespace krp {
     class ByamlHashPair;
 
     enum ByamlDataType {
-        BYAML_TYPE_INVALID = 0,
-        BYAML_TYPE_STRING = 0xA0,
-        BYAML_TYPE_BINARY = 0xA1,
-        BYAML_TYPE_ARRAY = 0xC0,
-        BYAML_TYPE_HASH = 0xC1,
-        BYAML_TYPE_STRING_TABLE = 0xC2,
-        BYAML_TYPE_BOOL = 0xD0,
-        BYAML_TYPE_INT = 0xD1,
-        BYAML_TYPE_FLOAT = 0xD2,
-        BYAML_TYPE_UINT = 0xD3,
-        BYAML_TYPE_LONG = 0xD4,
-        BYAML_TYPE_ULONG = 0xD5,
-        BYAML_TYPE_DOUBLE = 0xD6,
-        BYAML_TYPE_NULL = 0xFF
+        ByamlDataType_Invalid = 0,
+        ByamlDataType_String = 0xA0,
+        ByamlDataType_Binary = 0xA1,
+        ByamlDataType_Array = 0xC0,
+        ByamlDataType_Hash = 0xC1,
+        ByamlDataType_StringTable = 0xC2,
+        ByamlDataType_Bool = 0xD0,
+        ByamlDataType_Int = 0xD1,
+        ByamlDataType_Float = 0xD2,
+        ByamlDataType_UInt = 0xD3,
+        ByamlDataType_Long = 0xD4,
+        ByamlDataType_ULong = 0xD5,
+        ByamlDataType_Double = 0xD6,
+        ByamlDataType_Null = 0xFF
     };
 
     class ByamlHashPair {
@@ -40,7 +40,7 @@ namespace krp {
 
     class ByamlData {
     public:
-        ByamlData() : mValue(0), mType(BYAML_TYPE_INVALID) {}
+        ByamlData() : mValue(0), mType(ByamlDataType_Invalid) {}
 
         void set(const ByamlHashPair* pPair) {
             mType = pPair->getType();

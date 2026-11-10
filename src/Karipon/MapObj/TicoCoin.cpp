@@ -46,10 +46,7 @@ namespace krp {
         MR::getJMapInfoArg0NoInit(rIter, &mID);
 
         if (!isTicoCoinExist()) {
-            OSReport("TicoCoin %d doesn't exist\n", mID);
             mID = -1;
-        } else {
-            OSReport("TicoCoin %d valid\n", mID);
         }
 
         s32 registerDemo;

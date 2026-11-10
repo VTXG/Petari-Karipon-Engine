@@ -108,6 +108,7 @@ void GameOnlineManager::update() {
 
 void GameOnlineManager::initMemory() {
     mOnlineHeap = JKRUnitHeap::create(sizeof(GameOnlinePacket), 0x1E000, 32, JKRHeap::sSystemHeap, true);
+    mOnlineHeap->setName("OnlineHeap");
     MR::CurrentHeapRestorer heapRestorer = MR::CurrentHeapRestorer(mOnlineHeap);
 
     mRecvPacket = new GameOnlinePacket();

@@ -22,7 +22,7 @@
 extern "C" int vswprintf(wchar_t* s, size_t n, const wchar_t* format, va_list arg);
 
 namespace {
-    typedef void (*PageUpdateFunc)(SystemDebugLayout::PrintContext& rContext);
+    typedef void (*PageUpdateFunc)(krp::SystemDebugLayout::PrintContext& rContext);
 
     struct PageUpdateInfo {
         const char* mName;
@@ -36,7 +36,7 @@ namespace {
     namespace DiagnosticsPage {
         static OSTick sLastTick;
 
-        static void printHeapInfo(SystemDebugLayout::PrintContext& rContext, const char* pHeapName, JKRHeap* pHeap) {
+        static void printHeapInfo(krp::SystemDebugLayout::PrintContext& rContext, JKRHeap* pHeap) {
             if (pHeap == nullptr) {
                 return;
             }
@@ -44,10 +44,10 @@ namespace {
             u32 max = pHeap->mSize;
             u32 used = max - pHeap->getFreeSize();
             f32 usedPercent = static_cast< f32 >(used) / static_cast< f32 >(max) * 100.0f;
-            rContext.printTextF(false, L"%s : %.02f%% usage, 0x%08X/0x%08X bytes used\n", pHeapName, usedPercent, used, max);
+            rContext.printTextF(false, L"%s : %.02f%% usage, 0x%08X/0x%08X bytes used\n", pHeap->mName, usedPercent, used, max);
         }
 
-        static void update(SystemDebugLayout::PrintContext& rContext) {
+        static void update(krp::SystemDebugLayout::PrintContext& rContext) {
             OSTick tick = OSGetTick();
             OSTick span = tick - sLastTick;
             sLastTick = tick;
@@ -66,23 +66,23 @@ namespace {
             rContext.printTextF(false, L"Object Info : %d/%d objects\n", pNameObjHolder->getObjArraySize(), pNameObjHolder->getObjArrayCapacity());
 
             HeapMemoryWatcher* pWatcher = SingletonHolder< HeapMemoryWatcher >::get();
-            printHeapInfo(rContext, "SystemHeap", JKRHeap::sSystemHeap);
-            printHeapInfo(rContext, "StationedHeapNapa", pWatcher->mStationedHeapNapa);
-            printHeapInfo(rContext, "StationedHeapGDDR", pWatcher->mStationedHeapGDDR);
-            printHeapInfo(rContext, "GameHeapNapa", pWatcher->mGameHeapNapa);
-            printHeapInfo(rContext, "GameHeapGDDR", pWatcher->mGameHeapGDDR);
-            printHeapInfo(rContext, "FileCacheHeap", pWatcher->mFileCacheHeap);
-            printHeapInfo(rContext, "SceneHeapNapa", pWatcher->mSceneHeapNapa);
-            printHeapInfo(rContext, "SceneHeapGDDR", pWatcher->mSceneHeapGDDR);
-            printHeapInfo(rContext, "WPadHeap", pWatcher->mWPadHeap);
-            printHeapInfo(rContext, "HomeButtonLayoutHeap", pWatcher->mHomeButtonLayoutHeap);
-            printHeapInfo(rContext, "AudSystemHeap", pWatcher->mAudSystemHeap);
-            printHeapInfo(rContext, "GameOnlineHeap", getOnlineManager()->mOnlineHeap);
+            printHeapInfo(rContext, JKRHeap::sSystemHeap);
+            printHeapInfo(rContext, pWatcher->mStationedHeapNapa);
+            printHeapInfo(rContext, pWatcher->mStationedHeapGDDR);
+            printHeapInfo(rContext, pWatcher->mGameHeapNapa);
+            printHeapInfo(rContext, pWatcher->mGameHeapGDDR);
+            printHeapInfo(rContext, pWatcher->mFileCacheHeap);
+            printHeapInfo(rContext, pWatcher->mSceneHeapNapa);
+            printHeapInfo(rContext, pWatcher->mSceneHeapGDDR);
+            printHeapInfo(rContext, pWatcher->mWPadHeap);
+            printHeapInfo(rContext, pWatcher->mHomeButtonLayoutHeap);
+            printHeapInfo(rContext, pWatcher->mAudSystemHeap);
+            printHeapInfo(rContext, getOnlineManager()->mOnlineHeap);
         }
     } // namespace DiagnosticsPage
 
     namespace OnlinePage {
-        static void update(SystemDebugLayout::PrintContext& rContext) {
+        static void update(krp::SystemDebugLayout::PrintContext& rContext) {
             GameOnlineManager* pOnlineManager = getOnlineManager();
 
             if (!pOnlineManager->isConnected()) {
@@ -139,138 +139,140 @@ namespace {
     }
 } // namespace
 
-SystemDebugLayout::PrintContext::PrintContext(SystemDebugLayout* pLayout) : mLayout(pLayout), mWriter(), mDrawRect() {
-    nw4r::ut::Font* pFont = MR::getFontOnCurrentLanguage();
+namespace krp {
+    SystemDebugLayout::PrintContext::PrintContext(SystemDebugLayout* pLayout) : mLayout(pLayout), mWriter(), mDrawRect() {
+        nw4r::ut::Font* pFont = MR::getFontOnCurrentLanguage();
 
-    mWriter.SetFont(*pFont);
-    mWriter.SetFontSize(::cFontSizeWidth, ::cFontSizeHeight);
-    mWriter.SetLineSpace(::cFontLineSpace);
-    mWriter.SetCharSpace(::cFontCharSpace);
+        mWriter.SetFont(*pFont);
+        mWriter.SetFontSize(::cFontSizeWidth, ::cFontSizeHeight);
+        mWriter.SetLineSpace(::cFontLineSpace);
+        mWriter.SetCharSpace(::cFontCharSpace);
 
-    mDrawRect.left = 0.0f;
-    mDrawRect.top = 0.0f;
-    mDrawRect.right = MR::getFrameBufferWidth();
-    mDrawRect.bottom = MR::getFrameBufferHeight();
+        mDrawRect.left = 0.0f;
+        mDrawRect.top = 0.0f;
+        mDrawRect.right = MR::getFrameBufferWidth();
+        mDrawRect.bottom = MR::getFrameBufferHeight();
 
-    mWriter.SetCursor(mDrawRect.left, mDrawRect.top);
-}
-
-void SystemDebugLayout::PrintContext::prepareDraw(u32 color) {
-    Mtx mtx;
-    PSMTXIdentity(mtx);
-
-    mtx[0][3] = ((mDrawRect.left - mDrawRect.right) / 2.0f) + (mWriter.GetFontWidth() * 2.0f);
-    mtx[1][1] = -1.0f;
-    mtx[1][3] = ((mDrawRect.bottom - mDrawRect.top) / 2.0f) - mWriter.GetFontHeight();
-
-    GXLoadPosMtxImm(mtx, GX_PNMTX0);
-    GXSetCurrentMtx(GX_PNMTX0);
-
-    nw4r::ut::Color col(color);
-    mWriter.SetGradationMode(nw4r::ut::CharWriter::GRADMODE_NONE);
-    mWriter.SetTextColor(col);
-
-    nw4r::ut::Color minCol(0x00000000);
-    nw4r::ut::Color maxCol(color);
-    mWriter.SetColorMapping(minCol, maxCol);
-    mWriter.SetupGX();
-
-    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-}
-
-bool SystemDebugLayout::PrintContext::printText(bool isSelectable, const wchar_t* pText) {
-    if (pText == nullptr) {
-        return false;
+        mWriter.SetCursor(mDrawRect.left, mDrawRect.top);
     }
 
-    u32 len = wcslen(pText);
-    if (len == 0) {
-        return false;
+    void SystemDebugLayout::PrintContext::prepareDraw(u32 color) {
+        Mtx mtx;
+        PSMTXIdentity(mtx);
+
+        mtx[0][3] = ((mDrawRect.left - mDrawRect.right) / 2.0f) + (mWriter.GetFontWidth() * 2.0f);
+        mtx[1][1] = -1.0f;
+        mtx[1][3] = ((mDrawRect.bottom - mDrawRect.top) / 2.0f) - mWriter.GetFontHeight();
+
+        GXLoadPosMtxImm(mtx, GX_PNMTX0);
+        GXSetCurrentMtx(GX_PNMTX0);
+
+        nw4r::ut::Color col(color);
+        mWriter.SetGradationMode(nw4r::ut::CharWriter::GRADMODE_NONE);
+        mWriter.SetTextColor(col);
+
+        nw4r::ut::Color minCol(0x00000000);
+        nw4r::ut::Color maxCol(color);
+        mWriter.SetColorMapping(minCol, maxCol);
+        mWriter.SetupGX();
+
+        GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     }
 
-    nw4r::math::VEC3 cursorPos(mWriter.mCursorPos);
+    bool SystemDebugLayout::PrintContext::printText(bool isSelectable, const wchar_t* pText) {
+        if (pText == nullptr) {
+            return false;
+        }
 
-    mWriter.SetCursorX(cursorPos.x + 1.0f);
-    mWriter.SetCursorY(cursorPos.y + 1.0f);
-    prepareDraw(0x000000D0);
-    mWriter.Print(pText, len);
+        u32 len = wcslen(pText);
+        if (len == 0) {
+            return false;
+        }
 
-    mWriter.mCursorPos = cursorPos;
+        nw4r::math::VEC3 cursorPos(mWriter.mCursorPos);
 
-    bool isSelected = false;
+        mWriter.SetCursorX(cursorPos.x + 1.0f);
+        mWriter.SetCursorY(cursorPos.y + 1.0f);
+        prepareDraw(0x000000D0);
+        mWriter.Print(pText, len);
 
-    if (isSelectable) {
-        if (mLayout->mSelectIndex == mLayout->mSelectCurrentIndex) {
-            prepareDraw(0x00FFDDFF);
+        mWriter.mCursorPos = cursorPos;
 
-            WPadButton* pPadButton = MR::getWPad(0)->mButton;
-            isSelected = pPadButton->testButton1() && pPadButton->testTriggerA();
+        bool isSelected = false;
+
+        if (isSelectable) {
+            if (mLayout->mSelectIndex == mLayout->mSelectCurrentIndex) {
+                prepareDraw(0x00FFDDFF);
+
+                WPadButton* padButton = MR::getWPad(0)->mButton;
+                isSelected = padButton->testButton1() && padButton->testTriggerA();
+            } else {
+                prepareDraw(0xFFFFFFFF);
+            }
+
+            mLayout->mSelectCurrentIndex++;
         } else {
             prepareDraw(0xFFFFFFFF);
         }
 
-        mLayout->mSelectCurrentIndex++;
-    } else {
+        mWriter.Print(pText, len);
+        return isSelected;
+    }
+
+    bool SystemDebugLayout::PrintContext::printTextF(bool isSelectable, const wchar_t* pText, ...) {
+        va_list list;
+        wchar_t text[0x200];
+
+        va_start(list, text);
+        vswprintf(text, sizeof(text) / sizeof(*text), pText, list);
+        va_end();
+
+        return printText(isSelectable, text);
+    }
+
+    void SystemDebugLayout::PrintContext::printFillBox(const TVec2f& tl, const TVec2f& br, u32 color) {
         prepareDraw(0xFFFFFFFF);
+        TDDraw::setup(0, 0, 2);
+        TDDraw::drawFillBox(tl, br, color);
     }
 
-    mWriter.Print(pText, len);
-    return isSelected;
-}
+    SystemDebugLayout::SystemDebugLayout() : mPageIndex(), mSelectIndex(), mSelectCurrentIndex(), mIsVisible() {}
 
-bool SystemDebugLayout::PrintContext::printTextF(bool isSelectable, const wchar_t* pText, ...) {
-    va_list list;
-    wchar_t text[0x200];
+    void SystemDebugLayout::draw() {
+        WPadButton* padButton = MR::getWPad(WPAD_CHAN0)->mButton;
 
-    va_start(list, text);
-    vswprintf(text, sizeof(text) / sizeof(*text), pText, list);
-    va_end();
-
-    return printText(isSelectable, text);
-}
-
-void SystemDebugLayout::PrintContext::printFillBox(const TVec2f& tl, const TVec2f& br, u32 color) {
-    prepareDraw(0xFFFFFFFF);
-    TDDraw::setup(0, 0, 2);
-    TDDraw::drawFillBox(tl, br, color);
-}
-
-SystemDebugLayout::SystemDebugLayout() : mPageIndex(), mSelectIndex(), mSelectCurrentIndex(), mIsVisible(true) {}
-
-void SystemDebugLayout::draw() {
-    WPadButton* pPadButton = MR::getWPad(WPAD_CHAN0)->mButton;
-
-    if (pPadButton->testTrigger2()) {
-        mIsVisible = !mIsVisible;
-    }
-
-    if (!mIsVisible) {
-        return;
-    }
-
-    mSelectCurrentIndex = 0;
-
-    PrintContext ctx(this);
-    ctx.printTextF(false, L"----- %s [%d/%d] -----\n", ::cPageUpdateFunc[mPageIndex].mName, mPageIndex + 1, ARRAY_SIZE(::cPageUpdateFunc));
-    ::cPageUpdateFunc[mPageIndex].mFunc(ctx);
-
-    if (pPadButton->testButton1()) {
-        if (pPadButton->testTriggerUp()) {
-            mSelectIndex = wrap(mSelectIndex - 1, 0, mSelectCurrentIndex);
+        if (padButton->testTrigger2()) {
+            mIsVisible = !mIsVisible;
         }
 
-        if (pPadButton->testTriggerDown()) {
-            mSelectIndex = wrap(mSelectIndex + 1, 0, mSelectCurrentIndex);
+        if (!mIsVisible) {
+            return;
         }
 
-        if (pPadButton->testTriggerLeft()) {
-            mPageIndex = wrap(mPageIndex - 1, 0, ARRAY_SIZE(::cPageUpdateFunc));
-            mSelectIndex = 0;
-        }
+        mSelectCurrentIndex = 0;
 
-        if (pPadButton->testTriggerRight()) {
-            mPageIndex = wrap(mPageIndex + 1, 0, ARRAY_SIZE(::cPageUpdateFunc));
-            mSelectIndex = 0;
+        PrintContext ctx(this);
+        ctx.printTextF(false, L"----- %s [%d/%d] -----\n", ::cPageUpdateFunc[mPageIndex].mName, mPageIndex + 1, ARRAY_SIZE(::cPageUpdateFunc));
+        ::cPageUpdateFunc[mPageIndex].mFunc(ctx);
+
+        if (padButton->testButton1()) {
+            if (padButton->testTriggerUp()) {
+                mSelectIndex = wrap(mSelectIndex - 1, 0, mSelectCurrentIndex);
+            }
+
+            if (padButton->testTriggerDown()) {
+                mSelectIndex = wrap(mSelectIndex + 1, 0, mSelectCurrentIndex);
+            }
+
+            if (padButton->testTriggerLeft()) {
+                mPageIndex = wrap(mPageIndex - 1, 0, ARRAY_SIZE(::cPageUpdateFunc));
+                mSelectIndex = 0;
+            }
+
+            if (padButton->testTriggerRight()) {
+                mPageIndex = wrap(mPageIndex + 1, 0, ARRAY_SIZE(::cPageUpdateFunc));
+                mSelectIndex = 0;
+            }
         }
     }
-}
+} // namespace krp

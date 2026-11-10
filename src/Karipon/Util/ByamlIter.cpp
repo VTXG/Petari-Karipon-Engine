@@ -15,7 +15,7 @@ namespace krp {
     }
 
     bool ByamlIter::isExistKey(const char* pKey) const {
-        if (mRootNode == nullptr || *mRootNode != BYAML_TYPE_HASH) {
+        if (mRootNode == nullptr || *mRootNode != ByamlDataType_Hash) {
             return false;
         }
 
@@ -42,7 +42,7 @@ namespace krp {
             return 0;
         }
 
-        if (mContainingHeader->getType() == BYAML_TYPE_ARRAY || mContainingHeader->getType() == BYAML_TYPE_HASH) {
+        if (mContainingHeader->getType() == ByamlDataType_Array || mContainingHeader->getType() == ByamlDataType_Hash) {
             return mContainingHeader->getCount();
         }
 
@@ -56,8 +56,8 @@ namespace krp {
             return ByamlIter();
         }
 
-        if (data.getType() != BYAML_TYPE_ARRAY && data.getType() != BYAML_TYPE_HASH) {
-            if (data.getType() == BYAML_TYPE_NULL) {
+        if (data.getType() != ByamlDataType_Array && data.getType() != ByamlDataType_Hash) {
+            if (data.getType() == ByamlDataType_Null) {
                 return ByamlIter(mData, nullptr);
             }
 
@@ -72,12 +72,12 @@ namespace krp {
             return false;
         }
 
-        if (*mRootNode == BYAML_TYPE_ARRAY) {
+        if (*mRootNode == ByamlDataType_Array) {
             ByamlArrayIter iter(mRootNode);
             return iter.getDataByIndex(pData, index);
         }
 
-        if (*mRootNode == BYAML_TYPE_HASH) {
+        if (*mRootNode == ByamlDataType_Hash) {
             ByamlHashIter iter(mRootNode);
             return iter.getDataByIndex(pData, index);
         }
@@ -92,8 +92,8 @@ namespace krp {
             return ByamlIter();
         }
 
-        if (data.getType() != BYAML_TYPE_ARRAY && data.getType() != BYAML_TYPE_HASH) {
-            if (data.getType() == BYAML_TYPE_NULL) {
+        if (data.getType() != ByamlDataType_Array && data.getType() != ByamlDataType_Hash) {
+            if (data.getType() == ByamlDataType_Null) {
                 return ByamlIter(mData, nullptr);
             }
 
@@ -104,7 +104,7 @@ namespace krp {
     }
 
     bool ByamlIter::tryGetByamlDataByKey(ByamlData* pData, const char* pKey) const {
-        if (mRootNode == nullptr || *mRootNode != BYAML_TYPE_HASH) {
+        if (mRootNode == nullptr || *mRootNode != ByamlDataType_Hash) {
             return false;
         }
 
@@ -138,7 +138,7 @@ namespace krp {
 
     template <>
     bool ByamlIter::tryConvertValue(const ByamlData* pData, const char** pValue) const {
-        if (pData->getType() != BYAML_TYPE_STRING) {
+        if (pData->getType() != ByamlDataType_String) {
             return false;
         }
 
@@ -153,7 +153,7 @@ namespace krp {
 
     template <>
     bool ByamlIter::tryConvertValue(const ByamlData* pData, bool* pValue) const {
-        if (pData->getType() != BYAML_TYPE_BOOL) {
+        if (pData->getType() != ByamlDataType_Bool) {
             return false;
         }
 
@@ -165,7 +165,7 @@ namespace krp {
     bool ByamlIter::tryConvertValue(const ByamlData* pData, s32* pValue) const {
         u32 val = pData->getValue< u32 >();
 
-        if (pData->getType() == BYAML_TYPE_INT || pData->getType() == BYAML_TYPE_UINT) {
+        if (pData->getType() == ByamlDataType_Int || pData->getType() == ByamlDataType_UInt) {
             *pValue = val;
             return true;
         }
@@ -177,7 +177,7 @@ namespace krp {
     bool ByamlIter::tryConvertValue(const ByamlData* pData, u32* pValue) const {
         s32 val = pData->getValue< s32 >();
 
-        if (pData->getType() == BYAML_TYPE_INT || pData->getType() == BYAML_TYPE_UINT) {
+        if (pData->getType() == ByamlDataType_Int || pData->getType() == ByamlDataType_UInt) {
             *pValue = val;
             return true;
         }
@@ -187,7 +187,7 @@ namespace krp {
 
     template <>
     bool ByamlIter::tryConvertValue(const ByamlData* pData, f32* pValue) const {
-        if (pData->getType() != BYAML_TYPE_FLOAT) {
+        if (pData->getType() != ByamlDataType_Float) {
             return false;
         }
 
