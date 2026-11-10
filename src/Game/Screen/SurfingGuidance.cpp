@@ -16,9 +16,9 @@ namespace {
     NEW_NERVE(SurfingGuidanceTurnRightHold, SurfingGuidance, TurnRightHold);
     NEW_NERVE(SurfingGuidanceTurnRightSuccess, SurfingGuidance, TurnRightSuccess);
     NEW_NERVE(SurfingGuidanceFadeOut, SurfingGuidance, FadeOut);
-}  // namespace
+};  // namespace
 
-SurfingGuidance::SurfingGuidance() : LayoutActor("サーフィンガイダンス", true), _20(), _24(), _2C() {
+SurfingGuidance::SurfingGuidance() : LayoutActor("サーフィンガイダンス"), _20(), _24(), _2C() {
 }
 
 void SurfingGuidance::init(const JMapInfoIter& rIter) {

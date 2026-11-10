@@ -24,7 +24,7 @@ namespace NrvCounterLayoutController {
 };  // namespace NrvCounterLayoutController
 
 CounterLayoutController::CounterLayoutController()
-    : LayoutActor("カウンタ系レイアウト制御", true), mPlayerNotMovingFrame(), _24(), mCoinCounter(), mStarPieceCounter(), mPlayerLeft(),
+    : LayoutActor("カウンタ系レイアウト制御"), mPlayerNotMovingFrame(), _24(), mCoinCounter(), mStarPieceCounter(), mPlayerLeft(),
       mStarCounter(), mHPMeter() {
 }
 
@@ -113,7 +113,7 @@ namespace {
     bool isHiddenOrWait(const T* pLayout) {
         return MR::isDead(pLayout) || MR::isHiddenLayout(pLayout) || pLayout->isWait();
     }
-}  // namespace
+};  // namespace
 
 bool CounterLayoutController::isHiddenOrWaitAllLayout() const {
     return ::isHiddenOrWait(mCoinCounter) && ::isHiddenOrWait(mStarPieceCounter) && ::isHiddenOrWait(mPlayerLeft) && ::isHiddenOrWait(mStarCounter);

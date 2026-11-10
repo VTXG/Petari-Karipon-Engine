@@ -74,9 +74,9 @@ namespace NrvStarPointerLayout {
 };  // namespace NrvStarPointerLayout
 
 StarPointerLayout::StarPointerLayout(const char* pName)
-    : LayoutActor(pName, true), mPosition(0.0f, 0.0f), mPointerKind(StarPointerKind_NULL), mAnimType(AnimType_HandPaa), mTouchTimer(),
+    : LayoutActor(pName), mPosition(0.0f, 0.0f), mPointerKind(StarPointerKind_NULL), mAnimType(AnimType_HandPaa), mTouchTimer(),
       mPadChannel(-1), mRadius(::sNormalRadius), _3C(),
-#if (VERSION != RMGJ01 && VERSION != RMGE01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
       mRotateAngle(),
 #endif
       mDirector(), mBlur(), mCommandStream(), mNumber(), mActor(), mNewTouchedID(), mTouchedID(), mStartTouch(), mStartDisableShoot(), mSingleTouch(),
@@ -585,7 +585,7 @@ void StarPointerLayout::control() {
     }
 
     updateDecoration();
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
     rotateTest();
 #endif
     updateTouch();
@@ -628,7 +628,7 @@ void StarPointerLayout::control() {
                 }
                 setNerve(GET_NERVE(StarPointerLayout, HostTypeNrvOutScreen));
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
                 MR::tryRumblePadWeak(this, mPadChannel);
 #else
                 rotateTest();
@@ -636,18 +636,18 @@ void StarPointerLayout::control() {
 #endif
             }
             
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
             return;
 #endif
         } else {
-#if (VERSION != RMGJ01 && VERSION != RMGE01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
             rotateTest();
 #endif
             return;
         }
     }
 
-#if (VERSION != RMGJ01 && VERSION != RMGE01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     rotateTest();
 #endif
 
@@ -674,7 +674,7 @@ void StarPointerLayout::setPosition() {
 }
 
 void StarPointerLayout::rotateTest() {
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
     TVec2f horiz;
     MR::getWPad(mPadChannel)->mPointer->getHorizonVec(&horiz);
     f32 angle = MR::normalizeAbs(MR::toDegree(MR::atan2(horiz.y, horiz.x)), ::sDegreeMin, 180.0f);
@@ -906,7 +906,7 @@ void StarPointerLayout::updateDecoration() {
 }
 
 StarPointerNumber::StarPointerNumber(StarPointerLayout* pParent, s32 padChannel, const char* pName)
-    : LayoutActor(pName, true), mParent(pParent), mPadChannel(padChannel), mAnimType(AnimType_NULL), mIsAppear(false), mAppearTime(0) {
+    : LayoutActor(pName), mParent(pParent), mPadChannel(padChannel), mAnimType(AnimType_NULL), mIsAppear(false), mAppearTime(0) {
     initLayoutManager("DPDPointerNumber", 1);
     startAnimPosition(0);
 }

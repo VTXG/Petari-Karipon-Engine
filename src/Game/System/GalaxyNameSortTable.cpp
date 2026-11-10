@@ -1,12 +1,9 @@
 #include "Game/System/GalaxyNameSortTable.hpp"
+#include "Game/System/GalaxyInfoTable.hpp"
 #include "Game/Util/JMapInfo.hpp"
 
 #ifdef KRP_CORE
 #include <Karipon/System/SystemDataHolder.hpp>
-#endif
-
-#ifndef KRP_CORE
-extern const JMapData GalaxyIDBCSV;
 #endif
 
 s32 GalaxyNameSortTable::getGalaxySortIndex(const char* pName) {
@@ -20,7 +17,7 @@ s32 GalaxyNameSortTable::getGalaxySortIndex(const char* pName) {
     return iter.mIndex;
 #else
     JMapInfo info;
-    info.attach(&GalaxyIDBCSV);
+    info.attach(&GalaxyInfoTable_bcsv_start);
 
     JMapInfoIter iter = info.findElement("name", pName, 0);
 

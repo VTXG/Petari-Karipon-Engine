@@ -15,7 +15,7 @@ namespace NrvMapPartsRailGuideDrawer {
     NEW_NERVE(HostTypeHideAll, MapPartsRailGuideDrawer, HideAll);
     NEW_NERVE(HostTypeDrawAll, MapPartsRailGuideDrawer, DrawAll);
     NEW_NERVE(HostTypeDrawForward, MapPartsRailGuideDrawer, DrawForward);
-}  // namespace NrvMapPartsRailGuideDrawer
+};  // namespace NrvMapPartsRailGuideDrawer
 
 MapPartsRailGuideDrawer::MapPartsRailGuideDrawer(LiveActor* pHost, const char* pModelName)
     : MapPartsFunction(pHost, "ガイド描画"), mGuidePoints(), mGuideType(), mRailId(-1), mModelName(pModelName) {
@@ -102,7 +102,7 @@ void MapPartsRailGuideDrawer::exeDrawAll() {
 void MapPartsRailGuideDrawer::exeDrawForward() {
     const f32 coord = MR::getRailCoord(mHost);
     for (MapPartsRailGuidePoint** pPoint = mGuidePoints.begin(); pPoint != mGuidePoints.end(); pPoint++) {
-        if (coord < (*pPoint)->_8C) {
+        if (coord < (*pPoint)->mRailCoord) {
             break;
         }
 

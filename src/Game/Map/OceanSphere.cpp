@@ -32,7 +32,7 @@ GXColor sOceanSphereTevReg1Env = {0x00, 0x00, 0x00, 0xFF};
 namespace NrvOceanSphere {
     NEW_NERVE(OceanSphereNrvRiseUp, OceanSphere, RiseUp);
     NEW_NERVE(OceanSphereNrvWait, OceanSphere, Wait);
-}  // namespace NrvOceanSphere
+};  // namespace NrvOceanSphere
 
 namespace {
     Vec sAxisX = {1.0f, 0.0f, 0.0f};
@@ -42,7 +42,7 @@ namespace {
     TVec3f sPosAxisX(sAxisX);
     TVec3f sPosAxisY(sAxisY);
     TVec3f sPosAxisZ(sAxisZ);
-}  // namespace
+};  // namespace
 
 namespace {
     u32 calcDisplayListSize(u32 count, u32 stride) {
@@ -63,7 +63,7 @@ namespace {
             GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, vtxCount);
         }
     }
-}  // namespace
+};  // namespace
 
 OceanSpherePlane::OceanSpherePlane(s32 pointCount, const TVec3f* pCenter, const TVec3f& rAxis1, const TVec3f& rAxis2, const TVec2f& rTex1,
                                    const TVec2f& rTex2, const TVec2f& rTex3) {
@@ -362,10 +362,10 @@ void OceanSphere::control() {
     const f32 add = 0.0008f;
     const f32 sub = -0.0008f;
 
-    mTexOffs0X = MR::repeat2(add + mTexOffs0X, 0.0f, 1.0f);
-    mTexOffs0Y = MR::repeat2(add + mTexOffs0Y, 0.0f, 1.0f);
-    mTexOffs1X = MR::repeat2(add + mTexOffs1X, 0.0f, 1.0f);
-    mTexOffs1Y = MR::repeat2(sub + mTexOffs1Y, 0.0f, 1.0f);
+    mTexOffs0X = MR::repeat(add + mTexOffs0X, 0.0f, 1.0f);
+    mTexOffs0Y = MR::repeat(add + mTexOffs0Y, 0.0f, 1.0f);
+    mTexOffs1X = MR::repeat(add + mTexOffs1X, 0.0f, 1.0f);
+    mTexOffs1Y = MR::repeat(sub + mTexOffs1Y, 0.0f, 1.0f);
 }
 
 void OceanSphere::updatePoints() {

@@ -8,6 +8,21 @@ splits: config/RMGP01/splits.txt
 # See config.example.yml for a list.
 mw_comment_version: 14
 
+extract:
+- symbol: StoryProgressTable_bcsv_start
+  binary: assets/StoryProgressTable.bcsv
+  header: assets/StoryProgressTable.hpp
+- symbol: GalaxyInfoTable_bcsv_start
+  binary: assets/GalaxyInfoTable.bcsv
+  header: assets/GalaxyInfoTable.hpp
+- symbol: ErrorMessageArchive_rodata_start
+  binary: assets/ErrorMessageArchive.arc
+  header: assets/ErrorMessageArchive.hpp
+
 block_relocations:
 - source: .data:0x805668DC
+- source: .data:0x805ECB5C
+- source: .data:0x805ECFD0
+- source: .data:0x805EE9D8
 - source: .rodata:0x80547AB8
+- source: .text:0x804A16D0

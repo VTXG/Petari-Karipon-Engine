@@ -12,7 +12,7 @@
 #define SCLanguage2GameLanguageTableIndex 1
 #elif (VERSION == RMGP01)
 #define SCLanguage2GameLanguageTableIndex 2
-#elif (VERSION == RMGK01)
+#elif (VERSION == RMGK01 || VERSION == SHIELD)
 #define SCLanguage2GameLanguageTableIndex 4
 #else
 #define SCLanguage2GameLanguageTableIndex -1
@@ -74,7 +74,7 @@ namespace {
             LANGUAGE_KRKOREAN,
 #endif
         },
-#if (VERSION == RMGK01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
         {
             LANGUAGE_JPJAPANESE,
             LANGUAGE_USENGLISH,
@@ -119,84 +119,82 @@ namespace {
         {LANGUAGE_EUENGLISH, "EuEnglish"},         {LANGUAGE_EUSPANISH, "EuSpanish"},
         {LANGUAGE_EUFRENCH, "EuFrench"},           {LANGUAGE_EUGERMAN, "EuGerman"},
         {LANGUAGE_EUITALIAN, "EuItalian"},         {LANGUAGE_EUDUTCH, "EuDutch"},
-#if (VERSION == RMGK01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
         {LANGUAGE_CNSIMPCHINESE, "CnSimpChinese"}, {LANGUAGE_KRKOREAN, "KrKorean"},
 #endif
     };
 };  // namespace
 
-namespace MR {
-    u32 getDecidedLanguageFromIPL() {
-        s32 language = SCGetLanguage();
-        s32 i;
+u32 MR::getDecidedLanguageFromIPL() {
+    s32 language = SCGetLanguage();
+    s32 i;
 
-        if (language < 0) {
-            i = 0;
+    if (language < 0) {
+        i = 0;
+    } else {
+        s32 size = ARRAY_SIZE(::cSCLanguage2GameLanguageTable[SCLanguage2GameLanguageTableIndex]);
+
+        if (language <= size) {
+            i = language;
         } else {
-            s32 size = ARRAY_SIZE(::cSCLanguage2GameLanguageTable[SCLanguage2GameLanguageTableIndex]);
-
-            if (language <= size) {
-                i = language;
-            } else {
-                i = size;
-            }
+            i = size;
         }
-
-        return ::cSCLanguage2GameLanguageTable[SCLanguage2GameLanguageTableIndex][i];
     }
 
-    u32 getLanguage() {
-        return SingletonHolder< GameSystem >::get()->mObjHolder->mLanguage;
+    return ::cSCLanguage2GameLanguageTable[SCLanguage2GameLanguageTableIndex][i];
+}
+
+u32 MR::getLanguage() {
+    return SingletonHolder< GameSystem >::get()->mObjHolder->mLanguage;
+}
+
+u32 MR::getLanguageFromIPL() {
+    return getLanguage() & LANGUAGE_MASK;
+}
+
+const char* MR::getCurrentLanguagePrefix() {
+    u32 id = getLanguage();
+
+    for (int i = 0; i < getLanguageNum(); i++) {
+        if (id == ::cLanguages[i].mId) {
+            return ::cLanguages[i].mName;
+        }
     }
 
-    u32 getLanguageFromIPL() {
-        return getLanguage() & LANGUAGE_MASK;
+    return "English";
+}
+
+const char* MR::getCurrentRegionPrefix() {
+    char prefix[3];
+    MR::extractString(prefix, getCurrentLanguagePrefix(), sizeof(prefix) - 1, sizeof(prefix));
+
+    if (MR::isEqualString(prefix, "Jp")) {
+        return "Jp";
     }
 
-    const char* getCurrentLanguagePrefix() {
-        u32 id = getLanguage();
-
-        for (int i = 0; i < getLanguageNum(); i++) {
-            if (id == ::cLanguages[i].mId) {
-                return ::cLanguages[i].mName;
-            }
-        }
-
-        return "English";
+    if (MR::isEqualString(prefix, "Us")) {
+        return "Us";
     }
 
-    const char* getCurrentRegionPrefix() {
-        char prefix[2];
-        MR::extractString(prefix, getCurrentLanguagePrefix(), sizeof(prefix), 3);
+    if (MR::isEqualString(prefix, "Eu")) {
+        return "Eu";
+    }
+#if (VERSION == RMGK01 || VERSION == SHIELD)
+    if (MR::isEqualString(prefix, "Cn")) {
+        return "Cn";
+    }
 
-        if (MR::isEqualString(prefix, "Jp")) {
-            return "Jp";
-        }
-
-        if (MR::isEqualString(prefix, "Us")) {
-            return "Us";
-        }
-
-        if (MR::isEqualString(prefix, "Eu")) {
-            return "Eu";
-        }
-#if (VERSION == RMGK01)
-        if (MR::isEqualString(prefix, "Cn")) {
-            return "Cn";
-        }
-
-        if (MR::isEqualString(prefix, "Kr")) {
-            return "Kr";
-        }
+    if (MR::isEqualString(prefix, "Kr")) {
+        return "Kr";
+    }
 #endif
-        return nullptr;
-    }
+    return nullptr;
+}
 
-    u32 getLanguageNum() {
-        return ARRAY_SIZE(::cLanguages);
-    }
+u32 MR::getLanguageNum() {
+    return ARRAY_SIZE(::cLanguages);
+}
 
-    const char* getLanguagePrefixByIndex(u32 index) {
-        return ::cLanguages[index].mName;
-    }
-};  // namespace MR
+const char* MR::getLanguagePrefixByIndex(u32 index) {
+    return ::cLanguages[index].mName;
+}

@@ -42,7 +42,7 @@ namespace {
     const f32 cSkyScale = 10.0f;
     const s32 cCometWarningWaitFrame = 15;
     const s32 cCometWarningFrame = 180;
-}  // namespace
+};  // namespace
 
 namespace {
     inline s32 getHiddenScenarioNum() {
@@ -55,7 +55,7 @@ namespace {
 
         return MR::isOnGameEventFlagPowerStarSuccess(stageName, scenarioNo) && RaceManagerFunction::getRaceId(stageName, scenarioNo) >= 0;
     }
-}  // namespace
+};  // namespace
 
 namespace NrvScenarioSelectLayout {
     NEW_NERVE(ScenarioSelectLayoutNrvAppearStar, ScenarioSelectLayout, AppearStar);
@@ -69,10 +69,10 @@ namespace NrvScenarioSelectLayout {
     NEW_NERVE(ScenarioSelectLayoutNrvAppearCometWarning, ScenarioSelectLayout, AppearCometWarning);
     NEW_NERVE(ScenarioSelectLayoutNrvWaitCometWarning, ScenarioSelectLayout, WaitCometWarning);
     NEW_NERVE(ScenarioSelectLayoutNrvDisappearCometWarning, ScenarioSelectLayout, DisappearCometWarning);
-}  // namespace NrvScenarioSelectLayout
+};  // namespace NrvScenarioSelectLayout
 
 ScenarioSelectLayout::ScenarioSelectLayout(EffectSystem* pEffectSystem, const CameraContext* pCameraContext)
-    : LayoutActor("シナリオ選択レイアウト", true), mSelectedScenarioNo(-1), _24(), _28(), mStar(), mScenarioSky(), mEffectSystem(pEffectSystem),
+    : LayoutActor("シナリオ選択レイアウト"), mSelectedScenarioNo(-1), _24(), _28(), mStar(), mScenarioSky(), mEffectSystem(pEffectSystem),
       mCameraContext(pCameraContext), mNewTextFollowPos(0.0f, 0.0f), mNewGreenTextFollowPos(0.0f, 0.0f), mStarTopFollowPos(0.0f, 0.0f), mBackButton(),
       mMarioPaneFollowPos(0.0f, 0.0f), mMarioPaneName(), _A4(), _A8(-1) {
     mEffectHostMtx.identity();
@@ -211,7 +211,7 @@ void ScenarioSelectLayout::appear() {
     mScenarioSky->appear();
     MultiScene::startBtk(mScenarioSky, "ScenarioSelectSky");
 
-#if (VERSION == RMGK01)
+#if (VERSION == RMGP01 || VERSION == RMGK01 || VERSION == SHIELD)
     MR::hidePaneRecursive(this, "CometAppear");
 #endif
 

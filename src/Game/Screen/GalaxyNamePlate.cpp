@@ -21,7 +21,7 @@ namespace NrvGalaxyNamePlate {
 };  // namespace NrvGalaxyNamePlate
 
 GalaxyNamePlate::GalaxyNamePlate(const char* pGalaxyName, bool param2)
-    : LayoutActor("ギャラクシー名プレート", true), mGalaxyName(pGalaxyName), _24(false), _25(false), mShowBalloonNozzle(true), mDrawerEntry(nullptr),
+    : LayoutActor("ギャラクシー名プレート"), mGalaxyName(pGalaxyName), _24(false), _25(false), mShowBalloonNozzle(true), mDrawerEntry(nullptr),
       _2C(0), _30(true) {
     initLayoutManager("GalaxyNamePlate", 3);
 
@@ -112,7 +112,7 @@ void GalaxyNamePlate::show(const wchar_t* pName, s32 a2, bool a3, bool a4) {
     galaxyName = (a3) ? "GalaxyName" : "GalaxyNameU";
     MR::setTextBoxMessageRecursive(this, galaxyName, pName);
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
     txtGaxyName = (a3) ? "TxtGalaxyName" : "TxtGalaxyNameU";
 #else
     txtGaxyName = (a3) ? "TxtGaxyName" : "TxtGaxyNameU";

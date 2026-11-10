@@ -18,7 +18,7 @@ namespace {
     NEW_NERVE(Manual2PNrvScrollLeft, Manual2P, ScrollLeft);
     NEW_NERVE(Manual2PNrvScrollLeftAfter, Manual2P, ScrollLeftAfter);
     NEW_NERVE(Manual2PNrvDisappear, Manual2P, Disappear);
-}  // namespace
+};  // namespace
 
 namespace {
     s32 countMessage(const char* pName) {
@@ -32,10 +32,10 @@ namespace {
 
         return count;
     }
-}  // namespace
+};  // namespace
 
 Manual2P::Manual2P(const char* pName)
-    : LayoutActor(pName, true), mPageIndex(), mPageNum(), mLeftPaneCtrl(), mRightPaneCtrl(), _30(true), _31(true), mBackButton() {
+    : LayoutActor(pName), mPageIndex(), mPageNum(), mLeftPaneCtrl(), mRightPaneCtrl(), _30(true), _31(true), mBackButton() {
 }
 
 void Manual2P::init(const JMapInfoIter& rIter) {

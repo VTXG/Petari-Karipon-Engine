@@ -60,6 +60,10 @@ namespace GameDataFunction {
     const wchar_t* getUserName();
     u16 getUserFileIndex();
     void resetAllGameData();
+    void resetSequenceGameData();
+    bool tryGetPowerStarToOpenGalaxyAndScenario(const char*, int);
+    bool followGameEventFlagGalaxyOpenAndStoryProgress(const char* pStageName, int scenarioNo);
+    bool tryGetPowerStarToNum(int);
     bool isOnJustGameEventFlag(const char*);
     bool canOnJustGameEventFlag(const char*);
     bool isOnJustAppearGalaxy(const char*);
@@ -87,6 +91,7 @@ namespace GameDataFunction {
     bool isOnGameEventFlagCoin100Comet(const char*);
     void updateGalaxyCometStatus(int, u16, u16);
     void addStockedStarPiece(int);
+    bool tryGetPowerStarToGetGrandStar(int);
     bool isPowerStarLeftInCometOnly();
     s32 calcGreenStarNum(const GameDataHolder*);
 };  // namespace GameDataFunction

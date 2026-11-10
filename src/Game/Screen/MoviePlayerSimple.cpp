@@ -33,7 +33,7 @@ namespace {
 };  // namespace
 
 MoviePlayerSimple::MoviePlayerSimple()
-    : LayoutActor("ムービープレイヤー", true), JKRDisposer(), mMovie(nullptr), mPlayerWrapper(nullptr), _44(false), _45(false) {
+    : LayoutActor("ムービープレイヤー"), JKRDisposer(), mMovie(nullptr), mPlayerWrapper(nullptr), _44(false), _45(false) {
     mMovie = new Movie();
     mMovie->mMovieName = "";
     mMovie->mBuffer = nullptr;
@@ -252,7 +252,7 @@ u32 MoviePlayerSimple::calcNeedMemoryForMovieWorks() {
     u32 needMemory = 0;
     needMemory += 0x140000;
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
     needMemory += OSRoundUp32B(MR::getFrameBufferWidth() * MR::getFrameBufferHeight());
     needMemory += OSRoundUp32B(MR::getFrameBufferWidth() * MR::getFrameBufferHeight() / 4);
     needMemory += OSRoundUp32B(MR::getFrameBufferWidth() * MR::getFrameBufferHeight() / 4);

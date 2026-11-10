@@ -105,6 +105,7 @@ public:
     void initHeaderSerializer();
     s32 findIndex(const char*) const;
     s32 findIndex(u16) const;
+    void resetSequenceData();
 
     BinaryDataContentHeaderSerializer* getSerializer() const {
         return mHeaderSerializer;

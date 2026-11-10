@@ -1,4 +1,5 @@
 #include "Game/System/GameEventFlagTable.hpp"
+#include "Game/System/GalaxyInfoTable.hpp"
 #include "Game/Util/HashUtil.hpp"
 #include "Game/Util/JMapInfo.hpp"
 #include "Game/Util/SingletonHolder.hpp"
@@ -8,8 +9,6 @@
 
 #ifdef KRP_CORE
 #include <Karipon/System/SystemDataHolder.hpp>
-#else
-#include "Game/System/GalaxyInfoTable.hpp"
 #endif
 
 namespace {
@@ -196,14 +195,14 @@ namespace {
         {"StarPieceCounterStop", GameEventFlag::Type_None, 0, 0, 0, 0, 0, 0},
         {"PlayHeavensDoorGalaxy1", GameEventFlag::Type_EventFlag, 1, 0, 0, 0, 0, 0},
         {"PlayHeavensDoorGalaxy2", GameEventFlag::Type_EventFlag, 1, 0, 0, 0, "SpecialStarGrand6", 0},
-        {"[同期]ピーチ城浮上後", GameEventFlag::Type_StoryEventSync, 1, 0, 0, 0, "PlayHeavensDoorGalaxy1", "ピーチ城浮上後"},
+        {"[同期]ピーチ城浮上後", GameEventFlag::Type_ProgressSync, 1, 0, 0, 0, "PlayHeavensDoorGalaxy1", "ピーチ城浮上後"},
         {"PlayEggStarGalaxy1", GameEventFlag::Type_EventFlag, 1, 0, 0, 0, "SpecialStarGrand1", 0},
-        {"[同期]バトラー情報Ａ", GameEventFlag::Type_StoryEventSync, 1, 0, 0, 0, "PlayEggStarGalaxy1", "バトラー情報Ａ"},
+        {"[同期]バトラー情報Ａ", GameEventFlag::Type_ProgressSync, 1, 0, 0, 0, "PlayEggStarGalaxy1", "バトラー情報Ａ"},
         {"SpecialStarEggStarGalaxy1", GameEventFlag::Type_SpecialStar, 1, 1, 0, 0, "EggStarGalaxy", 0},
         {"PlayEggStarGalaxy2", GameEventFlag::Type_EventFlag, 1, 0, 0, 0, "SpecialStarEggStarGalaxy1", 0},
-        {"[同期]スターピースレクチャー", GameEventFlag::Type_StoryEventSync, 1, 0, 0, 0, "PlayEggStarGalaxy2", "スターピースレクチャー"},
+        {"[同期]スターピースレクチャー", GameEventFlag::Type_ProgressSync, 1, 0, 0, 0, "PlayEggStarGalaxy2", "スターピースレクチャー"},
         {"PowerStarNumForButlerKoopaDemo", GameEventFlag::Type_GalaxyOpenStar, 1, 0, 0, 0, "KoopaBattleVs1Galaxy", 0},
-        {"[同期]クッパスタープラント発見", GameEventFlag::Type_StoryEventSync, 1, 0, 0, 0, "PowerStarNumForButlerKoopaDemo",
+        {"[同期]クッパスタープラント発見", GameEventFlag::Type_ProgressSync, 1, 0, 0, 0, "PowerStarNumForButlerKoopaDemo",
          "クッパスタープラント発見"},
     };
 #endif
@@ -481,7 +480,7 @@ namespace GameEventFlagTable {
         const JMapInfo& info = *iter.mInfo;
 #else
         JMapInfo info;
-        info.attach(&cGalaxyInfoTable);
+        info.attach(&GalaxyInfoTable_bcsv_start);
 
         JMapInfoIter iter = info.findElement("name", pName, 0);
 #endif

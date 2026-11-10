@@ -10,7 +10,9 @@
 #include "Game/Screen/GalaxyMapTitle.hpp"
 #include "Game/Screen/IconAButton.hpp"
 #include "Game/Screen/LayoutManager.hpp"
+#include "Game/System/GalaxyInfoTable.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
+#include "Game/System/GameDataConst.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
 #include "Game/Util/GamePadUtil.hpp"
 #include "Game/Util/LayoutUtil.hpp"
@@ -23,8 +25,6 @@
 
 #ifdef KRP_CORE
 #include <Karipon/System/SystemDataHolder.hpp>
-#else
-#include "Game/System/GameDataConst.hpp"
 #endif
 
 namespace {
@@ -42,8 +42,8 @@ namespace {
 };  // namespace
 
 GalaxyMap::GalaxyMap()
-    : LayoutActor("ギャラクシー・天文台マップ", true), mMarioIcon1(), mMarioIcon2(), mGalaxyPlain(), mGalaxyDetail(), mPointingIcon(), mGalaxyName(),
-#if (VERSION != RMGJ01 && VERSION != RMGE01)
+    : LayoutActor("ギャラクシー・天文台マップ"), mMarioIcon1(), mMarioIcon2(), mGalaxyPlain(), mGalaxyDetail(), mPointingIcon(), mGalaxyName(),
+#if (VERSION == RMGK01 || VERSION == SHIELD)
       mIconAButton(),
 #endif
       _70(), _71(true) {
@@ -82,7 +82,7 @@ void GalaxyMap::init(const JMapInfoIter& rIter) {
     mTitle = new GalaxyMapTitle();
     mTitle->initWithoutIter();
 
-#if (VERSION != RMGJ01 && VERSION != RMGE01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     mIconAButton = new IconAButton(false, false);
     mIconAButton->initWithoutIter();
     mIconAButton->setFollowActorPane(this, "AButtonPosition");
@@ -121,7 +121,7 @@ void GalaxyMap::kill() {
     mGalaxyDetail->kill();
     mMarioIcon1->kill();
     mTitle->kill();
-#if (VERSION != RMGJ01 && VERSION != RMGE01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     mIconAButton->kill();
 #endif
 
@@ -149,7 +149,7 @@ void GalaxyMap::movement() {
     mGalaxyDetail->movement();
     mGalaxyPlain->movement();
     mTitle->movement();
-#if (VERSION != RMGJ01 && VERSION != RMGE01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     mIconAButton->movement();
 #endif
 }
@@ -166,7 +166,7 @@ void GalaxyMap::calcAnim() {
     mGalaxyDetail->calcAnim();
     mGalaxyPlain->calcAnim();
     mTitle->calcAnim();
-#if (VERSION != RMGJ01 && VERSION != RMGE01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     mIconAButton->calcAnim();
 #endif
 
@@ -196,7 +196,7 @@ void GalaxyMap::draw() const {
     std::for_each(mCometIcon.begin(), mCometIcon.end(), std::mem_func(&GalaxyMapCometIcon::draw));
     drawGalaxyIconWithOrder(2);
 
-#if (VERSION != RMGJ01 && VERSION != RMGE01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     mIconAButton->draw();
 #endif
 }
@@ -286,7 +286,7 @@ void GalaxyMap::setModeCapture() {
 
     mTitle->kill();
     mMarioIcon1->kill();
-#if (VERSION != RMGJ01 && VERSION != RMGE01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     mIconAButton->kill();
 #endif
 
@@ -316,7 +316,7 @@ bool GalaxyMap::isShowDetail() const {
     return !MR::isDead(this) && isNerve(GET_NERVE_ANON(GalaxyMapShowDetail));
 }
 
-#if (VERSION != RMGJ01 && VERSION != RMGE01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
 void GalaxyMap::dispIconAButton() {
     mIconAButton->openWithoutMessage();
 }
@@ -421,14 +421,14 @@ namespace {
         rIcons.mArray.mArr = pBuffer;
         rIcons.mArray.mMaxSize = capacity;
     }
-}  // namespace
+};  // namespace
 
 void GalaxyMap::initPaneCtrlPointing() {
 #ifdef KRP_CORE
     JMapInfo& galaxyInfo = krp::SystemDataHolder::get()->mGalaxyInfoTable;
 #else
     JMapInfo galaxyInfo;
-    galaxyInfo.attach(&GalaxyIDBCSV);
+    galaxyInfo.attach(&GalaxyInfoTable_bcsv_start);
 #endif
 
     ::initIconArray(mIcon, new GalaxyMapIcon*[galaxyInfo.getNumEntries()], galaxyInfo.getNumEntries());
@@ -502,7 +502,7 @@ namespace {
         pIcon->initWithoutIter();
         return pIcon;
     }
-}  // namespace
+};  // namespace
 
 void GalaxyMap::initMarioIcon() {
     s32 scenarioNo = 0;

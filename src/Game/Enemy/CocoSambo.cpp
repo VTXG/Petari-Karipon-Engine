@@ -3,9 +3,23 @@
 #include "Game/Enemy/SamboFunction.hpp"
 #include "Game/LiveActor/HitSensor.hpp"
 #include "Game/LiveActor/Nerve.hpp"
-#include "Game/Util.hpp"
+#include "Game/Util/ActorMovementUtil.hpp"
+#include "Game/Util/ActorSensorUtil.hpp"
+#include "Game/Util/ActorShadowUtil.hpp"
+#include "Game/Util/ActorSwitchUtil.hpp"
+#include "Game/Util/EffectUtil.hpp"
+#include "Game/Util/FixedPosition.hpp"
+#include "Game/Util/GravityUtil.hpp"
+#include "Game/Util/JMapUtil.hpp"
+#include "Game/Util/JointUtil.hpp"
+#include "Game/Util/LiveActorUtil.hpp"
+#include "Game/Util/MathUtil.hpp"
+#include "Game/Util/ModelUtil.hpp"
+#include "Game/Util/MtxUtil.hpp"
+#include "Game/Util/ObjUtil.hpp"
 #include "Game/Util/PlayerUtil.hpp"
-#include "JSystem/JGeometry/TVec.hpp"
+#include "Game/Util/SoundUtil.hpp"
+#include "Game/Util/StarPointerUtil.hpp"
 
 namespace NrvCocoSamboHead {
     NEW_NERVE(CocoSamboHeadNrvHeadConnectedBody, CocoSamboHead, ConnectedBody);
@@ -14,7 +28,7 @@ namespace NrvCocoSamboHead {
     NEW_NERVE(CocoSamboHeadNrvHeadSwoon, CocoSamboHead, Swoon);
     NEW_NERVE(CocoSamboHeadNrvHeadSwoonEnd, CocoSamboHead, SwoonEnd);
     NEW_NERVE(CocoSamboHeadNrvHeadBlow, CocoSamboHead, Blow);
-}  // namespace NrvCocoSamboHead
+};  // namespace NrvCocoSamboHead
 
 namespace {
     const Vec cHeadSensorOffset = {60.0f, 0.0f, 0.0f};
@@ -48,7 +62,7 @@ namespace {
     // const f32 cPointingRadius =
     // const f32 cPointingOffset =
     // const f32 cAppearDistance =
-}  // namespace
+};  // namespace
 
 namespace NrvCocoSambo {
     NEW_NERVE(CocoSamboNrvHideWait, CocoSambo, HideWait);
@@ -64,7 +78,7 @@ namespace NrvCocoSambo {
     NEW_NERVE(CocoSamboNrvPressY, CocoSambo, PressY);
     NEW_NERVE(CocoSamboNrvBlow, CocoSambo, Blow);
     NEW_NERVE_ONEND(CocoSamboNrvDpdPointing, CocoSambo, DpdPointing, DpdPointing);
-}  // namespace NrvCocoSambo
+};  // namespace NrvCocoSambo
 
 inline bool CocoSambo::isSensorTryToFallHead(HitSensor* pSensor) {
     return pSensor->isType(ATYPE_COCO_NUT) || pSensor->isType(ATYPE_KURIBO) || pSensor->isType(ATYPE_BEGOMAN);

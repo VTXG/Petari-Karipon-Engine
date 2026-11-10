@@ -63,7 +63,7 @@ namespace {
 };  // namespace
 
 GalaxyMapController::GalaxyMapController()
-    : LayoutActor("GalaxyMapController", true), mMap(), mMapBackground(), mPowerStarList(), mBackButton(), mWipe(), _38(), mMode(),
+    : LayoutActor("GalaxyMapController"), mMap(), mMapBackground(), mPowerStarList(), mBackButton(), mWipe(), _38(), mMode(),
       mWipeFrame(::sMapFadeinoutFrame) {
 }
 
@@ -595,7 +595,7 @@ bool GalaxyMapController::tryDisplayAndKeyWait() {
         mMap->_71 = false;
     }
 
-#if (VERSION != RMGJ01 && VERSION != RMGE01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     if (MR::isStep(this, ::sDisplayKeepFrame)) {
         mMap->dispIconAButton();
     }

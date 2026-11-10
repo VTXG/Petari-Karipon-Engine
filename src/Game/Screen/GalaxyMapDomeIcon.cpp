@@ -1,6 +1,8 @@
 #include "Game/Screen/GalaxyMapDomeIcon.hpp"
 #include "Game/Screen/GalaxyNamePlate.hpp"
+#include "Game/System/GalaxyInfoTable.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
+#include "Game/System/GameDataConst.hpp"
 #include "Game/Util/EventUtil.hpp"
 #include "Game/Util/LayoutUtil.hpp"
 #include "Game/Util/MessageUtil.hpp"
@@ -8,8 +10,6 @@
 
 #ifdef KRP_CORE
 #include <Karipon/System/SystemDataHolder.hpp>
-#else
-#include "Game/System/GameDataConst.hpp"
 #endif
 
 void GalaxyMapDomeIcon_FORCE_MATCH(LayoutActor* pLayout) {
@@ -65,10 +65,10 @@ namespace {
             }
         }
     };
-}  // namespace
+};  // namespace
 
 GalaxyMapDomeIcon::GalaxyMapDomeIcon(int param1, LayoutActor* pHost, const char* pPaneName, const char* pParam4)
-    : LayoutActor(pPaneName, true), _20(param1), mHost(pHost), mPaneName(pPaneName), _2C(pParam4), mNamePlate(), mMode() {
+    : LayoutActor(pPaneName), _20(param1), mHost(pHost), mPaneName(pPaneName), _2C(pParam4), mNamePlate(), mMode() {
 }
 
 void GalaxyMapDomeIcon::appear() {
@@ -133,7 +133,7 @@ bool GalaxyMapDomeIcon::isComplete() const {
     JMapInfo& mapInfo = krp::SystemDataHolder::get()->mGalaxyInfoTable;
 #else
     JMapInfo mapInfo = JMapInfo();
-    mapInfo.attach(&GalaxyIDBCSV);
+    mapInfo.attach(&GalaxyInfoTable_bcsv_start);
 #endif
 
     CheckerIsComplete checker = CheckerIsComplete(_20);
@@ -196,7 +196,7 @@ bool GalaxyMapDomeIcon::hasNewGalaxy() const {
     JMapInfo mapInfo = krp::SystemDataHolder::get()->mGalaxyInfoTable;
 #else
     JMapInfo mapInfo = JMapInfo();
-    mapInfo.attach(&GalaxyIDBCSV);
+    mapInfo.attach(&GalaxyInfoTable_bcsv_start);
 #endif
 
     CheckerIsExistNewGalaxy checker = CheckerIsExistNewGalaxy(_20);
@@ -213,7 +213,7 @@ namespace {
     AstroDomeCheckerBase::AstroDomeCheckerBase(int param1) {
         snprintf(_4, sizeof(_4), "Galaxy%1d", param1);
     }
-}  // namespace
+};  // namespace
 
 namespace {
     void AstroDomeCheckerBase::operator()(const JMapInfoIter& rIter) {
@@ -231,4 +231,4 @@ namespace {
             execute(pName);
         }
     }
-}  // namespace
+};  // namespace

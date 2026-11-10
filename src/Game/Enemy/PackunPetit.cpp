@@ -20,8 +20,6 @@
 #include "Game/Util/PlayerUtil.hpp"
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StarPointerUtil.hpp"
-#include "JSystem/JGeometry/TVec.hpp"
-#include "JSystem/JMath/JMath.hpp"
 
 namespace NrvPackunPetit {
     NEW_NERVE_ONEND(PackunPetitNrvNonActive, PackunPetit, NonActive, NonActive);
@@ -390,13 +388,13 @@ bool PackunPetit::receiveMsgPlayerAttack(u32 msg, HitSensor* pSender, HitSensor*
     }
 
     if (MR::isMsgPlayerTrample(msg)) {
-        MR::tryRumbleDefaultHit(this, 0);
+        MR::tryRumbleDefaultHit(this, WPAD_CHAN0);
         setNerve(GET_NERVE(PackunPetit, PackunPetitNrvTrampleDown));
         return true;
     }
 
     if (MR::isMsgPlayerHipDrop(msg)) {
-        MR::tryRumbleDefaultHit(this, 0);
+        MR::tryRumbleDefaultHit(this, WPAD_CHAN0);
         setNerve(GET_NERVE(PackunPetit, PackunPetitNrvTrampleDown));
         return true;
     }

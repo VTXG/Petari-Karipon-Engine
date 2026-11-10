@@ -19,10 +19,10 @@ namespace {
 
         return pTextBox;
     }
-}  // namespace
+};  // namespace
 
 namespace MR {
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
     inline f32 getLanguageRate() {
         return getLanguage() == 0x10 ? 1.0f : 1.25f;
     }
@@ -99,7 +99,7 @@ namespace MR {
 
         return isEnd;
     }
-}  // namespace MR
+};  // namespace MR
 
 TalkTextFormer::TalkTextFormer(LayoutActor* pActor, const char* pPaneName) : mHostActor(pActor), mMsg(), _8(), mPaneName(pPaneName) {
 }

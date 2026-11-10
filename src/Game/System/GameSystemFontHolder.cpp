@@ -24,7 +24,7 @@ void GameSystemFontHolder::createFontFromEmbeddedData() {
 
     MR::getMountedArchiveAndHeap("ErrorMessageArchive.arc", &pArchive, &pHeap);
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
     const char* embeddedFontPath = "/LayoutData/EmbeddedFont.arc";
 #else
     char embeddedFontPath[256];
@@ -45,7 +45,7 @@ namespace {
         pFont->SetResource(pArchive->getResource(pName));
         return pFont;
     }
-}  // namespace
+};  // namespace
 
 void GameSystemFontHolder::createFontFromFile() {
     JKRMemArchive* pArchive = MR::receiveArchive("/LayoutData/Font.arc");

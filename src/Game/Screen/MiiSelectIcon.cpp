@@ -24,10 +24,10 @@ namespace {
     NEW_NERVE(MiiSelectIconNrvSelected, MiiSelectIcon, Selected);
     NEW_NERVE(MiiSelectIconNrvDisappear, MiiSelectIcon, Disappear);
     NEW_NERVE(MiiSelectIconNrvInvalid, MiiSelectIcon, Invalid);
-}  // namespace
+};  // namespace
 
 MiiSelectIcon::MiiSelectIcon(int movementType, int calcAnimType, int drawType, const char* pName)
-    : LayoutActor(pName, true), _20(), _24(), _28(), mIcon(), mMiiTexMap(), mFellowTexMap(), mIconID(new FileSelectIconID()), mIsMiiDummy(),
+    : LayoutActor(pName), _20(), _24(), _28(), mIcon(), mMiiTexMap(), mFellowTexMap(), mIconID(new FileSelectIconID()), mIsMiiDummy(),
       _3D(true) {
     initLayoutManager("MiiIcon", 1);
     MR::createAndAddPaneCtrl(this, "MarioIcon", 3);

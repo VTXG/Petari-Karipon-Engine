@@ -41,7 +41,7 @@ namespace {
     static const StaffRollParam sStaffRollParamTable[] = {
         // Jp, Us, Eu
         {0.8f, 0.5f, 27.5f, 36.0f},  {0.8f, 0.5f, 24.5f, 29.5f}, {0.8f, 0.5f, 23.5f, 30.5f},
-#if (VERSION == RMGK01)  // Cn, Kr
+#if (VERSION == RMGK01 || VERSION == SHIELD)  // Cn, Kr
         {0.85f, 0.5f, 27.5f, 32.5f}, {0.8f, 0.5f, 24.0f, 30.5f},
 #endif
     };
@@ -101,7 +101,7 @@ namespace {
             return &::sStaffRollParamTable[2];
         }
 
-#if (VERSION == RMGK01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
         if (MR::isEqualString(pRegionPrefix, "Cn")) {
             return &::sStaffRollParamTable[3];
         }
@@ -119,7 +119,7 @@ namespace NrvStaffRollLine {
     NEW_NERVE(StaffRollLineNrvScroll, StaffRollLine, Scroll);
 };  // namespace NrvStaffRollLine
 
-StaffRollLine::StaffRollLine(const char* pName) : LayoutActor(pName, true), mPosition(0.0f, 0.0f) {
+StaffRollLine::StaffRollLine(const char* pName) : LayoutActor(pName), mPosition(0.0f, 0.0f) {
 }
 
 void StaffRollLine::init(const JMapInfoIter& rIter) {
@@ -152,7 +152,7 @@ namespace NrvStaffRollPicture {
     NEW_NERVE(StaffRollPictureNrvWork, StaffRollPicture, Work);
 };  // namespace NrvStaffRollPicture
 
-StaffRollPicture::StaffRollPicture(const char* pName) : LayoutActor(pName, true), mReplaceTexture() {
+StaffRollPicture::StaffRollPicture(const char* pName) : LayoutActor(pName), mReplaceTexture() {
 }
 
 void StaffRollPicture::init(const JMapInfoIter& rIter) {
@@ -250,7 +250,7 @@ namespace NrvStaffRoll {
 };  // namespace NrvStaffRoll
 
 StaffRoll::StaffRoll(const char* pName)
-    : LayoutActor(pName, true), mInfo(), mLine(), mPicture(), mMsg(), mMsgLineNum(), mMsgLine(), mTitleLogoPos(0.0f, 0.0f), mEndLogoPos(0.0f, 0.0f),
+    : LayoutActor(pName), mInfo(), mLine(), mPicture(), mMsg(), mMsgLineNum(), mMsgLine(), mTitleLogoPos(0.0f, 0.0f), mEndLogoPos(0.0f, 0.0f),
       _48(-1), _4C() {
 }
 
@@ -418,7 +418,7 @@ void StaffRoll::exeAllRights() {
     }
 
     if (MR::isPaneAnimStopped(this, ::cPaneNameTheEnd, 0)) {
-#if (VERSION == RMGK01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
         MR::stopStageBGM(0);
 #endif
 
@@ -544,7 +544,7 @@ void StaffRoll::movement() {
     LayoutActor::movement();
     tryGenerateLine();
 
-    #if (VERSION == RMGJ01 || VERSION == RMGE01)
+    #if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
     if (MR::isPlayingStageBgm()) {
         _4C++;
     }

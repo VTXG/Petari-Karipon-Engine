@@ -9343,8 +9343,11 @@ Game/System/StorySequenceExecutor.cpp:
 	.sdata      start:0x806B25F8 end:0x806B2600
 	.sbss       start:0x806B6FD8 end:0x806B7000
 
-Game/System/BCSVInclude.s:
-	.rodata     start:0x8053DC20 end:0x8053EB20
+Game/System/StoryProgressTable.cpp:
+	.rodata     start:0x8053DC20 end:0x8053DE00
+
+Game/System/GalaxyInfoTable.cpp:
+	.rodata     start:0x8053DE00 end:0x8053EB20
 
 Game/System/SysConfigFile.cpp:
 	.text       start:0x803BD404 end:0x803BD7EC
@@ -9729,7 +9732,7 @@ Game/Util/ValueControl.cpp:
 	.text       start:0x80408364 end:0x80408558
 	.rodata     start:0x8053F5D0 end:0x8053F5D8
 
-Game/System/ErrorArchive.cpp:
+Game/System/ErrorMessageArchive.cpp:
 	.rodata     start:0x8053F5E0 end:0x8055C0A0
 
 Game/NWC24/NWC24Function.cpp:

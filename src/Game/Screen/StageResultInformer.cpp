@@ -38,7 +38,7 @@ namespace {
     static const s32 sWaitBeforeCountUpPowerStar = 85;
     static const s32 sWaitAppearInformationWindow = 15;
     static const s32 sWaitDisplayStarPieceCount = 45;
-}  // namespace
+};  // namespace
 
 namespace {
     NEW_NERVE(StageResultInformerAppearGetPowerStar, StageResultInformer, AppearGetPowerStar);
@@ -66,7 +66,7 @@ namespace {
     NEW_NERVE(DisplayInformationForResultDisplay, DisplayInformationForResult, Display);
     NEW_NERVE(DisplayInformationForResultDisappear, DisplayInformationForResult, Disappear);
     NEW_NERVE(DisplayInformationForResultIdle, DisplayInformationForResult, Idle);
-}  // namespace
+};  // namespace
 
 DisplayInformationForResult::DisplayInformationForResult(StageResultInformer* pHost) : NerveExecutor("DisplayInformationForResult"), mHost(pHost) {
     initNerve(GET_NERVE_ANON(DisplayInformationForResultIdle));
@@ -108,7 +108,7 @@ void DisplayInformationForResult::exeIdle() {
 }
 
 StageResultInformer::StageResultInformer()
-    : LayoutActor("リザルト通知", true), mInformationDisplayer(), mSequenceChecker(), mIconAButton(), _30(), _31() {
+    : LayoutActor("リザルト通知"), mInformationDisplayer(), mSequenceChecker(), mIconAButton(), _30(), _31() {
     mInformationDisplayer = new DisplayInformationForResult(this);
     mSequenceChecker = new StageResultSequenceChecker();
 }

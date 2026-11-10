@@ -4,8 +4,8 @@
 #include "Game/Util/StringUtil.hpp"
 
 GalaxyMoveArgument::GalaxyMoveArgument(u32 moveType, const char* pStageName, s32 scenarioNo, const JMapIdInfo* pMapIdInfo)
-    : mMoveType(moveType), mStageName(pStageName), mScenarioNo(scenarioNo), _C(-1) {
-    mIDInfo._0 = -1;
+    : mMoveType(moveType), mStageName(pStageName), mScenarioNo(scenarioNo), mSelectedScenarioNo(-1) {
+    mIDInfo.mID = -1;
     mIDInfo.mZoneID = -1;
 
     if (pMapIdInfo != nullptr) {

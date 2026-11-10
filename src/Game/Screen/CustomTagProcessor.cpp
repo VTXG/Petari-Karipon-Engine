@@ -39,7 +39,7 @@ namespace {
                             {235, 200, 0, 255},   {180, 110, 200, 255}, {255, 190, 190, 255}, {110, 243, 70, 255},
                             {120, 255, 255, 255}, {255, 255, 80, 255},  {251, 188, 250, 255}, {190, 190, 200, 255}};
 
-#if (VERSION == RMGK01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     GXColor sTextColorKorean[] = {{255, 255, 255, 255}, {230, 160, 0, 255},   {80, 170, 80, 255},   {80, 140, 210, 255},
                                   {235, 200, 0, 255},   {180, 110, 200, 255}, {255, 210, 80, 255},  {110, 243, 70, 255},
                                   {120, 255, 255, 255}, {255, 255, 80, 255},  {251, 188, 250, 255}, {190, 190, 200, 255}};
@@ -75,7 +75,7 @@ namespace {
         color.a = writer->GetTextColor().a;
         writer->SetTextColor(color);
     }
-}  // namespace
+};  // namespace
 
 CustomTagAlphaCtrl::CustomTagAlphaCtrl() : mStartDelay(), mEndDelay(), mFrame() {
     mCharInterval = 0.0f;
@@ -138,7 +138,7 @@ CustomTagProcessor::Impl::GroupFunctionInfo CustomTagProcessor::Impl::sGroupFunc
     {255, &CustomTagProcessor::exeSystemGroup},
     {10, &CustomTagProcessor::exeFontGroup},
 
-#if (VERSION == RMGK01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     {11, &CustomTagProcessor::exePatchimuGroup},
 #endif
 
@@ -162,7 +162,7 @@ namespace nw4r {
     namespace ut {
         template <>
         f32 TextWriterBase< wchar_t >::PrintImpl(StreamType str, int length) {
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
             NW4R_POINTER_ASSERT_AT(271, this);
             NW4R_POINTER_ASSERT_AT(272, str);
             NW4R_POINTER_ASSERT_AT(273, GetFont());
@@ -230,7 +230,7 @@ namespace nw4r {
                     operation = mTagProcessor->Process(code, &context);
 
                     if (operation == TagProcessor::OPERATION_NEXT_LINE) {
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
                         NW4R_POINTER_ASSERT_AT(341, context.str);
 #else
                         NW4R_POINTER_ASSERT_AT(378, context.str);
@@ -265,7 +265,7 @@ namespace nw4r {
                         break;
                     }
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
+#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
                     NW4R_POINTER_ASSERT_AT(386, context.str);
 #else
                     NW4R_POINTER_ASSERT_AT(423, context.str);
@@ -306,7 +306,7 @@ namespace nw4r {
 
                     CharWriter::Print(code);
 
-#if (VERSION == RMGK01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
                     if (processor) {
                         processor->mPreviousChar = code;
                     }
@@ -339,8 +339,8 @@ namespace nw4r {
 
             return textWidth;
         }
-    }  // namespace ut
-}  // namespace nw4r
+    };  // namespace ut
+};  // namespace nw4r
 
 CustomTagProcessor::CustomTagProcessor(nw4r::lyt::TextBox* textBox)
     : mAlphaCtrl(), mPlayedSounds(), mColorMappingMin(::setGXColor(textBox->GetMaterial()->GetTevColor(0))),
@@ -350,7 +350,7 @@ CustomTagProcessor::CustomTagProcessor(nw4r::lyt::TextBox* textBox)
     mFontWidth = textBox->mFontSize.width;
     mFontHeight = textBox->mFontSize.height;
 
-#if (VERSION == RMGK01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     mPreviousChar = 0;
 #endif
 
@@ -446,7 +446,7 @@ void CustomTagProcessor::reset(const wchar_t* string) {
     mAlphaCtrl.mWaitTime = 0;
     mAlphaCtrl.mCharIndex = 0;
 
-#if (VERSION == RMGK01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     mPreviousChar = 0;
 #endif
 }
@@ -595,7 +595,7 @@ CustomTagProcessor::Operation CustomTagProcessor::exeFontSizeGroup(nw4r::ut::Rec
         break;
     }
 
-#if (VERSION == RMGK01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     switch (tag.getTag()) {
     case 2:
         if (mTextBox->GetTextPositionV() != 0) {
@@ -649,7 +649,7 @@ CustomTagProcessor::Operation CustomTagProcessor::exeNumberGroup(nw4r::ut::Rect*
 }
 
 CustomTagProcessor::Operation CustomTagProcessor::exeStringGroup(nw4r::ut::Rect* rect, const MessageEditorMessageTag& tag, ContextType* context) {
-#if (VERSION == RMGK01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
     if (!*reinterpret_cast< const u8* >(tag.getParamPtr(0))) {
         return OPERATION_DEFAULT;
     }
@@ -794,7 +794,7 @@ CustomTagProcessor::Operation CustomTagProcessor::exeFontGroup(nw4r::ut::Rect* r
     return OPERATION_NO_CHAR_SPACE;
 }
 
-#if (VERSION == RMGK01)
+#if (VERSION == RMGK01 || VERSION == SHIELD)
 CustomTagProcessor::Operation CustomTagProcessor::exePatchimuGroup(nw4r::ut::Rect* rect, const MessageEditorMessageTag& tag, ContextType* context) {
     wchar_t string[16] = {};
     wchar_t* out = string;

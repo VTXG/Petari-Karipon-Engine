@@ -1,6 +1,7 @@
 #include "Game/System/GameDataHolder.hpp"
 #include "Game/System/GameDataGalaxyStorage.hpp"
 #include "Game/System/GameDataPlayerStatus.hpp"
+#include "Game/System/GameEventFlag.hpp"
 #include "Game/System/GameEventFlagChecker.hpp"
 #include "Game/System/GameEventFlagStorage.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
@@ -8,6 +9,7 @@
 #include "Game/System/ScenarioProgressTestRun.hpp"
 #include "Game/System/SpinDriverPathStorage.hpp"
 #include "Game/System/StarPieceAlmsStorage.hpp"
+#include "Game/System/StoryProgressTable.hpp"
 #include "Game/System/UserFile.hpp"
 #include "Game/Util/JMapInfo.hpp"
 #include "Game/Util/MathUtil.hpp"
@@ -17,13 +19,9 @@
 #include <Karipon/System/SystemDataHolder.hpp>
 #endif
 
-#ifndef KRP_CORE
-extern const u8 StoryEventBCSV[];
-#endif
-
 namespace {
     const char cPictureBookChapterSuffix[] = "ABCDEFGHI";
-}  // namespace
+};  // namespace
 
 GameDataHolder::GameDataHolder(const UserFile* pUserFile)
     : mUserFile(pUserFile), mEventFlagChecker(), mEventValueChecker(), mPlayerStatus(), mAllGalaxyStorage(), mSpinDriverPathStorage(),
@@ -38,7 +36,7 @@ GameDataHolder::GameDataHolder(const UserFile* pUserFile)
 
 #ifndef KRP_CORE
     mMapInfo = new JMapInfo();
-    mMapInfo->attach(StoryEventBCSV);
+    mMapInfo->attach(StoryProgressTable_bcsv_start);
 #endif
 
     mChunkHolder = new BinaryDataChunkHolder(4096, 6);
@@ -82,6 +80,30 @@ bool GameDataHolder::isOnGameEventFlag(const char* pFlagName) const {
 
 void GameDataHolder::tryOnGameEventFlag(const char* pFlagName) {
     mEventFlagChecker->tryOn(pFlagName);
+}
+
+bool GameDataHolder::tryOnGameEventFlagsDependedAnother(const char* pFlagName) {
+    bool isOnFlagAny = false;
+    bool isOnFlag;
+
+    do {
+        isOnFlag = false;
+
+        for (GameEventFlagIter iter = GameEventFlagTable::getBeginIter(); !iter.isEnd(); iter.goNext()) {
+            GameEventFlagAccessor accessor(iter.getFlag());
+
+            if (!GameEventFlagTable::isDependedAnother(accessor.getName(), pFlagName)) {
+                continue;
+            }
+
+            if (mEventFlagChecker->isOn(accessor.getName()) && mEventFlagChecker->tryOn(accessor.getName())) {
+                isOnFlagAny = true;
+                isOnFlag = true;
+            }
+        }
+    } while (isOnFlag);
+
+    return isOnFlagAny;
 }
 
 s32 GameDataHolder::getGameEventValue(const char* pName) const {
@@ -321,6 +343,29 @@ void GameDataHolder::followStoryEventByName(const char* pEventName) {
 #endif
 }
 
+bool GameDataHolder::trySyncStoryEventByGameEventFlag() {
+    bool isFollowStoryAny = false;
+
+    for (GameEventFlagIter iter = GameEventFlagTable::getBeginIter(); !iter.isEnd(); iter.goNext()) {
+        GameEventFlagAccessor accessor(iter.getFlag());
+        if (!accessor.isTypeProgressSync()) {
+            continue;
+        }
+
+        const char* dependedFlagName = accessor.getDependedFlagName();
+        if (!mEventFlagChecker->isOn(dependedFlagName)) {
+            continue;
+        }
+
+        if (!isPassedStoryEvent(accessor.getProgressName())) {
+            followStoryEventByName(accessor.getProgressName());
+            isFollowStoryAny = true;
+        }
+    }
+
+    return isFollowStoryAny;
+}
+
 void GameDataHolder::resetAllData() {
     mAllGalaxyStorage->initializeData();
     mEventFlagChecker->reset();
@@ -328,6 +373,14 @@ void GameDataHolder::resetAllData() {
     mPlayerStatus->initializeData();
     mSpinDriverPathStorage->initializeData();
     mStarPieceAlmsStorage->initializeData();
+}
+
+void GameDataHolder::resetSequenceData() {
+    mAllGalaxyStorage->resetSequenceData();
+    mEventFlagChecker->reset();
+    mEventValueChecker->initializeData();
+    mStarPieceAlmsStorage->initializeData();
+    mPlayerStatus->resetStoryProgress();
 }
 
 u32 GameDataHolder::makeFileBinary(u8* pData, u32 a2) {
